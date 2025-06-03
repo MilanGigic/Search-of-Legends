@@ -1,7 +1,9 @@
+import SearchForm from "@/components/SearchForm";
+
 export default function Home() {
   return (
     <div>
-      <input type="text" placeholder="Search..." />
+      <SearchForm />
     </div>
   );
 }

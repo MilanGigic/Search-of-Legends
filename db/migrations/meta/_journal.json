@@ -8,6 +8,20 @@
       "when": 1748938892204,
       "tag": "0000_many_umar",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1748939785773,
+      "tag": "0001_nice_magma",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1748939830255,
+      "tag": "0002_shiny_molten_man",
+      "breakpoints": true
     }
   ]
 }
