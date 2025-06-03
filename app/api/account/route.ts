@@ -100,6 +100,18 @@ export async function GET(req: NextRequest) {
       console.log(`Found summoner in region: ${summonerResult.region}`);
 
       if (summonerResult) {
+        completeData = {
+          ...accountData,
+          summonerInfo: {
+            id: summonerData.id,
+            accountId: summonerData.accountId,
+            puuid: summonerData.puuid,
+            profileIconId: summonerData.profileIconId,
+            revisionDate: summonerData.revisionDate,
+            summonerLevel: summonerData.summonerLevel,
+          },
+        };
+
         await db
           .insert(accounts)
           .values({
