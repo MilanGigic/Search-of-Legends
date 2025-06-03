@@ -7,6 +7,9 @@ export default function SearchForm() {
   const [accountInfo, setAccountInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [inputValue, setInputValue] = useState<string>("");
+
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL!;
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -18,7 +21,7 @@ export default function SearchForm() {
       setError("");
       try {
         const res = await fetch(
-          `/api/account?gameName=${gameName}&tagLine=${tagLine}`
+          `${BASE_URL}/api/account?gameName=${gameName}&tagLine=${tagLine}`
         );
         const data = await res.json();
 
@@ -41,19 +44,37 @@ export default function SearchForm() {
     return () => clearTimeout(delay); // Cleanup on re-type
   }, [gameName, tagLine]);
 
+  const handleRiotNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    console.log("Input value changed:", value);
+    setInputValue(value);
+
+    const hashIndex = value.indexOf("#");
+
+    if (hashIndex === -1) {
+      // No hashtag present
+      console.log("No hashtag present, setting gameName:", value.trim());
+      setGameName(value.trim());
+      setTagLine("");
+    } else if (value.split("#").length - 1 > 1) {
+      // more than one #
+      console.error("Only one # allowed");
+    } else {
+      const [name, tag] = value.split("#");
+      console.log("Parsed gameName:", name.trim(), "tagLine:", tag.trim());
+      setGameName(name.trim());
+      setTagLine(tag.trim());
+    }
+  };
+
   return (
     <div className="space-y-4">
       <input
-        placeholder="Game Name"
-        value={gameName}
-        onChange={(e) => setGameName(e.target.value)}
+        placeholder="Enter Summoner Name (e.g. PlayerName#1234)"
         className="border p-2 w-full"
-      />
-      <input
-        placeholder="Tag Line"
-        value={tagLine}
-        onChange={(e) => setTagLine(e.target.value)}
-        className="border p-2 w-full"
+        value={inputValue}
+        onChange={(e) => handleRiotNameChange(e)}
       />
 
       {loading && <p className="text-blue-500">Searching...</p>}
