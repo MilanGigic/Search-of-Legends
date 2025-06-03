@@ -1,10 +1,13 @@
 "use client";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 
 export default function SearchForm() {
   const [gameName, setGameName] = useState("");
   const [tagLine, setTagLine] = useState("");
-  const [accountInfo, setAccountInfo] = useState(null);
+  const [accountInfo, setAccountInfo] = useState<CompleteAccountInfo | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [inputValue, setInputValue] = useState<string>("");
@@ -44,6 +47,10 @@ export default function SearchForm() {
     return () => clearTimeout(delay); // Cleanup on re-type
   }, [gameName, tagLine]);
 
+  useEffect(() => {
+    console.log("Account info:", accountInfo);
+  }, [accountInfo]);
+
   const handleRiotNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
@@ -81,9 +88,19 @@ export default function SearchForm() {
       {error && <p className="text-red-500">{error}</p>}
 
       {accountInfo && (
-        <pre className="bg-gray-100 p-4 mt-4 text-sm">
-          {JSON.stringify(accountInfo, null, 2)}
-        </pre>
+        <div className="text-black gap-4">
+          <Image
+            src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountInfo.summonerInfo?.profileIconId}.png`}
+            alt={`${(<div className="rounded-full p-2 bg-[#EAEAEA]" />)}`}
+            width={60}
+            height={60}
+            className="rounded-full border-2 border-[#5C87F8] animate-pulse animate-duration-5000 mr-4"
+          />
+          <h1>
+            {accountInfo.gameName}#{accountInfo.tagLine}{" "}
+            <span>{accountInfo.summonerInfo?.summonerLevel}</span>
+          </h1>
+        </div>
       )}
     </div>
   );

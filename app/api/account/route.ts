@@ -1,13 +1,8 @@
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import fetchSummonerFromAnyRegion from "@/lib/actions/region";
+import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
-
-interface Account {
-  puuid: string;
-  gameName: string;
-  tagLine: string;
-}
 
 export async function GET(req: NextRequest) {
   console.log("Received GET request:", req.url);
@@ -36,59 +31,112 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const url = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
-    gameName
-  )}/${encodeURIComponent(tagLine)}?api_key=${API_KEY}`;
-
-  console.log("Constructed Riot API URL:", url);
-
-  if (!url) {
-    console.log("Failed to construct API URL");
-    return NextResponse.json(
-      { error: "Failed to construct API URL" },
-      { status: 500 }
-    );
-  }
-
   try {
-    const response = await fetch(url);
-    console.log("Riot API response status:", response.status);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.log("Riot API error:", errorData);
-      return NextResponse.json(
-        { error: errorData.status.message || "Failed to fetch account" },
-        { status: response.status }
-      );
-    }
-
-    const data: Account = await response.json();
-    console.log("Fetched account data:", data);
-
     // Check if account already exists in database
-    const existingAccount = await db.query.accounts.findFirst({
-      where: eq(accounts.puuid, data.puuid),
-    });
+    const existingAccount = await db
+      .select()
+      .from(accounts)
+      .where(
+        and(eq(accounts.gameName, gameName), eq(accounts.tagLine, tagLine))
+      )
+      .limit(1);
 
     console.log("Existing account in DB:", existingAccount);
 
-    if (!existingAccount) {
-      console.log(
-        "Account not found in DB, inserting new account",
-        data.puuid,
-        data.gameName,
-        data.tagLine
-      );
-      await db.insert(accounts).values({
-        puuid: data.puuid,
-        gameName: data.gameName,
-        tagLine: data.tagLine,
+    const now = Date.now();
+    const ONE_HOUR = 60 * 60 * 1000; // Cache for 1 hour
+
+    if (
+      existingAccount.length > 0 &&
+      existingAccount[0].summonerId &&
+      existingAccount[0].lastUpdated &&
+      now - existingAccount[0].lastUpdated < ONE_HOUR
+    ) {
+      console.log("Returning cached complete account data");
+      return NextResponse.json({
+        puuid: existingAccount[0].puuid,
+        gameName: existingAccount[0].gameName,
+        tagLine: existingAccount[0].tagLine,
+        summonerInfo: {
+          id: existingAccount[0].summonerId,
+          accountId: existingAccount[0].accountId,
+          puuid: existingAccount[0].puuid,
+          profileIconId: existingAccount[0].profileIconId,
+          revisionDate: existingAccount[0].revisionDate,
+          summonerLevel: existingAccount[0].summonerLevel,
+        },
       });
-      console.log("Inserted new account into DB");
     }
 
-    return NextResponse.json(data, { status: 200 });
+    const accountUrl = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
+      gameName
+    )}/${encodeURIComponent(tagLine)}?api_key=${API_KEY}`;
+
+    console.log("Constructed Riot API URL:", accountUrl);
+
+    const accountResponse = await fetch(accountUrl);
+    console.log("Riot API accountResponse status:", accountResponse.status);
+
+    if (!accountResponse.ok) {
+      const errorData = await accountResponse.json();
+      console.log("Riot API error:", errorData);
+      return NextResponse.json(
+        { error: errorData.status.message || "Failed to fetch account" },
+        { status: accountResponse.status }
+      );
+    }
+
+    const accountData: Account = await accountResponse.json();
+    console.log("Fetched account data:", accountData);
+
+    let completeData: CompleteAccountInfo = accountData;
+
+    try {
+      const summonerResult = await fetchSummonerFromAnyRegion(
+        accountData.puuid
+      );
+      const summonerData: SummonerInfo = summonerResult.data;
+
+      console.log(`Found summoner in region: ${summonerResult.region}`);
+
+      if (summonerResult) {
+        await db
+          .insert(accounts)
+          .values({
+            puuid: accountData.puuid,
+            gameName: accountData.gameName,
+            tagLine: accountData.tagLine,
+            region: summonerResult.region,
+            summonerId: summonerData.id,
+            accountId: summonerData.accountId,
+            profileIconId: summonerData.profileIconId,
+            revisionDate: summonerData.revisionDate,
+            summonerLevel: summonerData.summonerLevel,
+            lastUpdated: Date.now(),
+          })
+          .onConflictDoUpdate({
+            target: [accounts.puuid],
+            set: {
+              gameName: accountData.gameName,
+              tagLine: accountData.tagLine,
+              region: summonerResult.region,
+              summonerId: summonerData.id,
+              accountId: summonerData.accountId,
+              profileIconId: summonerData.profileIconId,
+              revisionDate: summonerData.revisionDate,
+              summonerLevel: summonerData.summonerLevel,
+              lastUpdated: Date.now(),
+            },
+          });
+      }
+
+      // Store the region in your database for future use
+      // You can add a 'region' column to your accounts table
+    } catch (error) {
+      console.log("Failed to fetch summoner from any region:", error);
+    }
+
+    return NextResponse.json(completeData, { status: 200 });
   } catch (error) {
     console.log("Error occurred:", error);
     return NextResponse.json(
