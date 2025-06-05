@@ -22,6 +22,13 @@
       "when": 1748939830255,
       "tag": "0002_shiny_molten_man",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1748956248512,
+      "tag": "0003_chilly_domino",
+      "breakpoints": true
     }
   ]
 }
