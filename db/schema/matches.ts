@@ -36,19 +36,6 @@ export const matchParticipants = pgTable("match_participants", {
     .references(() => matches.matchId, { onDelete: "cascade" })
     .notNull(),
 
-  // Ping-related fields
-  allInPings: integer("all_in_pings"),
-  assistMePings: integer("assist_me_pings"),
-  commandPings: integer("command_pings"),
-  enemyMissingPings: integer("enemy_missing_pings"),
-  enemyVisionPings: integer("enemy_vision_pings"),
-  holdPings: integer("hold_pings"),
-  getBackPings: integer("get_back_pings"),
-  needVisionPings: integer("need_vision_pings"),
-  onMyWayPings: integer("on_my_way_pings"),
-  pushPings: integer("push_pings"),
-  visionClearedPings: integer("vision_cleared_pings"),
-
   // Performance metrics
   assists: integer("assists"),
   baronKills: integer("baron_kills"),
@@ -135,23 +122,10 @@ export const matchParticipants = pgTable("match_participants", {
   sightWardsBoughtInGame: integer("sight_wards_bought_in_game"),
   visionScore: integer("vision_score"),
   visionWardsBoughtInGame: integer("vision_wards_bought_in_game"),
-  wardsKilled: integer("wards_killed"),
-  wardsPlaced: integer("wards_placed"),
-
-  // Spell casts
-  spell1Casts: integer("spell1_casts"),
-  spell2Casts: integer("spell2_casts"),
-  spell3Casts: integer("spell3_casts"),
-  spell4Casts: integer("spell4_casts"),
-  summoner1Casts: integer("summoner1_casts"),
-  summoner1Id: integer("summoner1_id"),
-  summoner2Casts: integer("summoner2_casts"),
-  summoner2Id: integer("summoner2_id"),
 
   // Miscellaneous
   timePlayed: integer("time_played"),
   totalMinionsKilled: integer("total_minions_killed"),
-  totalTimeCCDealt: integer("total_time_cc_dealt"),
 });
 
 export const matchObjectives = pgTable("match_objectives", {
