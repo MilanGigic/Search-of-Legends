@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export default function SearchForm() {
@@ -89,17 +90,19 @@ export default function SearchForm() {
 
       {accountInfo && (
         <div className="text-black gap-4">
-          <Image
-            src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountInfo.summonerInfo?.profileIconId}.png`}
-            alt={`${(<div className="rounded-full p-2 bg-[#EAEAEA]" />)}`}
-            width={60}
-            height={60}
-            className="rounded-full border-2 border-[#5C87F8] animate-pulse animate-duration-5000 mr-4"
-          />
-          <h1>
-            {accountInfo.gameName}#{accountInfo.tagLine}{" "}
-            <span>{accountInfo.summonerInfo?.summonerLevel}</span>
-          </h1>
+          <Link href={`/${gameName}-${tagLine}`}>
+            <Image
+              src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountInfo.summonerInfo?.profileIconId}.png`}
+              alt={`${(<div className="rounded-full p-2 bg-[#EAEAEA]" />)}`}
+              width={60}
+              height={60}
+              className="rounded-full border-2 border-[#5C87F8] animate-pulse animate-duration-5000 mr-4"
+            />
+            <h1>
+              {accountInfo.gameName}#{accountInfo.tagLine}{" "}
+              <span>{accountInfo.summonerInfo?.summonerLevel}</span>
+            </h1>
+          </Link>
         </div>
       )}
     </div>
