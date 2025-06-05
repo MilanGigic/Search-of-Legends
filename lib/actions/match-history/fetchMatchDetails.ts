@@ -28,50 +28,67 @@ export const fetchMatchDetailsInBatch = async (
   REGION: string,
   puuid: string
 ) => {
-  const BATCH_SIZE = 20;
-  const TWO_MINUTE_LIMIT = 100;
-  const totalRequests = matchIds.length;
+  const matches = await fetchMatchDetailsInSmallBatch(matchIds, REGION, puuid);
+  return matches;
+};
 
-  let fetchedCount = 0;
-  let matchData;
+// New function optimized for progressive loading
+export const fetchMatchDetailsInSmallBatch = async (
+  matchIds: string[],
+  REGION: string,
+  puuid: string
+) => {
+  if (matchIds.length === 0) {
+    return [];
+  }
 
-  console.log(
-    `Starting batch fetch for ${totalRequests} matches in region ${REGION}`
-  );
+  console.log(`Fetching ${matchIds.length} matches in region ${REGION}`);
 
-  for (let i = 0; i < matchIds.length; i += BATCH_SIZE) {
-    const batch = matchIds.slice(i, i + BATCH_SIZE);
-    console.log(
-      `Fetching batch: ${i / BATCH_SIZE + 1}, matches ${i + 1}-${
-        i + batch.length
-      }`
-    );
+  const allMatchData: any[] = [];
+  const MAX_CONCURRENT = 5; // Limit concurrent requests to avoid rate limits
 
-    await Promise.allSettled(
+  // Process matches in smaller concurrent batches
+  for (let i = 0; i < matchIds.length; i += MAX_CONCURRENT) {
+    const batch = matchIds.slice(i, i + MAX_CONCURRENT);
+    console.log(`Processing batch: matches ${i + 1}-${i + batch.length}`);
+
+    const batchResults = await Promise.allSettled(
       batch.map(async (matchId) => {
         try {
           console.log(`Fetching match ${matchId}...`);
-          matchData = await fetchMatchDetails(matchId, REGION);
+          const matchData = await fetchMatchDetails(matchId, REGION);
           console.log(`Fetched match ${matchId}, inserting data...`);
           await insertMatchData(matchData, puuid);
           console.log(`Inserted data for match ${matchId}`);
+          return matchData;
         } catch (err) {
           console.error(`Failed match ${matchId}:`, err);
+          throw err;
         }
       })
     );
 
-    fetchedCount += batch.length;
-    console.log(`Fetched ${fetchedCount}/${totalRequests} matches so far.`);
+    // Collect successful results
+    batchResults.forEach((result, index) => {
+      if (result.status === "fulfilled") {
+        allMatchData.push(result.value);
+      } else {
+        console.error(
+          `Failed to process match ${batch[index]}:`,
+          result.reason
+        );
+      }
+    });
 
-    if (fetchedCount % TWO_MINUTE_LIMIT === 0) {
-      console.log("Hit 2-minute limit, waiting 2 minutes...");
-      await delay(120_000);
-    } else {
-      console.log("Waiting 1.1 seconds before next batch...");
-      await delay(1100); // wait 1.1 seconds to stay under 20/sec
+    // Rate limiting delay between batches
+    if (i + MAX_CONCURRENT < matchIds.length) {
+      console.log(`Waiting 1.2 seconds before next batch...`);
+      await delay(1200); // Slightly longer delay for safety
     }
   }
-  console.log("Finished batch fetching all matches.");
-  return matchData;
+
+  console.log(
+    `Finished fetching ${allMatchData.length}/${matchIds.length} matches successfully.`
+  );
+  return allMatchData;
 };

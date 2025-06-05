@@ -27,10 +27,6 @@ export const matchDetails = pgTable("match_details", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-{
-  /* FIGURE OUT AND IMPLEMENT LOGIC FOR FETCHING MATCH INFO IN THE MOST EFFICIENT WAY AND STORE IT IN DATABASE EFFICIENTLY */
-}
-
 export const matchParticipants = pgTable("match_participants", {
   matchId: text("match_id")
     .references(() => matches.matchId, { onDelete: "cascade" })

@@ -1,6 +1,9 @@
 import { db } from "@/db";
 import { accounts, matches } from "@/db/schema";
-import { fetchMatchDetailsInBatch } from "@/lib/actions/match-history/fetchMatchDetails";
+import {
+  fetchMatchDetailsInBatch,
+  fetchMatchDetailsInSmallBatch,
+} from "@/lib/actions/match-history/fetchMatchDetails";
 import fetchAllMatchIds from "@/lib/actions/match-history/fetchMatchIds";
 import getRegionalEndpoint from "@/lib/actions/match-history/getRegionalEndpoint";
 import { eq, inArray } from "drizzle-orm";
@@ -15,6 +18,8 @@ export async function GET(req: NextRequest) {
   console.log("Received GET request:", req.url);
   const { searchParams } = new URL(req.url);
   const puuid = searchParams.get("puuid");
+  const start = parseInt(searchParams.get("start") || "0");
+  const count = parseInt(searchParams.get("count") || "20");
 
   if (!puuid) {
     return new Response("Missing puuid parameter", { status: 400 });
@@ -49,6 +54,9 @@ export async function GET(req: NextRequest) {
     const existingIds = new Set(existing.map((m) => m.matchId));
     const newMatchIds = allMatchIds.filter((id) => !existingIds.has(id));
 
+    // 3. Get the requested slice of match IDs
+    const requestedMatchIds = newMatchIds.slice(start, start + count);
+
     console.log({
       allMatchIdsCount: allMatchIds.length,
       existingIdsCount: existingIds.size,
@@ -61,13 +69,34 @@ export async function GET(req: NextRequest) {
       existing,
       newMatchIds,
     });
-    const matchDetails = await fetchMatchDetailsInBatch(
-      newMatchIds,
-      REGION,
-      puuid
-    );
+    // 4. Fetch only the requested batch
+    const matchDetails =
+      requestedMatchIds.length > 0
+        ? await fetchMatchDetailsInSmallBatch(requestedMatchIds, REGION, puuid)
+        : [];
 
-    return NextResponse.json({ matchDetails }, { status: 200 });
+    // 5. Also return existing matches for this batch if any
+    const existingMatches = await db
+      .select()
+      .from(matches)
+      .where(inArray(matches.matchId, allMatchIds.slice(start, start + count)));
+
+    // Combine new and existing matches
+    const allBatchMatches = [...matchDetails, ...existingMatches];
+
+    return NextResponse.json(
+      {
+        matchDetails: allBatchMatches,
+        hasMore: start + count < allMatchIds.length,
+        totalMatches: allMatchIds.length,
+        currentBatch: {
+          start,
+          count: allBatchMatches.length,
+          requested: count,
+        },
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error fetching match details:", error);
     return NextResponse.json(
