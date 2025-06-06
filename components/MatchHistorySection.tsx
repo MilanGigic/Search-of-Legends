@@ -1,8 +1,10 @@
 "use client";
 
 import pLimit from "p-limit";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import SearchForm from "./SearchForm";
+import GameMatchCard from "./GameMatchCard";
+import UserStats from "./UserStats";
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
@@ -119,10 +121,10 @@ const MatchHistorySection = ({
   }
 
   return (
-    <div className="container max-w-6xl mx-auto grid grid-cols-3 gap-1 mt-5">
-      {/* <div className="h-full border">
+    <div className="container max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 mt-5">
+      <div className="h-full border">
         <UserStats games={games} matchHistory={matchHistory} />
-      </div> */}
+      </div>
       <div className="col-span-2 max-w-[765px] shadow-2xl shadow-[#2A2A40]">
         <div className="mt-4 flex justify-center items-center space-x-2">
           <button
@@ -165,17 +167,17 @@ const MatchHistorySection = ({
           <h1 className="mr-2">Search for a champion</h1>
           <SearchForm />
         </div>
-        {/* <Suspense>
+        <Suspense>
           {currentGames.map((game) => (
             <GameMatchCard
               key={game.data?.info.gameId}
               game={game.data!}
-              currentPuuid={currentPuuid}
+              puuid={puuid}
               region={region}
               currentPage={currentPage}
             />
           ))}
-        </Suspense> */}
+        </Suspense>
         <div className="flex pb-3 justify-center items-center space-x-2">
           <button
             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}

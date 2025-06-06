@@ -37,12 +37,15 @@ const AccountPage = async ({ params }: AccountPageProps) => {
 
   const matchHistory: string[] = await fetchAllMatchIds(puuid, account.region);
   return (
-    <div>
-      <MatchHistorySection
-        matchHistory={matchHistory}
-        puuid={puuid}
-        region={REGION}
-      />
+    <div className="bg-[#1E1E2F] min-h-screen p-4 bg-pattern">
+      <UserCard accountData={initialAccountData} region={region} />
+      <div className="h-full w-full">
+        <MatchHistorySection
+          matchHistory={matchHistory}
+          puuid={puuid}
+          region={REGION}
+        />
+      </div>
     </div>
   );
 };

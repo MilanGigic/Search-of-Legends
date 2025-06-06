@@ -271,3 +271,81 @@ interface PerkStatsDto {
   flex: number;
   offense: number;
 }
+
+interface ChampionDetailData {
+  type: string;
+  format: string;
+  version: string;
+  data: {
+    [key: string]: ChampionDetail;
+  };
+}
+
+interface ChampionDetail {
+  id: string;
+  key: string;
+  name: string;
+  title: string;
+  image: {
+    full: string;
+    sprite: string;
+    group: string;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  };
+  skins: Array<{
+    id: string;
+    num: number;
+    name: string;
+    chromas: boolean;
+  }>;
+  lore: string;
+  blurb: string;
+  allytips: string[];
+  enemytips: string[];
+  tags: string[];
+  partype: string;
+  info: {
+    attack: number;
+    defense: number;
+    magic: number;
+    difficulty: number;
+  };
+  stats: {
+    [key: string]: number;
+  };
+  spells: Array<{
+    id: string;
+    name: string;
+    description: string;
+    tooltip: string;
+    maxrank: number;
+    cooldown: number[];
+    cost: number[];
+    datavalues: {};
+    image: {
+      full: string;
+      sprite: string;
+      group: string;
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+    };
+  }>;
+  passive: {
+    name: string;
+    description: string;
+    image: {
+      full: string;
+      sprite: string;
+      group: string;
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+    };
+  };
+}
