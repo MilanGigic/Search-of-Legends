@@ -62,6 +62,11 @@ interface MetadataDto {
   participants?: string[]; // List of participant PUUIDs
 }
 
+interface GameDataProps {
+  id: string;
+  data: RiotMatchDto | null;
+}
+
 // Expanded Info Interface
 interface InfoDto {
   // Game Identification and Metadata

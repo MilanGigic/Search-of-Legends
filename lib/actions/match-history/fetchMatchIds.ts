@@ -1,6 +1,8 @@
+import getRegionalEndpoint from "./getRegionalEndpoint";
+
 export default async function fetchAllMatchIds(
   puuid: string,
-  REGION: string
+  region: string
 ): Promise<string[]> {
   const allMatchIds: string[] = [];
   let start = 0;
@@ -10,6 +12,8 @@ export default async function fetchAllMatchIds(
   if (!RIOT_API_KEY) {
     throw new Error("Riot API key is not set");
   }
+
+  const REGION = getRegionalEndpoint(region);
 
   while (true) {
     const res = await fetch(
