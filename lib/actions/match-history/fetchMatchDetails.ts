@@ -20,7 +20,9 @@ export const fetchMatchDetails = async (matchId: string, REGION: string) => {
     throw new Error(`Failed to fetch match ${matchId}`);
   }
 
-  return await res.json();
+  const matchData: RiotMatchDto = await res.json();
+
+  return matchData;
 };
 
 export const fetchMatchDetailsInBatch = async (

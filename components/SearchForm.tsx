@@ -89,7 +89,7 @@ export default function SearchForm() {
       {error && <p className="text-red-500">{error}</p>}
 
       {accountInfo && (
-        <div className="text-black gap-4">
+        <div className="text-[#EAEAEA] gap-4">
           <Link href={`/${gameName}-${tagLine}`}>
             <Image
               src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountInfo.summonerInfo?.profileIconId}.png`}

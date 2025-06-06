@@ -120,3 +120,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .bg-pattern {
+    @apply bg-[#1E1E2F];
+    background-image: linear-gradient(#1e2939 0.5px, transparent 1px),
+      linear-gradient(90deg, #1e2939 0.5px, transparent 1px),
+      linear-gradient(rgba(0, 0, 0, 1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 0, 0, 1) 1px, transparent 1px);
+    background-size: 150px 150px;
+  }
+}
