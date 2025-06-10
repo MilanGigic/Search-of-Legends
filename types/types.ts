@@ -60,9 +60,9 @@ interface DbSummonerInfo {
 interface DbGameInfo {
   info: {
     matchId: string;
-    gameCreation: number | null;
-    gameDuration: number | null;
-    gameEndTimestamp: number | null;
+    gameCreation: Date | null;
+    gameDuration: Date | null;
+    gameEndTimestamp: Date | null;
     gameMode: string;
     gameType: string;
     gameVersion: string | null;

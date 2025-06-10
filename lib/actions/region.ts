@@ -41,10 +41,6 @@ export default async function fetchSummonerFromAnyRegion(puuid: string) {
       }
     });
 
-    {
-      /* IMPLEMENT QUERYING FOR GAMES IF THERE ARE EXISTING GAMES, FINISH THE BACKEND, THEN WORK ON FRONTEND */
-    }
-
     // Wait for first successful response in this batch
     const results = await Promise.allSettled(batchPromises);
 

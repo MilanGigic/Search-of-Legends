@@ -1,4 +1,4 @@
-import { bigint, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { accounts } from "./accounts";
 
 export const matches = pgTable("matches", {
@@ -14,9 +14,9 @@ export const matchDetails = pgTable("match_details", {
   matchId: text("match_id")
     .references(() => matches.matchId, { onDelete: "cascade" })
     .notNull(),
-  gameCreation: bigint("game_creation", { mode: "number" }).notNull(),
-  gameDuration: bigint("game_duration", { mode: "number" }).notNull(),
-  gameEndTimestamp: bigint("game_end_timestamp", { mode: "number" }),
+  gameCreation: timestamp("game_creation", { withTimezone: true }).notNull(),
+  gameDuration: timestamp("game_duration", { withTimezone: true }).notNull(),
+  gameEndTimestamp: timestamp("game_end_timestamp", { withTimezone: true }),
   gameMode: text("game_mode").notNull(),
   gameType: text("game_type").notNull(),
   gameVersion: text("game_version"),

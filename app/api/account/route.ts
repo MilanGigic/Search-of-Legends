@@ -103,6 +103,8 @@ export async function GET(req: NextRequest) {
         `https://${summonerResult.region}.api.riotgames.com/lol/league/v4/entries/by-puuid/${accountData.puuid}?api_key=${API_KEY}`
       );
 
+      console.log("Entries response status:", entriesRes.status);
+
       if (!entriesRes.ok) {
         console.log(
           "Fetching summoner entries failed:",

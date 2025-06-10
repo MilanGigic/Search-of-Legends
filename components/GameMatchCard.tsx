@@ -43,16 +43,21 @@ const GameMatchCard = ({
 
   useEffect(() => {
     const timeStamp = game.info.gameCreation;
+    if (!timeStamp) return;
+
+    console.log("gameCreation:", game.info.gameCreation);
+
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    const formatted = new Date(timeStamp!).toLocaleString(undefined, {
+    const formatted = new Date(timeStamp).toLocaleString(undefined, {
       timeZone: timeZone,
       day: "numeric",
       month: "long",
       year: "numeric",
     });
+
     setLocalTime(formatted);
-  }, []);
+  }, [game.info.gameCreation]);
 
   return (
     <div className="container mx-auto text-white">
@@ -128,7 +133,6 @@ const GameMatchCard = ({
               Runes
             </Button>
           </section>
-          General
           <General
             game={game}
             puuid={puuid}

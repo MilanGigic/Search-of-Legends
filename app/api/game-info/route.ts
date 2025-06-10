@@ -26,34 +26,39 @@ export async function GET(req: NextRequest) {
     return new Response("Missing gameId or region", { status: 400 });
   }
 
-  const existingGameInfo = await db.query.matchDetails.findFirst({
-    where: eq(matchDetails.matchId, gameId),
-  });
-  const existingGameParticipants = await db.query.matchParticipants.findMany({
-    where: eq(matchParticipants.matchId, gameId),
-  });
-  const existingGameObjectives = await db.query.matchObjectives.findMany({
-    where: eq(matchObjectives.matchId, gameId),
-  });
-  const existingGameTeams = await db.query.matchTeams.findMany({
-    where: eq(matchTeams.matchId, gameId),
-  });
-  const existingGameBans = await db.query.matchBans.findMany({
-    where: eq(matchBans.matchId, gameId),
-  });
-
-  let completeGameInfo: DbGameInfo;
+  const [
+    existingGameInfo,
+    existingGameParticipants,
+    existingGameObjectives,
+    existingGameTeams,
+    existingGameBans,
+  ] = await Promise.all([
+    db.query.matchDetails.findFirst({
+      where: eq(matchDetails.matchId, gameId),
+    }),
+    db.query.matchParticipants.findMany({
+      where: eq(matchParticipants.matchId, gameId),
+    }),
+    db.query.matchObjectives.findMany({
+      where: eq(matchObjectives.matchId, gameId),
+    }),
+    db.query.matchTeams.findMany({
+      where: eq(matchTeams.matchId, gameId),
+    }),
+    db.query.matchBans.findMany({
+      where: eq(matchBans.matchId, gameId),
+    }),
+  ]);
 
   if (
     existingGameInfo &&
-    existingGameInfo !== undefined &&
     existingGameParticipants.length > 0 &&
     existingGameObjectives.length > 0 &&
     existingGameTeams.length > 0 &&
     existingGameBans.length > 0
   ) {
     try {
-      completeGameInfo = {
+      const completeGameInfo: DbGameInfo = {
         info: existingGameInfo,
         participants: existingGameParticipants,
         objectives: existingGameObjectives,
@@ -73,35 +78,67 @@ export async function GET(req: NextRequest) {
         { status: 500 }
       );
     }
-  } else {
-    try {
-      const url = `https://${REGION}.api.riotgames.com/lol/match/v5/matches/${gameId}?api_key=${API_KEY}`;
+  }
 
-      const res = await fetch(url, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  try {
+    const url = `https://${REGION}.api.riotgames.com/lol/match/v5/matches/${gameId}?api_key=${API_KEY}`;
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error(
-          `Failed to fetch game info for gameId: ${gameId}. Status: ${res.status}, Error: ${errorText}`
-        );
-        return new Response(errorText, { status: res.status });
-      }
+    const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-      const data: RiotMatchDto = await res.json();
-
-      await insertMatchData(data, puuid);
-
-      return NextResponse.json(data, { status: 200 });
-    } catch (error) {
-      console.error(`Failed to fetch game info for gameId: ${gameId}`, error);
-      return NextResponse.json(
-        { message: "Internal server error" },
-        { status: 500 }
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(
+        `Failed to fetch game info for gameId: ${gameId}. Status: ${res.status}, Error: ${errorText}`
       );
+      return new Response(errorText, { status: res.status });
     }
+
+    const data: RiotMatchDto = await res.json();
+
+    await insertMatchData(data, puuid);
+
+    const [
+      newGameInfo,
+      newGameParticipants,
+      newGameObjectives,
+      newGameTeams,
+      newGameBans,
+    ] = await Promise.all([
+      db.query.matchDetails.findFirst({
+        where: eq(matchDetails.matchId, gameId),
+      }),
+      db.query.matchParticipants.findMany({
+        where: eq(matchParticipants.matchId, gameId),
+      }),
+      db.query.matchObjectives.findMany({
+        where: eq(matchObjectives.matchId, gameId),
+      }),
+      db.query.matchTeams.findMany({
+        where: eq(matchTeams.matchId, gameId),
+      }),
+      db.query.matchBans.findMany({
+        where: eq(matchBans.matchId, gameId),
+      }),
+    ]);
+
+    const transformedData: DbGameInfo = {
+      info: newGameInfo!,
+      participants: newGameParticipants,
+      objectives: newGameObjectives,
+      teams: newGameTeams,
+      bans: newGameBans,
+    };
+
+    return NextResponse.json(transformedData, { status: 200 });
+  } catch (error) {
+    console.error(`Failed to fetch game info for gameId: ${gameId}`, error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
