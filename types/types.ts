@@ -14,8 +14,84 @@ interface SummonerInfo {
   summonerLevel: number;
 }
 
+interface SummonerRankInfo {
+  leagueId: string;
+  summonerId: string;
+  puuid: string;
+  queueType: string;
+  tier: string;
+  rank: string;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
+  hotStreak: boolean;
+  veteran: boolean;
+  freshBlood: boolean;
+  inactive: boolean;
+  miniSeries?: MiniSeriesDTO; // Optional in case the player isn't in a promo series
+}
+
+interface CompleteSummonerInfo extends SummonerInfo {
+  summoner: SummonerRankInfo;
+}
+
 interface CompleteAccountInfo extends Account {
   summonerInfo?: SummonerInfo;
+}
+
+interface DbSummonerInfo {
+  puuid: string;
+  gameName: string;
+  tagLine: string;
+  region: string;
+  summonerId: string;
+  accountId: string;
+  summonerLevel: number;
+  profileIconId: number;
+  tier: string | null;
+  rank: string | null;
+  leaguePoints: number | null;
+  wins: number | null;
+  losses: number | null;
+  revisionDate: number;
+  lastUpdated: number;
+}
+
+interface DbGameInfo {
+  info: {
+    matchId: string;
+    gameCreation: number | null;
+    gameDuration: number | null;
+    gameEndTimestamp: number | null;
+    gameMode: string;
+    gameType: string;
+    gameVersion: string | null;
+    mapId: number | null;
+    platformId: string | null;
+    queueId: number;
+    tournamentCode: string | null;
+    createdAt: Date | null;
+  };
+  participants: (ParticipantData & { matchId: string })[];
+  objectives: {
+    matchId: string;
+    baron: string;
+    champion: string;
+    dragon: string;
+    inhibitor: string;
+    riftHerald: string;
+    tower: string;
+  }[];
+  teams: {
+    matchId: string;
+    teamId: number | null;
+    win: number | null;
+  }[];
+  bans: {
+    matchId: string;
+    championId: number | null;
+    pickTurn: number | null;
+  }[];
 }
 
 interface MatchHistoryParams {
@@ -64,7 +140,7 @@ interface MetadataDto {
 
 interface GameDataProps {
   id: string;
-  data: RiotMatchDto | null;
+  data: DbGameInfo | null;
 }
 
 // Expanded Info Interface
@@ -96,124 +172,93 @@ interface InfoDto {
 
 // Main Participant Interface
 interface ParticipantData {
-  // Ping-related fields
-  allInPings?: number;
-  assistMePings?: number;
-  commandPings?: number;
-  enemyMissingPings?: number;
-  enemyVisionPings?: number;
-  holdPings?: number;
-  getBackPings?: number;
-  needVisionPings?: number;
-  onMyWayPings?: number;
-  pushPings?: number;
-  visionClearedPings?: number;
-
   // Performance metrics
-  assists?: number;
-  baronKills?: number;
-  bountyLevel?: number;
-  champExperience?: number;
-  champLevel?: number;
-  championId?: number;
-  championName?: string;
-  championTransform?: number;
+  assists: number | null;
+  baronKills: number | null;
+  bountyLevel: number | null;
+  champExperience: number | null;
+  champLevel: number | null;
+  championId: number | null;
+  championName: string | null;
+  championTransform: number | null;
 
   // Damage-related fields
-  damageDealtToBuildings?: number;
-  damageDealtToObjectives?: number;
-  damageDealtToTurrets?: number;
-  damageSelfMitigated?: number;
-  deaths?: number;
+  damageDealtToBuildings: number | null;
+  damageDealtToObjectives: number | null;
+  damageDealtToTurrets: number | null;
+  damageSelfMitigated: number | null;
+  deaths: number | null;
 
   // Damage breakdown
-  magicDamageDealt?: number;
-  magicDamageDealtToChampions?: number;
-  magicDamageTaken?: number;
-  physicalDamageDealt?: number;
-  physicalDamageDealtToChampions?: number;
-  physicalDamageTaken?: number;
-  trueDamageDealt?: number;
-  trueDamageDealtToChampions?: number;
-  trueDamageTaken?: number;
-  totalDamageDealt?: number;
-  totalDamageDealtToChampions?: number;
-  totalDamageTaken?: number;
+  magicDamageDealt: number | null;
+  magicDamageDealtToChampions: number | null;
+  magicDamageTaken: number | null;
+  physicalDamageDealt: number | null;
+  physicalDamageDealtToChampions: number | null;
+  physicalDamageTaken: number | null;
+  trueDamageDealt: number | null;
+  trueDamageDealtToChampions: number | null;
+  trueDamageTaken: number | null;
+  totalDamageDealt: number | null;
+  totalDamageDealtToChampions: number | null;
+  totalDamageTaken: number | null;
 
   // Kill-related fields
-  doubleKills?: number;
-  dragonKills?: number;
-  firstBloodAssist?: boolean;
-  firstBloodKill?: boolean;
-  firstTowerAssist?: boolean;
-  firstTowerKill?: boolean;
-  killingSprees?: number;
-  kills?: number;
-  largestKillingSpree?: number;
-  largestMultiKill?: number;
-  pentaKills?: number;
-  quadraKills?: number;
-  tripleKills?: number;
+  doubleKills: number | null;
+  dragonKills: number | null;
+  firstBloodAssist: number | null;
+  firstBloodKill: number | null;
+  firstTowerAssist: number | null;
+  firstTowerKill: number | null;
+  killingSprees: number | null;
+  kills: number | null;
+  largestKillingSpree: number | null;
+  largestMultiKill: number | null;
+  pentaKills: number | null;
+  quadraKills: number | null;
+  tripleKills: number | null;
 
   // Economic fields
-  goldEarned?: number;
-  goldSpent?: number;
-  itemsPurchased?: number;
+  goldEarned: number | null;
+  goldSpent: number | null;
+  itemsPurchased: number | null;
 
   // Items
-  item0?: number;
-  item1?: number;
-  item2?: number;
-  item3?: number;
-  item4?: number;
-  item5?: number;
-  item6?: number;
+  item0: number | null;
+  item1: number | null;
+  item2: number | null;
+  item3: number | null;
+  item4: number | null;
+  item5: number | null;
+  item6: number | null;
 
   // Position and lane
-  individualPosition?: string;
-  teamPosition?: string;
-  lane?: string;
-  role?: string;
+  individualPosition: string | null;
+  teamPosition: string | null;
+  lane: string | null;
+  role: string | null;
 
   // Summoner-related fields
-  participantId?: number;
-  puuid?: string;
-  summonerId?: string;
-  summonerLevel?: number;
-  summonerName?: string;
-  profileIcon?: number;
-  riotIdGameName?: string;
-  riotIdTagline?: string;
+  participantId: number | null;
+  puuid: string | null;
+  summonerId: string | null;
+  summonerLevel: number | null;
+  summonerName: string | null;
+  profileIcon: number | null;
+  riotIdGameName: string | null;
+  riotIdTagline: string | null;
+
+  summoner1Id: number | null;
+  summoner2Id: number | null;
 
   // Team-related
-  teamId?: number;
-  teamEarlySurrendered?: boolean;
-  win?: boolean;
-
-  // Vision-related
-  detectorWardsPlaced?: number;
-  sightWardsBoughtInGame?: number;
-  visionScore?: number;
-  visionWardsBoughtInGame?: number;
-  wardsKilled?: number;
-  wardsPlaced?: number;
-
-  // Spell casts
-  spell1Casts?: number;
-  spell2Casts?: number;
-  spell3Casts?: number;
-  spell4Casts?: number;
-  summoner1Casts?: number;
-  summoner1Id?: number;
-  summoner2Casts?: number;
-  summoner2Id?: number;
+  teamId: number | null;
+  teamEarlySurrendered: number | null;
+  win: number | null;
 
   // Miscellaneous
-  challenges?: ChallengesDto;
-  perks?: PerksDto;
-  timePlayed?: number;
-  totalMinionsKilled?: number;
-  totalTimeCCDealt?: number;
+  timePlayed: number | null;
+  totalMinionsKilled: number | null;
 }
 
 // Team-related Interfaces
@@ -348,4 +393,10 @@ interface ChampionDetail {
       h: number;
     };
   };
+}
+interface MiniSeriesDTO {
+  losses: number;
+  progress: string;
+  target: number;
+  wins: number;
 }

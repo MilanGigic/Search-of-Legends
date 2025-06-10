@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
     const accountData: Account = await accountResponse.json();
     console.log("Fetched account data:", accountData);
 
-    let completeData: CompleteAccountInfo = accountData;
+    let completeData: DbSummonerInfo | null = null;
 
     try {
       const summonerResult = await fetchSummonerFromAnyRegion(
@@ -99,47 +99,81 @@ export async function GET(req: NextRequest) {
 
       console.log(`Found summoner in region: ${summonerResult.region}`);
 
+      const entriesRes = await fetch(
+        `https://${summonerResult.region}.api.riotgames.com/lol/league/v4/entries/by-puuid/${accountData.puuid}?api_key=${API_KEY}`
+      );
+
+      if (!entriesRes.ok) {
+        console.log(
+          "Fetching summoner entries failed:",
+          entriesRes.status,
+          entriesRes.statusText
+        );
+      }
+
+      const entries: SummonerRankInfo = await entriesRes.json();
+
+      console.log("Riot entries:", entries);
+
       if (summonerResult) {
         completeData = {
-          ...accountData,
-          summonerInfo: {
-            id: summonerData.id,
-            accountId: summonerData.accountId,
-            puuid: summonerData.puuid,
-            profileIconId: summonerData.profileIconId,
-            revisionDate: summonerData.revisionDate,
-            summonerLevel: summonerData.summonerLevel,
-          },
+          puuid: accountData.puuid,
+          gameName: accountData.gameName,
+          tagLine: accountData.tagLine,
+          region: accountData.region,
+          accountId: summonerData.accountId,
+          profileIconId: summonerData.profileIconId,
+          summonerLevel: summonerData.summonerLevel,
+          summonerId: entries.summonerId,
+          tier: entries.tier,
+          rank: entries.rank,
+          leaguePoints: entries.leaguePoints,
+          wins: entries.wins,
+          losses: entries.losses,
+          revisionDate: summonerData.revisionDate,
+          lastUpdated: Date.now(),
         };
 
-        await db
-          .insert(accounts)
-          .values({
-            puuid: accountData.puuid,
-            gameName: accountData.gameName,
-            tagLine: accountData.tagLine,
-            region: summonerResult.region,
-            summonerId: summonerData.id,
-            accountId: summonerData.accountId,
-            profileIconId: summonerData.profileIconId,
-            revisionDate: summonerData.revisionDate,
-            summonerLevel: summonerData.summonerLevel,
-            lastUpdated: Date.now(),
-          })
-          .onConflictDoUpdate({
-            target: [accounts.puuid],
-            set: {
+        if (accountData && entries && summonerData) {
+          await db
+            .insert(accounts)
+            .values({
+              puuid: accountData.puuid,
               gameName: accountData.gameName,
               tagLine: accountData.tagLine,
               region: summonerResult.region,
               summonerId: summonerData.id,
               accountId: summonerData.accountId,
               profileIconId: summonerData.profileIconId,
+              tier: entries?.tier,
+              rank: entries?.rank,
+              leaguePoints: entries?.leaguePoints,
+              wins: entries?.wins,
+              losses: entries?.losses,
               revisionDate: summonerData.revisionDate,
               summonerLevel: summonerData.summonerLevel,
               lastUpdated: Date.now(),
-            },
-          });
+            })
+            .onConflictDoUpdate({
+              target: [accounts.puuid],
+              set: {
+                gameName: accountData.gameName,
+                tagLine: accountData.tagLine,
+                region: summonerResult.region,
+                summonerId: summonerData.id,
+                accountId: summonerData.accountId,
+                profileIconId: summonerData.profileIconId,
+                tier: entries?.tier,
+                rank: entries?.rank,
+                leaguePoints: entries?.leaguePoints,
+                wins: entries?.wins,
+                losses: entries?.losses,
+                revisionDate: summonerData.revisionDate,
+                summonerLevel: summonerData.summonerLevel,
+                lastUpdated: Date.now(),
+              },
+            });
+        }
       }
 
       // Store the region in your database for future use

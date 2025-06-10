@@ -39,7 +39,7 @@ const MatchHistorySection = ({
           return;
         }
 
-        const data: RiotMatchDto = await res.json();
+        const data: DbGameInfo = await res.json();
 
         if (!isCancelled && data?.info) {
           setGames((prev) => [...prev, { id: matchId, data: data }]);
@@ -168,9 +168,9 @@ const MatchHistorySection = ({
           <SearchForm />
         </div>
         <Suspense>
-          {currentGames.map((game) => (
+          {currentGames.map((game, index) => (
             <GameMatchCard
-              key={game.data?.info.gameId}
+              key={index}
               game={game.data!}
               puuid={puuid}
               region={region}

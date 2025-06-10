@@ -1,4 +1,4 @@
-import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { bigint, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { accounts } from "./accounts";
 
 export const matches = pgTable("matches", {
@@ -14,9 +14,9 @@ export const matchDetails = pgTable("match_details", {
   matchId: text("match_id")
     .references(() => matches.matchId, { onDelete: "cascade" })
     .notNull(),
-  gameCreation: text("game_creation").notNull(),
-  gameDuration: text("game_duration").notNull(),
-  gameEndTimestamp: timestamp("game_end_timestamp"),
+  gameCreation: bigint("game_creation", { mode: "number" }).notNull(),
+  gameDuration: bigint("game_duration", { mode: "number" }).notNull(),
+  gameEndTimestamp: bigint("game_end_timestamp", { mode: "number" }),
   gameMode: text("game_mode").notNull(),
   gameType: text("game_type").notNull(),
   gameVersion: text("game_version"),
@@ -26,6 +26,8 @@ export const matchDetails = pgTable("match_details", {
   tournamentCode: text("tournament_code"),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// FIGURE THIS SHIT OUT IM TIRED
 
 export const matchParticipants = pgTable("match_participants", {
   matchId: text("match_id")
@@ -67,9 +69,9 @@ export const matchParticipants = pgTable("match_participants", {
   doubleKills: integer("double_kills"),
   dragonKills: integer("dragon_kills"),
   firstBloodAssist: integer("first_blood_assist"), // boolean as integer (0/1)
-  firstBloodKill: integer("first_blood_kill"),
-  firstTowerAssist: integer("first_tower_assist"),
-  firstTowerKill: integer("first_tower_kill"),
+  firstBloodKill: integer("first_blood_kill"), // boolean as integer (0/1)
+  firstTowerAssist: integer("first_tower_assist"), // boolean as integer (0/1)
+  firstTowerKill: integer("first_tower_kill"), // boolean as integer (0/1)
   killingSprees: integer("killing_sprees"),
   kills: integer("kills"),
   largestKillingSpree: integer("largest_killing_spree"),
@@ -108,6 +110,9 @@ export const matchParticipants = pgTable("match_participants", {
   riotIdGameName: text("riot_id_game_name"),
   riotIdTagline: text("riot_id_tagline"),
 
+  summoner1Id: integer("summoner_1_id"),
+  summoner2Id: integer("summoner_2_id"),
+
   // Team-related
   teamId: integer("team_id"),
   teamEarlySurrendered: integer("team_early_surrendered"), // boolean as integer (0/1)
@@ -134,4 +139,20 @@ export const matchObjectives = pgTable("match_objectives", {
   inhibitor: text("inhibitor").notNull(),
   riftHerald: text("rift_herald").notNull(),
   tower: text("tower").notNull(),
+});
+
+export const matchTeams = pgTable("match_teams", {
+  matchId: text("match_id")
+    .references(() => matches.matchId, { onDelete: "cascade" })
+    .notNull(),
+  teamId: integer("team_id"),
+  win: integer("win"), // Boolean as integer (0/1)
+});
+
+export const matchBans = pgTable("match_bans", {
+  matchId: text("match_id")
+    .references(() => matches.matchId, { onDelete: "cascade" })
+    .notNull(),
+  championId: integer("champion_id"),
+  pickTurn: integer("pick_turn"),
 });

@@ -7,7 +7,7 @@ const General = ({
   showGame,
   region,
 }: {
-  game: RiotMatchDto;
+  game: DbGameInfo;
   puuid: string;
   showGame: boolean;
   region: string;
@@ -26,15 +26,15 @@ const General = ({
                 <h1>Blue </h1>
                 <span
                   className={`${
-                    game.info.teams![0].win
+                    game.teams[0].win === 1
                       ? "text-[#7ECA9C]"
                       : "text-[#F05A5A]"
                   }`}
                 >
-                  {game.info.teams![0].win ? "Victory" : "Defeat"}
+                  {game.teams[0].win === 1 ? "Victory" : "Defeat"}
                 </span>
               </div>
-              {game.info.participants?.map((participant) => {
+              {game.participants?.map((participant) => {
                 return (
                   <div
                     key={participant.puuid}
@@ -433,14 +433,14 @@ const General = ({
                 Red{" "}
                 <span
                   className={`${
-                    game.info.teams![1].win ? "text-green-600" : "text-red-600"
+                    game.teams![1].win === 1 ? "text-green-600" : "text-red-600"
                   }`}
                 >
                   {" "}
-                  {game.info.teams![1].win ? "Victory" : "Defeat"}
+                  {game.teams![1].win === 1 ? "Victory" : "Defeat"}
                 </span>
               </div>
-              {game.info.participants?.map((participant) => {
+              {game.participants?.map((participant) => {
                 return (
                   <div
                     key={participant.puuid}

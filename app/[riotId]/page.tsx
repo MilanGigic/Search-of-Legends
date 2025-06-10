@@ -1,4 +1,5 @@
 import MatchHistorySection from "@/components/MatchHistorySection";
+import UserCard from "@/components/UserCard";
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
 import fetchAllMatchIds from "@/lib/actions/match-history/fetchMatchIds";
@@ -11,7 +12,7 @@ interface AccountPageProps {
 }
 
 const AccountPage = async ({ params }: AccountPageProps) => {
-  const { riotId } = params;
+  const { riotId } = await params;
   const [gameName, tagLine] = riotId.split("-");
   console.log("Parsed gameName and tagLine:", { gameName, tagLine });
 
@@ -38,7 +39,7 @@ const AccountPage = async ({ params }: AccountPageProps) => {
   const matchHistory: string[] = await fetchAllMatchIds(puuid, account.region);
   return (
     <div className="bg-[#1E1E2F] min-h-screen p-4 bg-pattern">
-      <UserCard accountData={initialAccountData} region={region} />
+      <UserCard accountData={account} region={REGION} />
       <div className="h-full w-full">
         <MatchHistorySection
           matchHistory={matchHistory}

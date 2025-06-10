@@ -1,9 +1,11 @@
 import { db } from "@/db";
 import {
+  matchBans,
   matchDetails,
   matches,
   matchObjectives,
   matchParticipants,
+  matchTeams,
 } from "@/db/schema";
 
 export default async function insertMatchData(
@@ -33,9 +35,9 @@ export default async function insertMatchData(
     .insert(matchDetails)
     .values({
       matchId,
-      gameCreation: info.gameCreation.toString(),
-      gameDuration: info.gameDuration.toString(),
-      gameEndTimestamp: new Date(info.gameEndTimestamp),
+      gameCreation: info.gameCreation,
+      gameDuration: info.gameDuration,
+      gameEndTimestamp: info.gameEndTimestamp,
       gameMode: info.gameMode,
       gameType: info.gameType,
       gameVersion: info.gameVersion,
@@ -115,10 +117,6 @@ export default async function insertMatchData(
         teamId: p.teamId,
         teamEarlySurrendered: p.teamEarlySurrendered ? 1 : 0,
         win: p.win ? 1 : 0,
-        detectorWardsPlaced: p.detectorWardsPlaced,
-        sightWardsBoughtInGame: p.sightWardsBoughtInGame,
-        visionScore: p.visionScore,
-        visionWardsBoughtInGame: p.visionWardsBoughtInGame,
         timePlayed: p.timePlayed,
         totalMinionsKilled: p.totalMinionsKilled,
       })
@@ -138,5 +136,45 @@ export default async function insertMatchData(
         tower: String(team.objectives?.tower?.kills ?? "0"),
       })
       .onConflictDoNothing();
+
+    // await db
+    //   .insert(matchTeams)
+    //   .values({
+    //     matchId,
+    //     teamId: team.teamId,
+    //     win: team.win === true ? 1 : 0,
+    //   })
+    //   .onConflictDoNothing();
+    // team.bans?.map(async (team) => {
+    //   await db.insert(matchBans).values({
+    //     matchId,
+    //     championId: team.championId,
+    //     pickTurn: team.pickTurn,
+    //   });
+    // });
+  }
+
+  for (const team of matchData.info.teams) {
+    await db
+      .insert(matchTeams)
+      .values({
+        matchId,
+        teamId: team.teamId,
+        win: team.win === true ? 1 : 0,
+      })
+      .onConflictDoNothing();
+  }
+
+  for (const team of matchData.info.teams) {
+    team.bans?.map(async (team) => {
+      await db
+        .insert(matchBans)
+        .values({
+          matchId,
+          championId: team.championId,
+          pickTurn: team.pickTurn,
+        })
+        .onConflictDoNothing();
+    });
   }
 }

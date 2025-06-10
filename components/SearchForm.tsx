@@ -6,9 +6,7 @@ import { useState, useEffect } from "react";
 export default function SearchForm() {
   const [gameName, setGameName] = useState("");
   const [tagLine, setTagLine] = useState("");
-  const [accountInfo, setAccountInfo] = useState<CompleteAccountInfo | null>(
-    null
-  );
+  const [accountInfo, setAccountInfo] = useState<DbSummonerInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [inputValue, setInputValue] = useState<string>("");
@@ -27,11 +25,11 @@ export default function SearchForm() {
         const res = await fetch(
           `${BASE_URL}/api/account?gameName=${gameName}&tagLine=${tagLine}`
         );
-        const data = await res.json();
 
         if (!res.ok) {
-          throw new Error(data.error || "Failed to fetch account");
+          throw new Error(res.statusText || "Failed to fetch account");
         }
+        const data: DbSummonerInfo = await res.json();
 
         setAccountInfo(data);
       } catch (err: any) {
@@ -92,7 +90,7 @@ export default function SearchForm() {
         <div className="text-[#EAEAEA] gap-4">
           <Link href={`/${gameName}-${tagLine}`}>
             <Image
-              src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountInfo.summonerInfo?.profileIconId}.png`}
+              src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountInfo?.profileIconId}.png`}
               alt={`${(<div className="rounded-full p-2 bg-[#EAEAEA]" />)}`}
               width={60}
               height={60}
@@ -100,7 +98,7 @@ export default function SearchForm() {
             />
             <h1>
               {accountInfo.gameName}#{accountInfo.tagLine}{" "}
-              <span>{accountInfo.summonerInfo?.summonerLevel}</span>
+              <span>{accountInfo?.summonerLevel}</span>
             </h1>
           </Link>
         </div>

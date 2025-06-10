@@ -3,8 +3,6 @@ import { calculateAccurateGameDuration } from "@/lib/riot";
 import { Button } from "@/components/ui/button";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-// import General from "./General";
-// import UserVsOpponent from "./UserVsOpponent";
 import Link from "next/link";
 import UserVsOpponent from "./UserVsOpponent";
 import General from "./General";
@@ -15,7 +13,7 @@ const GameMatchCard = ({
   region,
   currentPage,
 }: {
-  game: RiotMatchDto;
+  game: DbGameInfo;
   puuid: string;
   region: string;
   currentPage: number;
@@ -27,13 +25,13 @@ const GameMatchCard = ({
   const [queueId, setQueueId] = useState<string>("");
 
   useEffect(() => {
-    const currentUser = game.info.participants?.find((p) => p.puuid === puuid);
+    const currentUser = game.participants?.find((p) => p.puuid === puuid);
     setUser(currentUser || null);
   }, [puuid, game]);
 
   useEffect(() => {
     if (user) {
-      const opponentParticipant = game.info.participants?.find(
+      const opponentParticipant = game.participants?.find(
         (p) =>
           p.puuid !== puuid &&
           p.teamPosition === user.teamPosition &&

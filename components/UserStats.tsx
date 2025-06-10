@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 interface UserStatsProps {
   games: {
     id: string;
-    data: RiotMatchDto | null;
+    data: DbGameInfo | null;
   }[];
   matchHistory: string[];
 }
