@@ -1,7 +1,18 @@
 "use client";
 
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import { Button } from "@/components/ui/button";
+import Iron from "@/public/ranked-emblems/Rank=Iron.png";
+import Bronze from "@/public/ranked-emblems/Rank=Bronze.png";
+import Silver from "@/public/ranked-emblems/Rank=Silver.png";
+import Gold from "@/public/ranked-emblems/Rank=Gold.png";
+import Platinum from "@/public/ranked-emblems/Rank=Platinum.png";
+import Emerald from "@/public/ranked-emblems/Rank=Emerald.png";
+import Diamond from "@/public/ranked-emblems/Rank=Diamond.png";
+import Master from "@/public/ranked-emblems/Rank=Master.png";
+import Grandmaster from "@/public/ranked-emblems/Rank=Grandmaster.png";
+import Challenger from "@/public/ranked-emblems/Rank=Challenger.png";
+import { useEffect, useState } from "react";
 
 const UserCard = ({
   accountData,
@@ -10,10 +21,53 @@ const UserCard = ({
   accountData: DbSummonerInfo;
   region: string;
 }) => {
+  const [tierImage, setTierImage] = useState<StaticImageData | undefined>(
+    undefined
+  );
   const puuid = accountData.puuid;
 
   const rank = accountData.rank;
   const tier = accountData.tier;
+
+  useEffect(() => {
+    if (tier) {
+      switch (tier) {
+        case "IRON":
+          setTierImage(Iron);
+          break;
+        case "BRONZE":
+          setTierImage(Bronze);
+          break;
+        case "SILVER":
+          setTierImage(Silver);
+          break;
+        case "GOLD":
+          setTierImage(Gold);
+          break;
+        case "PLATINUM":
+          setTierImage(Platinum);
+          break;
+        case "EMERALD":
+          setTierImage(Emerald);
+          break;
+        case "DIAMOND":
+          setTierImage(Diamond);
+          break;
+        case "MASTER":
+          setTierImage(Master);
+          break;
+        case "GRANDMASTER":
+          setTierImage(Grandmaster);
+          break;
+        case "CHALLENGER":
+          setTierImage(Challenger);
+          break;
+        default:
+          setTierImage(undefined);
+      }
+      console.log("Set tier image for:", tier);
+    }
+  }, [tier]);
 
   const handleUpdate = () => {
     const update = async () => {
@@ -68,10 +122,10 @@ const UserCard = ({
         </h1>
       </div>
       <div className="mb-4 flex items-center">
-        {tier ? (
+        {tierImage ? (
           <div className="flex items-center gap-3">
             <Image
-              src={`https://ddragon.leagueoflegends.com/cdn/13.24.1/img/profileicon/Season10_${tier}`}
+              src={tierImage}
               alt={`${tier} Rank`}
               width={80}
               height={80}

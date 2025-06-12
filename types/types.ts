@@ -48,11 +48,11 @@ interface DbSummonerInfo {
   accountId: string;
   summonerLevel: number;
   profileIconId: number;
-  tier: string | null;
-  rank: string | null;
-  leaguePoints: number | null;
-  wins: number | null;
-  losses: number | null;
+  tier: string;
+  rank: string;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
   revisionDate: number;
   lastUpdated: number;
 }
@@ -61,8 +61,6 @@ interface DbGameInfo {
   info: {
     matchId: string;
     gameCreation: Date | null;
-    gameDuration: Date | null;
-    gameEndTimestamp: Date | null;
     gameMode: string;
     gameType: string;
     gameVersion: string | null;
@@ -102,30 +100,6 @@ interface MatchHistoryParams {
   queue?: number;
 }
 
-interface RiotMatch {
-  metadata: {
-    matchId: string;
-    participants: string[];
-  };
-  info: {
-    gameCreation: number;
-    gameDuration: number;
-    gameMode: string;
-    gameType: string;
-    queueId: number;
-    // ... other match info
-    participants: Array<{
-      puuid: string;
-      championId: number;
-      championName: string;
-      kills: number;
-      deaths: number;
-      assists: number;
-      // ... other participant data
-    }>;
-  };
-}
-
 interface RiotMatchDto {
   metadata: MetadataDto;
   info: InfoDto;
@@ -157,10 +131,7 @@ interface InfoDto {
   tournamentCode: string;
 
   // Timestamps
-  gameCreation: number;
-  gameStartTimestamp: number;
-  gameEndTimestamp: number;
-  gameDuration: number;
+  gameCreation: Date;
 
   // End of Game Details
   endOfGameResult: string;
@@ -247,6 +218,7 @@ interface ParticipantData {
   profileIcon: number | null;
   riotIdGameName: string | null;
   riotIdTagline: string | null;
+  queueId: number;
 
   summoner1Id: number | null;
   summoner2Id: number | null;

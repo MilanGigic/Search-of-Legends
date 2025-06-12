@@ -15,8 +15,6 @@ export const matchDetails = pgTable("match_details", {
     .references(() => matches.matchId, { onDelete: "cascade" })
     .notNull(),
   gameCreation: timestamp("game_creation", { withTimezone: true }).notNull(),
-  gameDuration: timestamp("game_duration", { withTimezone: true }).notNull(),
-  gameEndTimestamp: timestamp("game_end_timestamp", { withTimezone: true }),
   gameMode: text("game_mode").notNull(),
   gameType: text("game_type").notNull(),
   gameVersion: text("game_version"),
@@ -27,13 +25,11 @@ export const matchDetails = pgTable("match_details", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// FIGURE THIS SHIT OUT IM TIRED
-
 export const matchParticipants = pgTable("match_participants", {
   matchId: text("match_id")
     .references(() => matches.matchId, { onDelete: "cascade" })
     .notNull(),
-
+  queueId: integer("queue_id").notNull(),
   // Performance metrics
   assists: integer("assists"),
   baronKills: integer("baron_kills"),
@@ -44,7 +40,7 @@ export const matchParticipants = pgTable("match_participants", {
   championName: text("champion_name"),
   championTransform: integer("champion_transform"),
 
-  // Damage-related fields
+  // Damage-related fields`
   damageDealtToBuildings: integer("damage_dealt_to_buildings"),
   damageDealtToObjectives: integer("damage_dealt_to_objectives"),
   damageDealtToTurrets: integer("damage_dealt_to_turrets"),

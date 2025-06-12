@@ -35,9 +35,7 @@ export default async function insertMatchData(
     .insert(matchDetails)
     .values({
       matchId,
-      gameCreation: info.gameCreation,
-      gameDuration: info.gameDuration,
-      gameEndTimestamp: info.gameEndTimestamp,
+      gameCreation: new Date(info.gameCreation),
       gameMode: info.gameMode,
       gameType: info.gameType,
       gameVersion: info.gameVersion,
@@ -54,6 +52,7 @@ export default async function insertMatchData(
       .insert(matchParticipants)
       .values({
         matchId,
+        queueId: info.queueId,
         assists: p.assists,
         baronKills: p.baronKills,
         bountyLevel: p.bountyLevel,
@@ -136,22 +135,6 @@ export default async function insertMatchData(
         tower: String(team.objectives?.tower?.kills ?? "0"),
       })
       .onConflictDoNothing();
-
-    // await db
-    //   .insert(matchTeams)
-    //   .values({
-    //     matchId,
-    //     teamId: team.teamId,
-    //     win: team.win === true ? 1 : 0,
-    //   })
-    //   .onConflictDoNothing();
-    // team.bans?.map(async (team) => {
-    //   await db.insert(matchBans).values({
-    //     matchId,
-    //     championId: team.championId,
-    //     pickTurn: team.pickTurn,
-    //   });
-    // });
   }
 
   for (const team of matchData.info.teams) {

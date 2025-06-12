@@ -7,35 +7,34 @@ export default async function fetchAllMatchIds(
   puuid: string,
   region: string
 ): Promise<string[]> {
-  const allMatchIds: string[] = [];
-  let start = 0;
-  const count = 100;
-
   console.log(`Fetching existing matches for puuid: ${puuid}`);
-  const existingMatch = await db.query.matches.findMany({
+
+  // 1. First get all matches from database
+  const existingMatches = await db.query.matches.findMany({
     where: eq(matches.puuid, puuid),
   });
+  const existingMatchIds = new Set(
+    existingMatches.map((match) => match.matchId)
+  );
+  console.log(`Found ${existingMatchIds.size} existing match IDs`);
 
-  const existingMatchIds = existingMatch.map((id) => {
-    return id.matchId;
-  });
-  console.log(`Found ${existingMatchIds.length} existing match IDs`);
-
+  // 2. Then fetch from Riot API to find any new matches
   const RIOT_API_KEY = process.env.RIOT_API_KEY;
-  if (!RIOT_API_KEY) {
-    throw new Error("Riot API key is not set");
-  }
+  if (!RIOT_API_KEY) throw new Error("Riot API key is not set");
 
   const REGION = getRegionalEndpoint(region);
   console.log(`Using region endpoint: ${REGION}`);
+
+  const allMatchIds = new Set<string>([...existingMatchIds]);
+  let start = 0;
+  const count = 100;
+  let hasNewMatches = false;
 
   while (true) {
     console.log(`Fetching matches from API: start=${start}, count=${count}`);
     const res = await fetch(
       `https://${REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}`,
-      {
-        headers: { "X-Riot-Token": RIOT_API_KEY },
-      }
+      { headers: { "X-Riot-Token": RIOT_API_KEY } }
     );
 
     if (!res.ok) {
@@ -46,21 +45,23 @@ export default async function fetchAllMatchIds(
     const batch: string[] = await res.json();
     console.log(`Fetched ${batch.length} match IDs from API`);
 
-    if (batch.length > existingMatchIds.length) {
-      console.log("Adding new batch of match IDs to allMatchIds");
-      allMatchIds.push(...batch);
-    } else {
-      console.log("Adding existing match IDs to allMatchIds");
-      allMatchIds.push(...existingMatchIds);
+    // Check if any matches are new (not in database)
+    for (const matchId of batch) {
+      if (!existingMatchIds.has(matchId)) {
+        hasNewMatches = true;
+      }
+      allMatchIds.add(matchId);
     }
 
-    if (batch.length < count) {
-      console.log("No more data to fetch, breaking loop");
-      break; // No more data
+    // Stop if we've reached the end or if we're not getting new matches
+    if (batch.length < count || !hasNewMatches) {
+      console.log("Stopping fetch - no more matches or no new matches");
+      break;
     }
+
     start += count;
   }
 
-  console.log(`Returning total of ${allMatchIds.length} match IDs`);
-  return allMatchIds;
+  console.log(`Total unique match IDs: ${allMatchIds.size}`);
+  return Array.from(allMatchIds);
 }

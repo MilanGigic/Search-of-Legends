@@ -57,9 +57,22 @@ export async function GET(req: NextRequest) {
     existingGameTeams.length > 0 &&
     existingGameBans.length > 0
   ) {
+    console.log("Raw gameCreation from DB:", existingGameInfo.gameCreation);
+    console.log("Type of gameCreation:", typeof existingGameInfo.gameCreation);
+    console.log(
+      "Instance of Date:",
+      existingGameInfo.gameCreation instanceof Date
+    );
     try {
+      const gameCreationDate =
+        existingGameInfo.gameCreation instanceof Date
+          ? existingGameInfo.gameCreation
+          : new Date(existingGameInfo.gameCreation);
       const completeGameInfo: DbGameInfo = {
-        info: existingGameInfo,
+        info: {
+          ...existingGameInfo,
+          gameCreation: gameCreationDate, // Convert to Date object
+        },
         participants: existingGameParticipants,
         objectives: existingGameObjectives,
         teams: existingGameTeams,
@@ -125,8 +138,15 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
+    const gameCreationDate =
+      newGameInfo?.gameCreation instanceof Date
+        ? newGameInfo.gameCreation
+        : new Date(newGameInfo!.gameCreation);
     const transformedData: DbGameInfo = {
-      info: newGameInfo!,
+      info: {
+        ...newGameInfo!,
+        gameCreation: gameCreationDate,
+      },
       participants: newGameParticipants,
       objectives: newGameObjectives,
       teams: newGameTeams,

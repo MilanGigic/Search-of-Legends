@@ -33,13 +33,12 @@ export async function GET(req: NextRequest) {
 
   try {
     // Check if account already exists in database
-    const existingAccount = await db
-      .select()
-      .from(accounts)
-      .where(
-        and(eq(accounts.gameName, gameName), eq(accounts.tagLine, tagLine))
-      )
-      .limit(1);
+    const existingAccount = await db.query.accounts.findFirst({
+      where: and(
+        eq(accounts.gameName, gameName),
+        eq(accounts.tagLine, tagLine)
+      ),
+    });
 
     console.log("Existing account in DB:", existingAccount);
 
@@ -47,23 +46,29 @@ export async function GET(req: NextRequest) {
     const ONE_HOUR = 60 * 60 * 1000; // Cache for 1 hour
 
     if (
-      existingAccount.length > 0 &&
-      existingAccount[0].summonerId &&
-      existingAccount[0].lastUpdated &&
-      now - existingAccount[0].lastUpdated < ONE_HOUR
+      existingAccount?.summonerId &&
+      existingAccount?.lastUpdated &&
+      now - existingAccount?.lastUpdated < ONE_HOUR
     ) {
       console.log("Returning cached complete account data");
       return NextResponse.json({
-        puuid: existingAccount[0].puuid,
-        gameName: existingAccount[0].gameName,
-        tagLine: existingAccount[0].tagLine,
+        puuid: existingAccount?.puuid,
+        gameName: existingAccount?.gameName,
+        tagLine: existingAccount?.tagLine,
         summonerInfo: {
-          id: existingAccount[0].summonerId,
-          accountId: existingAccount[0].accountId,
-          puuid: existingAccount[0].puuid,
-          profileIconId: existingAccount[0].profileIconId,
-          revisionDate: existingAccount[0].revisionDate,
-          summonerLevel: existingAccount[0].summonerLevel,
+          id: existingAccount.summonerId,
+          region: existingAccount.region,
+          accountId: existingAccount.accountId,
+          puuid: existingAccount.puuid,
+          profileIconId: existingAccount.profileIconId,
+          revisionDate: existingAccount.revisionDate,
+          summonerLevel: existingAccount.summonerLevel,
+          tier: existingAccount.tier,
+          rank: existingAccount.rank,
+          leaguePoints: existingAccount.leaguePoints,
+          wins: existingAccount.wins,
+          losses: existingAccount.losses,
+          lastUpdated: existingAccount.lastUpdated,
         },
       });
     }
@@ -100,7 +105,7 @@ export async function GET(req: NextRequest) {
       console.log(`Found summoner in region: ${summonerResult.region}`);
 
       const entriesRes = await fetch(
-        `https://${summonerResult.region}.api.riotgames.com/lol/league/v4/entries/by-puuid/${accountData.puuid}?api_key=${API_KEY}`
+        `https://${summonerResult.region}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerData.id}?api_key=${API_KEY}`
       );
 
       console.log("Entries response status:", entriesRes.status);
@@ -113,11 +118,16 @@ export async function GET(req: NextRequest) {
         );
       }
 
-      const entries: SummonerRankInfo = await entriesRes.json();
+      const entries: SummonerRankInfo[] = await entriesRes.json();
+
+      // Find the ranked solo queue entry
+      const soloQueueEntry = entries.find(
+        (entry) => entry.queueType === "RANKED_SOLO_5x5"
+      );
 
       console.log("Riot entries:", entries);
 
-      if (summonerResult) {
+      if (summonerResult && soloQueueEntry) {
         completeData = {
           puuid: accountData.puuid,
           gameName: accountData.gameName,
@@ -126,17 +136,17 @@ export async function GET(req: NextRequest) {
           accountId: summonerData.accountId,
           profileIconId: summonerData.profileIconId,
           summonerLevel: summonerData.summonerLevel,
-          summonerId: entries.summonerId,
-          tier: entries.tier,
-          rank: entries.rank,
-          leaguePoints: entries.leaguePoints,
-          wins: entries.wins,
-          losses: entries.losses,
+          summonerId: summonerData.id,
+          tier: soloQueueEntry.tier,
+          rank: soloQueueEntry.rank,
+          leaguePoints: soloQueueEntry.leaguePoints,
+          wins: soloQueueEntry.wins,
+          losses: soloQueueEntry.losses,
           revisionDate: summonerData.revisionDate,
           lastUpdated: Date.now(),
         };
 
-        if (accountData && entries && summonerData) {
+        if (accountData && soloQueueEntry && summonerData) {
           await db
             .insert(accounts)
             .values({
@@ -147,11 +157,11 @@ export async function GET(req: NextRequest) {
               summonerId: summonerData.id,
               accountId: summonerData.accountId,
               profileIconId: summonerData.profileIconId,
-              tier: entries?.tier,
-              rank: entries?.rank,
-              leaguePoints: entries?.leaguePoints,
-              wins: entries?.wins,
-              losses: entries?.losses,
+              tier: soloQueueEntry.tier,
+              rank: soloQueueEntry.rank,
+              leaguePoints: soloQueueEntry.leaguePoints,
+              wins: soloQueueEntry.wins,
+              losses: soloQueueEntry.losses,
               revisionDate: summonerData.revisionDate,
               summonerLevel: summonerData.summonerLevel,
               lastUpdated: Date.now(),
@@ -165,11 +175,11 @@ export async function GET(req: NextRequest) {
                 summonerId: summonerData.id,
                 accountId: summonerData.accountId,
                 profileIconId: summonerData.profileIconId,
-                tier: entries?.tier,
-                rank: entries?.rank,
-                leaguePoints: entries?.leaguePoints,
-                wins: entries?.wins,
-                losses: entries?.losses,
+                tier: soloQueueEntry.tier,
+                rank: soloQueueEntry.rank,
+                leaguePoints: soloQueueEntry.leaguePoints,
+                wins: soloQueueEntry.wins,
+                losses: soloQueueEntry.losses,
                 revisionDate: summonerData.revisionDate,
                 summonerLevel: summonerData.summonerLevel,
                 lastUpdated: Date.now(),

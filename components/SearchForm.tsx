@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 
 export default function SearchForm() {
   const [gameName, setGameName] = useState("");
@@ -75,10 +75,10 @@ export default function SearchForm() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full flex flex-col justify-center items-center">
       <input
         placeholder="Enter Summoner Name (e.g. PlayerName#1234)"
-        className="border p-2 w-full"
+        className="border-b border-gray-400 text-gray-200 focus:outline-none p-2 w-full text-center"
         value={inputValue}
         onChange={(e) => handleRiotNameChange(e)}
       />
@@ -87,19 +87,29 @@ export default function SearchForm() {
       {error && <p className="text-red-500">{error}</p>}
 
       {accountInfo && (
-        <div className="text-[#EAEAEA] gap-4">
-          <Link href={`/${gameName}-${tagLine}`}>
-            <Image
-              src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountInfo?.profileIconId}.png`}
-              alt={`${(<div className="rounded-full p-2 bg-[#EAEAEA]" />)}`}
-              width={60}
-              height={60}
-              className="rounded-full border-2 border-[#5C87F8] animate-pulse animate-duration-5000 mr-4"
-            />
-            <h1>
-              {accountInfo.gameName}#{accountInfo.tagLine}{" "}
-              <span>{accountInfo?.summonerLevel}</span>
-            </h1>
+        <div className="px-4 py-1 bg-[#2A2A40] rounded-b-lg shadow border-x border-b border-gray-200">
+          <Link
+            href={`/${accountInfo.gameName}-${accountInfo.tagLine}`}
+            className="flex items-center justify-between p-2 text-center gap-2 hover:opacity-85 cursor-pointer"
+          >
+            <div className="flex items-center">
+              <Image
+                src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountInfo.profileIconId}.png`}
+                alt={`${(<div className="rounded-full p-2 bg-[#EAEAEA]" />)}`}
+                width={60}
+                height={60}
+                className="rounded-full border-2 border-[#5C87F8] animate-pulse animate-duration-5000 mr-4"
+              />
+              <h1 className="text-[#EAEAEA] text-2xl flex flex-col">
+                {accountInfo.gameName}#{accountInfo.tagLine}
+                <span className="text-sm text-gray-400">
+                  Level: {accountInfo.summonerLevel}
+                </span>
+              </h1>
+            </div>
+            <h4 className="bg-[#1E2A78] text-[#EAEAEA] p-2 px-3 uppercase rounded-md font-semibold">
+              {accountInfo.region}
+            </h4>
           </Link>
         </div>
       )}

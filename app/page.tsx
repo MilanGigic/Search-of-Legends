@@ -1,9 +1,9 @@
-import SearchForm from "@/components/SearchForm";
+import HomePage from "@/components/HomePage";
 
 export default function Home() {
   return (
-    <div>
-      <SearchForm />
+    <div className="flex justify-center items-center mx-auto">
+      <HomePage />
     </div>
   );
 }

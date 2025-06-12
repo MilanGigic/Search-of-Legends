@@ -5,6 +5,7 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import SearchForm from "./SearchForm";
 import GameMatchCard from "./GameMatchCard";
 import UserStats from "./UserStats";
+import checkDbGames from "@/lib/actions/checkDbGames";
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
@@ -21,12 +22,43 @@ const MatchHistorySection = ({
   const [games, setGames] = useState<GameDataProps[]>([]);
   const [failedMatches, setFailedMatches] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [dbChecked, setDbChecked] = useState<boolean>(false);
   const gamesPerPage = 9;
+
+  const checkDatabaseForMatches = useCallback(async () => {
+    try {
+      const dbGames = await checkDbGames(puuid, matchHistory); // Process found matches
+      dbGames?.foundMatches.forEach((matchData: DbGameInfo) => {
+        if (matchData.info) {
+          setGames((prev) => {
+            const exists = prev.some((g) => g.id === matchData.info.matchId);
+            return exists
+              ? prev
+              : [
+                  ...prev,
+                  {
+                    id: matchData.info.matchId,
+                    data: matchData,
+                  },
+                ];
+          });
+        }
+      });
+
+      setDbChecked(true);
+      return dbGames?.missingMatchIds;
+    } catch (error) {
+      console.error("Error checking database:", error);
+      return matchHistory; // Fallback to fetching all
+    }
+  }, [puuid, matchHistory]);
 
   const fetchGameInfo = useCallback(
     async (matchId: string, index: number) => {
-      const DELAY_TIME = 200;
-      await delay(index * DELAY_TIME);
+      if (!dbChecked) {
+        const DELAY_TIME = 200;
+        await delay(index * DELAY_TIME);
+      }
 
       try {
         const controller = new AbortController();
@@ -80,18 +112,22 @@ const MatchHistorySection = ({
 
     const startFetching = async () => {
       try {
+        // First check database for existing matches
+        const missingMatchIds = await checkDatabaseForMatches();
+
+        // Only fetch matches that weren't in the database
         const batchSize = 10;
-        for (let i = 0; i < matchHistory.length; i += batchSize) {
+        for (let i = 0; i < missingMatchIds!.length; i += batchSize) {
           if (isCancelled) break;
-          const batch = matchHistory.slice(i, i + batchSize);
-          const tasks = batch.map((matchId, batchIndex) =>
+          const batch = missingMatchIds!.slice(i, i + batchSize);
+          const tasks = batch.map((matchId: string, batchIndex: number) =>
             limit(() => fetchGameInfo(matchId, i + batchIndex))
           );
 
           await Promise.all(tasks);
 
-          if (i + batchSize < matchHistory.length) {
-            await delay(500);
+          if (i + batchSize < missingMatchIds!.length) {
+            await delay(500); // Rate limiting between batches
           }
         }
       } finally {
@@ -107,7 +143,7 @@ const MatchHistorySection = ({
       isCancelled = true;
       setIsLoading(false);
     };
-  }, [matchHistory, fetchGameInfo]);
+  }, [matchHistory, fetchGameInfo, checkDatabaseForMatches]);
 
   const { validGames, totalPages } = useMemo(() => {
     const valid = games
@@ -168,9 +204,13 @@ const MatchHistorySection = ({
   if (isLoading && validGames.length === 0) {
     return (
       <div className="container max-w-6xl mx-auto mt-5 text-center">
-        <div className="text-white">Loading matches...</div>
+        <div className="text-white">
+          {dbChecked ? "Loading remaining matches..." : "Checking database..."}
+        </div>
         <div className="text-gray-400 mt-2">
           Loaded {games.length} of {matchHistory.length} matches
+          {dbChecked &&
+            ` (${matchHistory.length - games.length} from database)`}
         </div>
       </div>
     );
@@ -179,7 +219,11 @@ const MatchHistorySection = ({
   if (validGames.length === 0 && !isLoading) {
     return (
       <div className="container max-w-6xl mx-auto mt-5 text-center">
-        <div className="text-white">No valid matches found</div>
+        <div className="text-white">
+          {failedMatches.length === matchHistory.length
+            ? "Failed to load matches"
+            : "No valid matches found"}
+        </div>
         {failedMatches.length > 0 && (
           <div className="text-red-400 mt-2">
             Failed to load {failedMatches.length} matches

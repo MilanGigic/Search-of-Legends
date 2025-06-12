@@ -30,6 +30,10 @@ const GameMatchCard = ({
   }, [puuid, game]);
 
   useEffect(() => {
+    setShowGame(false);
+  }, [currentPage]);
+
+  useEffect(() => {
     if (user) {
       const opponentParticipant = game.participants?.find(
         (p) =>
@@ -42,21 +46,32 @@ const GameMatchCard = ({
   }, [user, puuid, game]);
 
   useEffect(() => {
-    const timeStamp = game.info.gameCreation;
-    if (!timeStamp) return;
+    if (!game.info.gameCreation) return;
 
-    console.log("gameCreation:", game.info.gameCreation);
+    try {
+      // Ensure we have a Date object
+      const gameDate =
+        game.info.gameCreation instanceof Date
+          ? game.info.gameCreation
+          : new Date(game.info.gameCreation);
 
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (isNaN(gameDate.getTime())) {
+        console.error("Invalid date:", game.info.gameCreation);
+        return;
+      }
 
-    const formatted = new Date(timeStamp).toLocaleString(undefined, {
-      timeZone: timeZone,
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const formatted = gameDate.toLocaleString(undefined, {
+        timeZone,
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
 
-    setLocalTime(formatted);
+      setLocalTime(formatted);
+    } catch (error) {
+      console.error("Error formatting date:", error);
+    }
   }, [game.info.gameCreation]);
 
   return (
