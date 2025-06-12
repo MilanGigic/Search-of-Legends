@@ -6,6 +6,7 @@ import SearchForm from "./SearchForm";
 import GameMatchCard from "./GameMatchCard";
 import UserStats from "./UserStats";
 import checkDbGames from "@/lib/actions/checkDbGames";
+import { createRiotRateLimiter } from "@/lib/actions/rateLimiter";
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
@@ -27,34 +28,178 @@ const MatchHistorySection = ({
 
   const checkDatabaseForMatches = useCallback(async () => {
     try {
+      if (!puuid || !matchHistory || matchHistory.length === 0) {
+        console.warn("Invalid inputs for database check:", {
+          puuid: !!puuid,
+          matchHistoryLength: matchHistory?.length,
+        });
+        return matchHistory || [];
+      }
+
+      console.log(`Checking database for ${matchHistory.length} matches`);
       const dbGames = await checkDbGames(puuid, matchHistory); // Process found matches
-      dbGames?.foundMatches.forEach((matchData: DbGameInfo) => {
-        if (matchData.info) {
-          setGames((prev) => {
-            const exists = prev.some((g) => g.id === matchData.info.matchId);
-            return exists
-              ? prev
-              : [
-                  ...prev,
-                  {
-                    id: matchData.info.matchId,
-                    data: matchData,
-                  },
-                ];
-          });
+
+      if (!dbGames || typeof dbGames !== "object") {
+        console.error("Invalid response from checkDbGames:", dbGames);
+        return matchHistory; // Fallback to fetching all
+      }
+      const { foundMatches, missingMatchIds } = dbGames;
+
+      if (!Array.isArray(foundMatches)) {
+        console.error("foundMatches is not an array:", foundMatches);
+        return matchHistory;
+      }
+
+      let validMatchesProcessed = 0;
+      foundMatches.forEach((matchData: DbGameInfo, index: number) => {
+        // Validate match data structure
+        if (!matchData || typeof matchData !== "object") {
+          console.warn(`Invalid match data at index ${index}:`, matchData);
+          return;
         }
+
+        // Validate essential match info exists
+        if (!matchData.info || !matchData.info.matchId) {
+          console.warn(`Missing essential info for match at index ${index}:`, {
+            hasInfo: !!matchData.info,
+            hasMatchId: !!matchData.info?.matchId,
+          });
+          return;
+        }
+
+        // Validate participants and teams (essential for game display)
+        if (
+          !matchData.participants ||
+          !Array.isArray(matchData.participants) ||
+          matchData.participants.length === 0
+        ) {
+          console.warn(
+            `Invalid participants for match ${matchData.info.matchId}:`,
+            {
+              hasParticipants: !!matchData.participants,
+              isArray: Array.isArray(matchData.participants),
+              length: matchData.participants?.length,
+            }
+          );
+          return;
+        }
+
+        if (
+          !matchData.teams ||
+          !Array.isArray(matchData.teams) ||
+          matchData.teams.length === 0
+        ) {
+          console.warn(`Invalid teams for match ${matchData.info.matchId}:`, {
+            hasTeams: !!matchData.teams,
+            isArray: Array.isArray(matchData.teams),
+            length: matchData.teams?.length,
+          });
+          return;
+        }
+
+        // Step 5: Additional validation for game data integrity
+        const hasValidGameCreation =
+          matchData.info.gameCreation &&
+          (typeof matchData.info.gameCreation === "number" ||
+            typeof matchData.info.gameCreation === "string");
+
+        if (!hasValidGameCreation) {
+          console.warn(
+            `Invalid gameCreation for match ${matchData.info.matchId}:`,
+            matchData.info.gameCreation
+          );
+        }
+
+        // Step 6: Process valid match data
+        setGames((prev) => {
+          const exists = prev.some((g) => g.id === matchData.info.matchId);
+          if (exists) {
+            console.log(
+              `Match ${matchData.info.matchId} already exists in state`
+            );
+            return prev;
+          }
+
+          validMatchesProcessed++;
+          return [
+            ...prev,
+            {
+              id: matchData.info.matchId,
+              data: matchData,
+            },
+          ];
+        });
       });
 
+      console.log(
+        `Successfully processed ${validMatchesProcessed} valid matches from database`
+      );
+
+      // Step 7: Validate missingMatchIds
+      if (!Array.isArray(missingMatchIds)) {
+        console.error("missingMatchIds is not an array:", missingMatchIds);
+        return matchHistory;
+      }
+
+      // Step 8: Validate missing IDs are actually strings
+      const validMissingIds = missingMatchIds.filter(
+        (id) => typeof id === "string" && id.trim().length > 0
+      );
+
+      if (validMissingIds.length !== missingMatchIds.length) {
+        console.warn(
+          `Filtered out ${
+            missingMatchIds.length - validMissingIds.length
+          } invalid missing match IDs`
+        );
+      }
+
       setDbChecked(true);
-      return dbGames?.missingMatchIds;
+      console.log(
+        `Database check complete: ${foundMatches.length} found, ${validMissingIds.length} missing`
+      );
+
+      return validMissingIds;
     } catch (error) {
       console.error("Error checking database:", error);
+
+      // Step 9: Enhanced error handling
+      if (error instanceof TypeError) {
+        console.error(
+          "Type error in database check - possible data structure issue"
+        );
+      } else if (error instanceof Error && error.message.includes("fetch")) {
+        console.error("Network error during database check");
+      }
+
+      setDbChecked(true); // Prevent infinite loops
       return matchHistory; // Fallback to fetching all
     }
   }, [puuid, matchHistory]);
 
+  const riotRateLimiter = createRiotRateLimiter();
+
   const fetchGameInfo = useCallback(
     async (matchId: string, index: number) => {
+      await riotRateLimiter();
+      if (
+        !matchId ||
+        typeof matchId !== "string" ||
+        matchId.trim().length === 0
+      ) {
+        console.error(`Invalid matchId provided: ${matchId}`);
+        setFailedMatches((prev) => [...prev, matchId || "unknown"]);
+        return;
+      }
+
+      if (!region || !puuid) {
+        console.error(
+          `Missing required parameters: region=${region}, puuid=${!!puuid}`
+        );
+        setFailedMatches((prev) => [...prev, matchId]);
+        return;
+      }
+
       if (!dbChecked) {
         const DELAY_TIME = 200;
         await delay(index * DELAY_TIME);
@@ -73,36 +218,101 @@ const MatchHistorySection = ({
 
         if (!res.ok) {
           console.error(
-            `Error fetching game info for ${matchId}:`,
-            res.statusText
+            `HTTP error fetching game info for ${matchId}: ${res.status} ${res.statusText}`
           );
           setFailedMatches((prev) => [...prev, matchId]);
           return;
         }
-        const data: DbGameInfo = await res.json();
-
-        if (data?.info && data?.participants && data?.teams) {
-          setGames((prev) => {
-            // Prevent duplicates
-            const exists = prev.some((game) => game.id === matchId);
-            if (exists) return prev;
-
-            return [...prev, { id: matchId, data: data }];
-          });
-        } else {
-          console.warn(`Invalid data structure for match ${matchId}:`, data);
+        let data: DbGameInfo;
+        try {
+          data = await res.json();
+        } catch (parseError) {
+          console.error(`JSON parse error for match ${matchId}:`, parseError);
           setFailedMatches((prev) => [...prev, matchId]);
+          return;
         }
+
+        // Step 4: Comprehensive data structure validation
+        if (!data || typeof data !== "object") {
+          console.warn(`Invalid data object for match ${matchId}:`, data);
+          setFailedMatches((prev) => [...prev, matchId]);
+          return;
+        }
+
+        // Step 5: Validate essential data fields
+        const validationChecks = {
+          hasInfo: data.info && typeof data.info === "object",
+          hasParticipants:
+            Array.isArray(data.participants) && data.participants.length > 0,
+          hasTeams: Array.isArray(data.teams) && data.teams.length > 0,
+          hasMatchId: data.info?.matchId === matchId,
+          hasGameCreation:
+            data.info?.gameCreation !== undefined &&
+            data.info.gameCreation !== null,
+        };
+
+        const failedChecks = Object.entries(validationChecks)
+          .filter(([_, passed]) => !passed)
+          .map(([check]) => check);
+
+        if (failedChecks.length > 0) {
+          console.warn(`Data validation failed for match ${matchId}:`, {
+            failedChecks,
+            dataStructure: {
+              hasInfo: !!data.info,
+              participantsLength: data.participants?.length || 0,
+              teamsLength: data.teams?.length || 0,
+              matchIdMatch: data.info?.matchId === matchId,
+            },
+          });
+          setFailedMatches((prev) => [...prev, matchId]);
+          return;
+        }
+
+        // Step 6: Additional participant validation
+        const validParticipants = data.participants.filter(
+          (p) => p && typeof p === "object" && p.puuid
+        );
+
+        if (validParticipants.length !== data.participants.length) {
+          console.warn(
+            `Some participants invalid for match ${matchId}: ${validParticipants.length}/${data.participants.length} valid`
+          );
+        }
+
+        // Step 7: Process valid game data
+        setGames((prev) => {
+          const exists = prev.some((game) => game.id === matchId);
+          if (exists) {
+            console.log(`Match ${matchId} already exists in games state`);
+            return prev;
+          }
+
+          console.log(`Successfully added match ${matchId} to games state`);
+          return [...prev, { id: matchId, data: data }];
+        });
       } catch (error) {
+        // Step 8: Enhanced error handling
         if (error === "AbortError") {
           console.error(`Request timeout for match ${matchId}`);
+        } else if (
+          error instanceof TypeError &&
+          error.message.includes("fetch")
+        ) {
+          console.error(
+            `Network error fetching match ${matchId}:`,
+            error.message
+          );
         } else {
-          console.error(`Error fetching game info for ${matchId}:`, error);
+          console.error(
+            `Unexpected error fetching game info for ${matchId}:`,
+            error
+          );
         }
         setFailedMatches((prev) => [...prev, matchId]);
       }
     },
-    [puuid, region]
+    [puuid, region, dbChecked]
   );
 
   useEffect(() => {
@@ -146,19 +356,59 @@ const MatchHistorySection = ({
   }, [matchHistory, fetchGameInfo, checkDatabaseForMatches]);
 
   const { validGames, totalPages } = useMemo(() => {
+    // Step 1: Apply comprehensive validation to each game
     const valid = games
-      .filter(
-        (game) =>
-          game.data &&
-          game.data.info &&
-          game.data.participants &&
-          game.data.teams
-      )
+      .filter((game) => {
+        // Basic structure validation
+        if (!game || !game.data || !game.id) {
+          return false;
+        }
+
+        const { data } = game;
+
+        // Essential data validation
+        const hasEssentialData =
+          data.info &&
+          typeof data.info === "object" &&
+          data.info.matchId &&
+          Array.isArray(data.participants) &&
+          data.participants.length > 0 &&
+          Array.isArray(data.teams) &&
+          data.teams.length > 0;
+
+        if (!hasEssentialData) {
+          console.debug(`Game ${game.id} failed essential data validation`);
+          return false;
+        }
+
+        // Validate game creation date for sorting
+        const hasValidDate =
+          data.info.gameCreation &&
+          !isNaN(new Date(data.info.gameCreation).getTime());
+
+        if (!hasValidDate) {
+          console.debug(
+            `Game ${game.id} has invalid gameCreation date: ${data.info.gameCreation}`
+          );
+          return false;
+        }
+
+        return true;
+      })
       .sort((a, b) => {
-        const dateA = new Date(a.data!.info.gameCreation!).getTime();
-        const dateB = new Date(b.data!.info.gameCreation!).getTime();
-        return dateB - dateA; // Newest first
+        try {
+          const dateA = new Date(a.data!.info.gameCreation!).getTime();
+          const dateB = new Date(b.data!.info.gameCreation!).getTime();
+          return dateB - dateA; // Newest first
+        } catch (error) {
+          console.error("Error sorting games by date:", error);
+          return 0; // Keep original order if sorting fails
+        }
       });
+
+    console.log(
+      `Filtered to ${valid.length} valid games from ${games.length} total games`
+    );
 
     return {
       validGames: valid,
