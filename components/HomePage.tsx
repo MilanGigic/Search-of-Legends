@@ -16,6 +16,8 @@ const HomePage = () => {
     setHasMounted(true);
   }, []);
 
+  // HYDRATION ERROR, FIGURE IT OUT
+
   useEffect(() => {
     if (!hasMounted) return;
 
