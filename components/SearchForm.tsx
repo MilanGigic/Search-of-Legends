@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect } from "react";
 
 export default function SearchForm() {
   const [gameName, setGameName] = useState("");

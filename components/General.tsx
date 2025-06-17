@@ -24,7 +24,7 @@ const General = ({
     >
       {showGame ? (
         <div className="max-w-[765px]">
-          <div className="flex gap-5 animate-fade-down animate-ease-in-out animate-duration-200">
+          <div className="flex gap-5 animate-fade-down animate-duration-300 animate-ease-in-out">
             <div className="w-full flex flex-col">
               <div className="flex justify-center items-center flex-col">
                 <h1>Blue </h1>

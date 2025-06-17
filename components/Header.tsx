@@ -1,10 +1,13 @@
+"use client";
+
 import Link from "next/link";
 
 // Shadcn
 import { House } from "lucide-react";
 import { Button } from "./ui/button";
+import SearchForm from "./SearchForm";
 
-const Header = () => {
+const Header = ({ showSearch = false }: { showSearch?: boolean }) => {
   return (
     <div className="w-full sticky top-0 z-50 bg-transparent backdrop-blur-sm backdrop-brightness-70 flex text-center items-center h-[70px] shadow-xl justify-center text-white">
       <div className="w-full absolute items-center px-5">
@@ -22,6 +25,7 @@ const Header = () => {
             >
               Leaderboard
             </Link>
+            {showSearch && <SearchForm />}
             <Link
               href="/champions"
               className="bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-300 hover:to-blue-200  font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"

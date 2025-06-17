@@ -5,6 +5,7 @@ import { motion, useAnimation } from "framer-motion";
 import TypewriterComponent from "typewriter-effect";
 import SearchForm from "@/components/SearchForm";
 import { useEffect, useRef, useState } from "react";
+import Spotlight from "./ui/spotlight";
 
 const HomePage = () => {
   const h1Ref = useRef(null);

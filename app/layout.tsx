@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
-import Header from "@/components/Header";
+import Spotlight from "@/components/ui/spotlight";
 
 const bebasNeue = Bebas_Neue({
   variable: "--font-bebas-neue",
@@ -36,7 +36,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
+          <Spotlight />
           {children}
         </ThemeProvider>
       </body>
