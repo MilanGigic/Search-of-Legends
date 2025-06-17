@@ -150,7 +150,7 @@
       /* subtle blue-gray tone */ rgba(36, 44, 58, 0.05) 50%,
       rgba(36, 44, 58, 0.03) 100%
     );
-    animation: sweep 30s linear infinite;
+    animation: sweep 30s 1s linear infinite;
     background-size: 500% 500%;
     z-index: 0;
     pointer-events: none;

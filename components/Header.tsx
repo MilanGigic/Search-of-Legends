@@ -25,7 +25,13 @@ const Header = ({ showSearch = false }: { showSearch?: boolean }) => {
             >
               Leaderboard
             </Link>
-            {showSearch && <SearchForm />}
+            {showSearch && (
+              <div className="flex flex-col h-full items-center justify-center">
+                <SearchForm
+                  placeholder={"Enter Summoner Name (e.g. Faker#KR1)"}
+                />
+              </div>
+            )}
             <Link
               href="/champions"
               className="bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-300 hover:to-blue-200  font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"

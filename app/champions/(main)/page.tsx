@@ -64,8 +64,8 @@ const ChampionsPage = () => {
   // NEXT TO DO: START IMPLEMENTING THE BUILD ITEMIZATIONS, MOST POPULAR RUNES, SPELLS, SUMMONERS, IF FINISHED, START IMPLEMENTING ACCOUNT STATS COMPONENT
 
   return (
-    <div className="bg-[#1E1E2F] flex items-center justify-center text-gray-100">
-      <div className="container bg-[#2A2A40] border-x py-4 shadow-2xl min-h-screen shadow-purple-800 border-gray-500 flex flex-col items-center justify-center">
+    <div className="bg-[#1E1E2F] bg-pattern flex items-center justify-center text-gray-100">
+      <div className="container bg-[#2A2A40]/50 border-x py-4 shadow-2xl min-h-screen shadow-purple-800 border-gray-500 flex flex-col items-center justify-center">
         <input
           placeholder="Search for a champion..."
           type="search"

@@ -1,13 +1,13 @@
 import Header from "@/components/Header";
 
-export default function MainLayout({
+export default function ChampionIdLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <>
-      <Header showSearch={false} />
+      <Header showSearch={true} />
       {children}
     </>
   );

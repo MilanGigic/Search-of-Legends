@@ -486,7 +486,7 @@ const MatchHistorySection = ({
   const PaginationControls = ({ position }: { position: "top" | "bottom" }) => (
     <div
       className={`${
-        position === "top" ? "mt-4" : "pb-3"
+        position === "top" ? "mt-4" : "py-3"
       } flex justify-center items-center space-x-2`}
     >
       <button
@@ -534,9 +534,8 @@ const MatchHistorySection = ({
       </div>
       <div className="col-span-2 max-w-[765px] shadow-2xl shadow-[#2A2A40]">
         <PaginationControls position="top" />
-        <div className="flex items-center w-full justify-center py-4 bg-[#1E1E2F]">
-          <h1 className="mr-2">Search for a champion</h1>
-          <SearchForm />
+        <div className="flex items-center w-full justify-center bg-[#1E1E2F]">
+          <SearchForm placeholder={"Search for a specific champion..."} />
         </div>
         <Suspense>
           {currentGames.map((game, index) => (

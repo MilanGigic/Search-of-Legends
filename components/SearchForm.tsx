@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
-export default function SearchForm() {
+export default function SearchForm({ placeholder }: { placeholder: string }) {
   const [gameName, setGameName] = useState("");
   const [tagLine, setTagLine] = useState("");
   const [accountInfo, setAccountInfo] = useState<DbSummonerInfo | null>(null);
@@ -77,42 +77,53 @@ export default function SearchForm() {
   return (
     <div className="space-y-4 w-full flex flex-col justify-center items-center">
       <input
-        placeholder="Enter Summoner Name (e.g. PlayerName#1234)"
+        placeholder={placeholder}
         className="border-b border-gray-400 text-gray-200 focus:outline-none p-2 w-full text-center"
         value={inputValue}
         onChange={(e) => handleRiotNameChange(e)}
       />
 
-      {loading && <p className="text-blue-500">Searching...</p>}
       {error && <p className="text-red-500">{error}</p>}
-
-      {accountInfo && (
-        <div className="px-4 py-1 bg-[#2A2A40] rounded-b-lg shadow border-x border-b border-gray-200">
-          <Link
-            href={`/${accountInfo.gameName}-${accountInfo.tagLine}`}
-            className="flex items-center justify-between p-2 text-center gap-2 hover:opacity-85 cursor-pointer"
-          >
-            <div className="flex items-center">
-              <Image
-                src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountInfo.profileIconId}.png`}
-                alt={`${(<div className="rounded-full p-2 bg-[#EAEAEA]" />)}`}
-                width={60}
-                height={60}
-                className="rounded-full border-2 border-[#5C87F8] animate-pulse animate-duration-5000 mr-4"
-              />
-              <h1 className="text-[#EAEAEA] text-2xl flex flex-col">
-                {accountInfo.gameName}#{accountInfo.tagLine}
-                <span className="text-sm text-gray-400">
-                  Level: {accountInfo.summonerLevel}
-                </span>
-              </h1>
+      <div className="min-h-[90px] w-full flex justify-center items-center transition-all duration-300">
+        {loading && (
+          <div className="flex gap-4 items-center p-4 rounded-lg bg-[#2A2A40] w-fit">
+            <div className="w-14 h-14 rounded-full skeleton" />
+            <div className="flex flex-col gap-2">
+              <div className="w-40 h-4 skeleton" />
+              <div className="w-24 h-3 skeleton" />
             </div>
-            <h4 className="bg-[#1E2A78] text-[#EAEAEA] p-2 px-3 uppercase rounded-md font-semibold">
-              {accountInfo.region}
-            </h4>
-          </Link>
-        </div>
-      )}
+            <div className="ml-auto w-16 h-6 skeleton rounded" />
+          </div>
+        )}
+
+        {!loading && accountInfo && (
+          <div className="px-4 py-1 bg-[#2A2A40] rounded-b-lg shadow border-x border-b border-gray-200 w-fit">
+            <Link
+              href={`/${accountInfo.gameName}-${accountInfo.tagLine}`}
+              className="flex items-center justify-between p-2 text-center gap-2 hover:opacity-85 cursor-pointer"
+            >
+              <div className="flex items-center">
+                <Image
+                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountInfo.profileIconId}.png`}
+                  alt={``}
+                  width={60}
+                  height={60}
+                  className="rounded-full border-2 border-[#5C87F8] animate-pulse animate-duration-5000 mr-4"
+                />
+                <h1 className="text-[#EAEAEA] text-2xl flex flex-col">
+                  {accountInfo.gameName}#{accountInfo.tagLine}
+                  <span className="text-sm text-gray-400">
+                    Level: {accountInfo.summonerLevel}
+                  </span>
+                </h1>
+              </div>
+              <h4 className="bg-[#1E2A78] text-[#EAEAEA] p-2 px-3 uppercase rounded-md font-semibold">
+                {accountInfo.region}
+              </h4>
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

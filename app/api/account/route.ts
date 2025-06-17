@@ -33,12 +33,13 @@ export async function GET(req: NextRequest) {
 
   try {
     // Check if account already exists in database
-    const existingAccount = await db.query.accounts.findFirst({
-      where: and(
-        eq(accounts.gameName, gameName),
-        eq(accounts.tagLine, tagLine)
-      ),
-    });
+    const existingAccount = await db
+      .select()
+      .from(accounts)
+      .where(
+        and(eq(accounts.gameName, gameName), eq(accounts.tagLine, tagLine))
+      )
+      .then((rows) => rows[0]);
 
     console.log("Existing account in DB:", existingAccount);
 
@@ -55,21 +56,18 @@ export async function GET(req: NextRequest) {
         puuid: existingAccount?.puuid,
         gameName: existingAccount?.gameName,
         tagLine: existingAccount?.tagLine,
-        summonerInfo: {
-          id: existingAccount.summonerId,
-          region: existingAccount.region,
-          accountId: existingAccount.accountId,
-          puuid: existingAccount.puuid,
-          profileIconId: existingAccount.profileIconId,
-          revisionDate: existingAccount.revisionDate,
-          summonerLevel: existingAccount.summonerLevel,
-          tier: existingAccount.tier,
-          rank: existingAccount.rank,
-          leaguePoints: existingAccount.leaguePoints,
-          wins: existingAccount.wins,
-          losses: existingAccount.losses,
-          lastUpdated: existingAccount.lastUpdated,
-        },
+        id: existingAccount.summonerId,
+        region: existingAccount.region,
+        accountId: existingAccount.accountId,
+        profileIconId: existingAccount.profileIconId,
+        revisionDate: existingAccount.revisionDate,
+        summonerLevel: existingAccount.summonerLevel,
+        tier: existingAccount.tier,
+        rank: existingAccount.rank,
+        leaguePoints: existingAccount.leaguePoints,
+        wins: existingAccount.wins,
+        losses: existingAccount.losses,
+        lastUpdated: existingAccount.lastUpdated,
       });
     }
 

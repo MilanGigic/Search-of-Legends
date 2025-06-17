@@ -96,7 +96,7 @@ const HomePage = () => {
           transition={{ delay: 0.6, duration: 0.5 }}
           className="w-full"
         >
-          <SearchForm />
+          <SearchForm placeholder={"Enter Summoner Name (e.g. Faker#KR1)"} />
         </motion.div>
       </div>
       <br />

@@ -137,7 +137,7 @@ const GameMatchCard = ({
         <div className="m-0">
           <section className="flex justify-center max-w-3xl mx-auto w-full">
             <Button
-              className={`hover:bg-[#2A2A40] w-1/3 py-5 disabled:bg-blue-950/50 rounded-none`}
+              className={`hover:bg-[#2A2A40] hover:text-slate-300 w-1/3 py-5 disabled:bg-blue-950/50 rounded-none`}
             >
               General
             </Button>
@@ -159,7 +159,7 @@ const GameMatchCard = ({
         <div></div>
       )}
       <Button
-        className={`w-full items-center justify-center hover:bg-[#2A2A40] rounded-t-none pt-2`}
+        className={`w-full items-center justify-center bg-[#2A2A40]/55 text-slate-300 hover:bg-[#2A2A40] rounded-t-none pt-2`}
         onClick={() => setShowGame(!showGame)}
       >
         {showGame ? <ArrowUpIcon /> : <ArrowDownIcon />}
