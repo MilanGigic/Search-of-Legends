@@ -3,15 +3,14 @@
 import { useEffect, useState } from "react";
 
 interface UserStatsProps {
-  games: {
-    id: string;
-    data: DbGameInfo | null;
-  }[];
   matchHistory: string[];
+  puuid: string;
 }
 
-const UserStats = ({ games, matchHistory }: UserStatsProps) => {
-  const [champions, setChampions] = useState<ChampionDetail[]>([]);
+const UserStats = ({ matchHistory, puuid }: UserStatsProps) => {
+  const [championData, setChampionData] = useState<ChampionDetailData | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchChampions = async () => {
@@ -25,20 +24,15 @@ const UserStats = ({ games, matchHistory }: UserStatsProps) => {
         }
 
         const data: ChampionDetailData = await res.json();
-        const championData = data.data;
-
-        setChampions(Object.values(championData));
-        console.log("Champions:", champions);
+        setChampionData(data);
       } catch (error) {
         console.error("Error fetching champions", error);
         return null;
       }
     };
     fetchChampions();
-  }, []);
+  }, [puuid]);
 
-  console.log("Games:", games);
-
-  return <div>UserStats</div>;
+  return <div className="h-full border">UserStats</div>;
 };
 export default UserStats;

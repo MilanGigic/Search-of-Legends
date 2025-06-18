@@ -35,31 +35,30 @@ const UserVsOpponent = ({
           : "bg-gradient-to-r from-red-500/40 to-rose-400/40"
       } w-full py-2.5 flex justify-between inset-shadow-xs`}
     >
-      <div className="px-4 flex justify-end items-center w-1/2">
-        <div className="flex w-full justify-end animate-fade-right animate-ease-in animate-duration-200">
-          <div className="flex justify-end items-center">
+      <div className="px-4 flex justify-start items-center w-1/2">
+        <div className="flex w-full justify-start animate-fade-right animate-ease-in animate-duration-200">
+          <div className="flex justify-start items-center">
             <div className="flex flex-col items-center justify-center">
               <img
                 src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${user?.championName}.png`}
-                width={60}
-                height={60}
+                className="w-[30px] h-[30px] md:w-[60px] md:h-[60px]"
               />
             </div>
-            <div className="pl-3 flex flex-col justify-end">
-              <div className="text-base flex items-center font-semibold italic">
+            <div className="pl-1 md:pl-3 flex flex-col justify-end">
+              <div className="text-sm md:text-base flex items-center font-normal md:font-semibold italic">
                 {user?.kills}/
                 <span className="text-red-300 items-center px-0.5">
                   {user?.deaths}
                 </span>
                 /{user?.assists}{" "}
-                <span className="not-italic text-base items-center font-light text-gray-300">
-                  <span className="text-lg font-bold not-italic items-center pl-3 text-white">
+                <span className="not-italic text-xs md:text-base px-0.5 items-center font-extralight md:font-light text-gray-300">
+                  <span className="text-sm md:text-lg font-semibold md:font-bold not-italic items-center pl-1 md:pl-3 text-white">
                     {userKda}
                   </span>
                   KDA
                 </span>
-                <p className="ml-2">
-                  <span className="font-light text-sm text-gray-300">
+                <p className="md:ml-2">
+                  <span className="font-extralight md:font-light text-xs md:text-sm text-gray-300">
                     {calculateCsPerMin(
                       user?.timePlayed!,
                       user?.totalMinionsKilled!
@@ -69,7 +68,7 @@ const UserVsOpponent = ({
                 </p>
               </div>
 
-              <ul className="flex z-10 gap-0.5 items-center w-[252px] bg-blue-950 p-3 rounded-md inset-shadow-xs inset-shadow-black/80">
+              <ul className="flex justify-start z-10 gap-0.5 items-center w-[152px] md:w-[252px] bg-blue-950 p-3 rounded-md inset-shadow-xs inset-shadow-black/80">
                 <li>
                   {user?.summoner1Id === 4 ? (
                     <img
@@ -235,21 +234,21 @@ const UserVsOpponent = ({
           </div>
         </div>
       </div>
-      <div className="px-4 flex items-center justify-start w-1/2">
-        <div className="w-full flex justify-start animate-fade-left animate-ease-in animate-duration-200">
-          <div className="pr-3 flex flex-col justify-center">
-            <div className="text-base font-semibold italic flex items-center justify-end">
+      <div className="px-4 flex items-center justify-end w-1/2">
+        <div className="w-full flex justify-end animate-fade-left animate-ease-in animate-duration-200">
+          <div className="pr-3 flex flex-col justify-end">
+            <div className="text-xs md:text-base font-medium md:font-semibold italic flex items-center justify-end">
               <p className="mr-2">
-                <span className="font-light text-sm text-gray-300">
+                <span className="md:font-light font-extralight text-[10px] md:text-sm text-gray-300">
                   {calculateCsPerMin(
                     opponent?.timePlayed!,
                     opponent?.totalMinionsKilled!
                   )}{" "}
-                  cs<span className="text-xs">/</span>min
+                  cs<span className="text-[8px]">/</span>min
                 </span>{" "}
               </p>
-              <span className="pr-3 not-italic text-base font-light text-gray-300">
-                <span className="text-lg font-bold not-italic items-center text-white">
+              <span className="pr-3 not-italic text-xs md:text-base font-extralight md:font-light text-gray-300">
+                <span className="text-sm md:text-lg font-semibold md:font-bold not-italic items-center text-white">
                   {opponentKda}
                 </span>
                 KDA
@@ -260,7 +259,7 @@ const UserVsOpponent = ({
               </span>
               /{opponent?.assists}
             </div>
-            <ul className="flex justify-end gap-0.5 items-center w-[252px] bg-blue-950 p-3 rounded-md inset-shadow-xs inset-shadow-black/80">
+            <ul className="flex justify-end gap-0.5 items-center w-[152px] md:w-[252px] bg-blue-950 p-3 rounded-md inset-shadow-xs inset-shadow-black/80">
               <li>
                 {opponent?.item0 ? (
                   <img
@@ -426,8 +425,7 @@ const UserVsOpponent = ({
           <div className="flex flex-col items-center justify-center">
             <img
               src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${opponent?.championName}.png`}
-              width={60}
-              height={60}
+              className="w-[30px] h-[30px] md:w-[60px] md:h-[60px]"
             />
           </div>
         </div>

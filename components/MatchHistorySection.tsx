@@ -453,7 +453,7 @@ const MatchHistorySection = ({
 
   if (isLoading && validGames.length === 0) {
     return (
-      <div className="container max-w-6xl mx-auto mt-5 text-center">
+      <div className="mx-auto mt-5 text-center">
         <div className="text-white">
           {dbChecked ? "Loading remaining matches..." : "Checking database..."}
         </div>
@@ -468,7 +468,7 @@ const MatchHistorySection = ({
 
   if (validGames.length === 0 && !isLoading) {
     return (
-      <div className="container max-w-6xl mx-auto mt-5 text-center">
+      <div className="mx-auto mt-5 text-center">
         <div className="text-white">
           {failedMatches.length === matchHistory.length
             ? "Failed to load matches"
@@ -528,11 +528,11 @@ const MatchHistorySection = ({
   );
 
   return (
-    <div className="container max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 mt-5">
-      <div className="h-full border">
-        <UserStats games={games} matchHistory={matchHistory} />
-      </div>
-      <div className="col-span-2 max-w-[765px] shadow-2xl shadow-[#2A2A40]">
+    <div className="mt-5">
+      {/* <div className="h-full border">
+        <UserStats games={games} matchHistory={matchHistory} puuid={puuid} />
+      </div> */}
+      <div className="max-w-[722px] md:max-w-[765px] shadow-2xl shadow-[#2A2A40]">
         <PaginationControls position="top" />
         <div className="flex items-center w-full justify-center bg-[#1E1E2F]">
           <SearchForm placeholder={"Search for a specific champion..."} />

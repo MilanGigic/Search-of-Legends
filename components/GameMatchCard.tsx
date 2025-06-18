@@ -78,7 +78,7 @@ const GameMatchCard = ({
     <div className="container mx-auto text-white">
       {/* User vs Opponent */}
       <div className={`${showGame ? "rounded-t-md" : ""} bg-[#2A2A40] w-full`}>
-        <div className="max-w-[765px] mx-auto grid grid-cols-3 items-center py-1.5">
+        <div className="max-w-[722px] md:max-w-[765px] mx-auto grid grid-cols-3 items-center py-1.5">
           <h1 className="text-amber-500 text-center">
             {user?.riotIdGameName}#{user?.riotIdTagline}
           </h1>

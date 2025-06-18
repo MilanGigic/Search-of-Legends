@@ -1,5 +1,6 @@
 import MatchHistorySection from "@/components/MatchHistorySection";
 import UserCard from "@/components/UserCard";
+import UserStats from "@/components/UserStats";
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
 import fetchAllMatchIds from "@/lib/actions/match-history/fetchMatchIds";
@@ -41,12 +42,20 @@ const AccountPage = async ({ params }: AccountPageProps) => {
   return (
     <div className="bg-[#1E1E2F] min-h-screen p-4 bg-pattern">
       <UserCard accountData={account} region={REGION} />
-      <div className="h-full w-full">
-        <MatchHistorySection
-          matchHistory={matchHistory}
-          puuid={puuid}
-          region={REGION}
-        />
+      <div className="container max-w-[722px] md:max-w-6xl h-full mx-auto">
+        <div className="w-full grid grid-cols-1 md:grid-cols-3 mx-auto">
+          <div className="col-span-1">
+            <UserStats puuid={puuid} matchHistory={matchHistory} />
+          </div>
+
+          <div className="col-span-1 md:mx-auto md:col-span-2">
+            <MatchHistorySection
+              matchHistory={matchHistory}
+              puuid={puuid}
+              region={REGION}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
