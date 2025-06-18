@@ -1,4 +1,5 @@
 "use client";
+import getFrontendRegion from "@/lib/actions/match-history/getFrontendRegion";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -10,6 +11,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [inputValue, setInputValue] = useState<string>("");
+  const [frontendRegion, setFrontendRegion] = useState<string>("");
 
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL!;
 
@@ -30,6 +32,11 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
           throw new Error(res.statusText || "Failed to fetch account");
         }
         const data: DbSummonerInfo = await res.json();
+        const region = getFrontendRegion(data.region);
+
+        if (region) {
+          setFrontendRegion(region);
+        }
 
         setAccountInfo(data);
       } catch (err: any) {
@@ -40,15 +47,15 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
       }
     };
 
+    if (gameName.length === 0) {
+      setError("");
+    }
+
     // Delay search to avoid triggering on every keystroke instantly
     const delay = setTimeout(fetchAccount, 500); // 500ms debounce
 
     return () => clearTimeout(delay); // Cleanup on re-type
   }, [gameName, tagLine]);
-
-  useEffect(() => {
-    console.log("Account info:", accountInfo);
-  }, [accountInfo]);
 
   const handleRiotNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -61,7 +68,9 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
     if (hashIndex === -1) {
       // No hashtag present
       console.log("No hashtag present, setting gameName:", value.trim());
+
       setGameName(value.trim());
+
       setTagLine("");
     } else if (value.split("#").length - 1 > 1) {
       // more than one #
@@ -83,10 +92,14 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
         onChange={(e) => handleRiotNameChange(e)}
       />
 
-      {error && <p className="text-red-500">{error}</p>}
+      {error && (
+        <div className="px-4 py-1 animate-pulse animate-duration-[3s] text-slate-300 text-start flex items-center bg-[#2A2A40] rounded-b-lg shadow border-x border-b border-gray-200 w-full h-[85px]">
+          Sorry, we couldn't find what you're looking for...
+        </div>
+      )}
       <div className="min-h-[90px] w-full flex justify-center items-center transition-all duration-300">
         {loading && (
-          <div className="flex gap-4 items-center p-4 rounded-lg bg-[#2A2A40] w-fit">
+          <div className="flex gap-4 items-center p-4 rounded-lg bg-[#2A2A40] w-full h-[85px]">
             <div className="w-14 h-14 rounded-full skeleton" />
             <div className="flex flex-col gap-2">
               <div className="w-40 h-4 skeleton" />
@@ -97,9 +110,11 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
         )}
 
         {!loading && accountInfo && (
-          <div className="px-4 py-1 bg-[#2A2A40] rounded-b-lg shadow border-x border-b border-gray-200 w-fit">
+          <div className="px-4 py-1 bg-[#2A2A40] rounded-b-lg shadow border-x border-b border-gray-200 w-full">
             <Link
-              href={`/${accountInfo.gameName}-${accountInfo.tagLine}`}
+              href={`/${encodeURIComponent(
+                accountInfo.gameName
+              )}-${encodeURIComponent(accountInfo.tagLine)}`}
               className="flex items-center justify-between p-2 text-center gap-2 hover:opacity-85 cursor-pointer"
             >
               <div className="flex items-center">
@@ -118,7 +133,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
                 </h1>
               </div>
               <h4 className="bg-[#1E2A78] text-[#EAEAEA] p-2 px-3 uppercase rounded-md font-semibold">
-                {accountInfo.region}
+                {frontendRegion}
               </h4>
             </Link>
           </div>

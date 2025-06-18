@@ -70,10 +70,9 @@ export async function GET(req: NextRequest) {
         lastUpdated: existingAccount.lastUpdated,
       });
     }
+    ``;
 
-    const accountUrl = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
-      gameName
-    )}/${encodeURIComponent(tagLine)}?api_key=${API_KEY}`;
+    const accountUrl = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}?api_key=${API_KEY}`;
 
     console.log("Constructed Riot API URL:", accountUrl);
 

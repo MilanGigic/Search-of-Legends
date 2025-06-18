@@ -13,7 +13,8 @@ interface AccountPageProps {
 
 const AccountPage = async ({ params }: AccountPageProps) => {
   const { riotId } = await params;
-  const [gameName, tagLine] = riotId.split("-");
+  const decodedRiotId = decodeURIComponent(riotId);
+  const [gameName, tagLine] = decodedRiotId.split("-");
   console.log("Parsed gameName and tagLine:", { gameName, tagLine });
 
   if (!gameName || !tagLine) {
