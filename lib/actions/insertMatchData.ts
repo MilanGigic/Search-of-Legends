@@ -108,6 +108,8 @@ export default async function insertMatchData(
         participantId: p.participantId,
         puuid: p.puuid,
         summonerId: p.summonerId,
+        summoner1Id: p.summoner1Id,
+        summoner2Id: p.summoner2Id,
         summonerLevel: p.summonerLevel,
         summonerName: p.summonerName,
         profileIcon: p.profileIcon,

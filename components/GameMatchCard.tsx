@@ -74,18 +74,21 @@ const GameMatchCard = ({
     }
   }, [game.info.gameCreation]);
 
+  console.log("Full User Data:", user);
+  console.log("Full Opponent Data:", opponent);
+
   return (
     <div className="container mx-auto text-white">
       {/* User vs Opponent */}
       <div className={`${showGame ? "rounded-t-md" : ""} bg-[#2A2A40] w-full`}>
         <div className="max-w-[722px] md:max-w-[765px] mx-auto grid grid-cols-3 items-center py-1.5">
-          <h1 className="text-amber-500 text-center">
+          <h1 className="text-amber-500 text-sm md:text-base text-center">
             {user?.riotIdGameName}#{user?.riotIdTagline}
           </h1>
 
           <div className="flex flex-col items-center">
             <div className="flex flex-col items-center justify-center text-sm font-light text-gray-300">
-              <p className="italic text-sm w-full items-center text-center">
+              <p className="italic text-xs font-bold md:font-normal md:text-sm w-full items-center text-center">
                 {game.info.queueId === 420
                   ? "Solo/Duo"
                   : game.info.queueId === 400
@@ -114,8 +117,8 @@ const GameMatchCard = ({
                   ? "Arena"
                   : ""}
               </p>
-              <p className="flex items-center w-full">
-                <strong className="mr-1 font-bold text-gray-300">
+              <p className="flex text-xs md:text-base items-center w-full">
+                <strong className="mr-0.5 md:mr-1 text-xs md:text-base font-semibold md:font-bold text-gray-300">
                   {localTime}
                 </strong>{" "}
                 / {calculateAccurateGameDuration(user?.timePlayed!)}
@@ -124,8 +127,9 @@ const GameMatchCard = ({
           </div>
           <Link
             href={`${opponent?.riotIdGameName}-${opponent?.riotIdTagline}?region=${region}`}
+            className="hover:text-amber-500 transition-colors duration-200"
           >
-            <h1 className="items-center text-center">
+            <h1 className="items-center text-sm md:text-base text-center overflow-hidden text-wrap">
               {opponent?.riotIdGameName}#{opponent?.riotIdTagline}
             </h1>
           </Link>

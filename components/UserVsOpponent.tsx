@@ -1,5 +1,30 @@
 import { calculateCsPerMin } from "@/lib/riot";
 
+const getSummonerSpellImage = (spellId: number) => {
+  const spellMap: Record<number, string> = {
+    1: "SummonerBoost", // Cleanse
+    3: "SummonerExhaust", // Exhaust
+    4: "SummonerFlash", // Flash
+    6: "SummonerHaste", // Ghost
+    7: "SummonerHeal", // Heal
+    11: "SummonerSmite", // Smite
+    12: "SummonerTeleport", // Teleport
+    13: "SummonerMana", // Clarity
+    14: "SummonerDot", // Ignite
+    21: "SummonerBarrier", // Barrier
+    32: "SummonerSnowball", // ARAM Mark/Dash
+    39: "SummonerSnowURFSnowball_Mark", // URF Mark
+  };
+  return spellMap[spellId] || null;
+};
+
+const calculateKDA = (kills: number, deaths: number, assists: number) => {
+  if (deaths > 0) {
+    return Math.round(((kills + assists) / deaths) * 100) / 100;
+  }
+  return kills + assists;
+};
+
 const UserVsOpponent = ({
   user,
   opponent,
@@ -9,428 +34,226 @@ const UserVsOpponent = ({
   opponent: ParticipantData | null;
   showGame: boolean;
 }) => {
-  let userKda;
-  if (user?.deaths! > 0) {
-    userKda =
-      Math.round(((user?.kills! + user?.assists!) / user?.deaths!) * 100) / 100;
-  } else if (user?.deaths! === 0) {
-    userKda = user?.kills! + user?.assists!;
-  }
+  const userKda = user
+    ? calculateKDA(user.kills!, user.deaths!, user.assists!)
+    : 0;
+  const opponentKda = opponent
+    ? calculateKDA(opponent.kills!, opponent.deaths!, opponent.assists!)
+    : 0;
 
-  let opponentKda;
-  if (opponent?.deaths! > 0) {
-    opponentKda =
-      Math.round(
-        ((opponent?.kills! + opponent?.assists!) / opponent?.deaths!) * 100
-      ) / 100;
-  } else if (opponent?.deaths! === 0) {
-    opponentKda = opponent?.kills! + opponent?.assists!;
-  }
+  // Item component for reusability
+  const ItemSlot = ({
+    itemId,
+    size = "w-6 h-6",
+  }: {
+    itemId?: number;
+    size?: string;
+  }) => (
+    <div className={`${size} flex-shrink-0`}>
+      {itemId ? (
+        <img
+          src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${itemId}.png`}
+          alt="Item"
+          className="w-full h-full object-cover rounded-sm"
+        />
+      ) : (
+        <div className="w-full h-full bg-gray-700/50 rounded-sm border border-gray-600" />
+      )}
+    </div>
+  );
 
-  return (
-    <div
-      className={`${
-        user?.win
-          ? "bg-gradient-to-r from-green-500/40 to-emerald-400/40"
-          : "bg-gradient-to-r from-red-500/40 to-rose-400/40"
-      } w-full py-2.5 flex justify-between inset-shadow-xs`}
-    >
-      <div className="px-4 flex justify-start items-center w-1/2">
-        <div className="flex w-full justify-start animate-fade-right animate-ease-in animate-duration-200">
-          <div className="flex justify-start items-center">
-            <div className="flex flex-col items-center justify-center">
-              <img
-                src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${user?.championName}.png`}
-                className="w-[30px] h-[30px] md:w-[60px] md:h-[60px]"
-              />
-            </div>
-            <div className="pl-1 md:pl-3 flex flex-col justify-end">
-              <div className="text-sm md:text-base flex items-center font-normal md:font-semibold italic">
-                {user?.kills}/
-                <span className="text-red-300 items-center px-0.5">
-                  {user?.deaths}
-                </span>
-                /{user?.assists}{" "}
-                <span className="not-italic text-xs md:text-base px-0.5 items-center font-extralight md:font-light text-gray-300">
-                  <span className="text-sm md:text-lg font-semibold md:font-bold not-italic items-center pl-1 md:pl-3 text-white">
-                    {userKda}
-                  </span>
-                  KDA
-                </span>
-                <p className="md:ml-2">
-                  <span className="font-extralight md:font-light text-xs md:text-sm text-gray-300">
-                    {calculateCsPerMin(
-                      user?.timePlayed!,
-                      user?.totalMinionsKilled!
-                    )}{" "}
-                    cs<span className="text-xs">/</span>min
-                  </span>
-                </p>
-              </div>
+  const SummonerSpell = ({
+    spellId,
+    size = "w-7 h-7",
+  }: {
+    spellId?: number;
+    size?: string;
+  }) => {
+    const spellName = spellId ? getSummonerSpellImage(spellId) : null;
 
-              <ul className="flex justify-start z-10 gap-0.5 items-center w-[152px] md:w-[252px] bg-blue-950 p-3 rounded-md inset-shadow-xs inset-shadow-black/80">
-                <li>
-                  {user?.summoner1Id === 4 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerFlash.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner1Id === 21 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerBarrier.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner1Id === 1 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerBoost.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner1Id === 14 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerDot.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner1Id === 3 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerExhaust.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner1Id === 6 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerHaste.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner1Id === 7 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerHeal.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner1Id === 13 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerMana.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner1Id === 11 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerSmite.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner1Id === 12 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerTeleport.png`}
-                      width={30}
-                    />
-                  ) : null}
-                </li>
-                <li className="mr-1">
-                  {user?.summoner2Id === 4 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerFlash.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner2Id === 21 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerBarrier.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner2Id === 1 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerBoost.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner2Id === 14 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerDot.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner2Id === 3 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerExhaust.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner2Id === 6 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerHaste.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner2Id === 7 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerHeal.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner2Id === 13 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerMana.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner2Id === 11 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerSmite.png`}
-                      width={30}
-                    />
-                  ) : user?.summoner2Id === 12 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerTeleport.png`}
-                      width={30}
-                    />
-                  ) : null}
-                </li>
-                <li>
-                  {user?.item0 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${user?.item0}.png`}
-                      alt="Item"
-                      width={25}
-                    />
-                  ) : null}
-                </li>
-                <li>
-                  {user?.item1 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${user?.item1}.png`}
-                      alt="Item"
-                      width={25}
-                    />
-                  ) : null}
-                </li>
-                <li>
-                  {user?.item2 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${user?.item2}.png`}
-                      alt="Item"
-                      width={25}
-                    />
-                  ) : null}
-                </li>
-                <li>
-                  {user?.item3 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${user?.item3}.png`}
-                      alt="Item"
-                      width={25}
-                    />
-                  ) : null}
-                </li>
-                <li>
-                  {user?.item4 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${user?.item4}.png`}
-                      alt="Item"
-                      width={25}
-                    />
-                  ) : null}
-                </li>
-                <li>
-                  {user?.item5 ? (
-                    <img
-                      src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${user?.item5}.png`}
-                      alt="Item"
-                      width={25}
-                    />
-                  ) : null}
-                </li>
-              </ul>
-            </div>
-          </div>
+    if (spellId && !spellName) {
+      console.warn("Unknown summoner spell ID:", spellId);
+    }
+
+    return (
+      <div className={`${size} flex-shrink-0`}>
+        {spellName ? (
+          <img
+            src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/${spellName}.png`}
+            alt="Summoner Spell"
+            className="w-full h-full object-cover rounded-sm"
+            onError={(e) => {
+              // Fallback if image fails to load
+              const target = e.target as HTMLImageElement;
+              target.style.display = "none";
+              target.nextElementSibling?.classList.remove("hidden");
+            }}
+          />
+        ) : null}
+        <div
+          className={`w-full h-full bg-gray-700/50 rounded-sm border border-gray-600 flex items-center justify-center text-xs text-gray-400 ${
+            spellName ? "hidden" : ""
+          }`}
+        >
+          {spellId || "?"}
         </div>
       </div>
-      <div className="px-4 flex items-center justify-end w-1/2">
-        <div className="w-full flex justify-end animate-fade-left animate-ease-in animate-duration-200">
-          <div className="pr-3 flex flex-col justify-end">
-            <div className="text-xs md:text-base font-medium md:font-semibold italic flex items-center justify-end">
-              <p className="mr-2">
-                <span className="md:font-light font-extralight text-[10px] md:text-sm text-gray-300">
-                  {calculateCsPerMin(
-                    opponent?.timePlayed!,
-                    opponent?.totalMinionsKilled!
-                  )}{" "}
-                  cs<span className="text-[8px]">/</span>min
-                </span>{" "}
-              </p>
-              <span className="pr-3 not-italic text-xs md:text-base font-extralight md:font-light text-gray-300">
-                <span className="text-sm md:text-lg font-semibold md:font-bold not-italic items-center text-white">
-                  {opponentKda}
-                </span>
-                KDA
-              </span>
-              {opponent?.kills}/
-              <span className="text-red-300 items-center px-0.5">
-                {opponent?.deaths}
-              </span>
-              /{opponent?.assists}
-            </div>
-            <ul className="flex justify-end gap-0.5 items-center w-[152px] md:w-[252px] bg-blue-950 p-3 rounded-md inset-shadow-xs inset-shadow-black/80">
-              <li>
-                {opponent?.item0 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${opponent?.item0}.png`}
-                    alt="Item"
-                    width={25}
-                  />
-                ) : null}
-              </li>
-              <li>
-                {opponent?.item1 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${opponent?.item1}.png`}
-                    alt="Item"
-                    width={25}
-                  />
-                ) : null}
-              </li>
-              <li>
-                {opponent?.item2 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${opponent?.item2}.png`}
-                    alt="Item"
-                    width={25}
-                  />
-                ) : null}
-              </li>
-              <li>
-                {opponent?.item3 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${opponent?.item3}.png`}
-                    alt="Item"
-                    width={25}
-                  />
-                ) : null}
-              </li>
-              <li>
-                {opponent?.item4 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${opponent?.item4}.png`}
-                    alt="Item"
-                    width={25}
-                  />
-                ) : null}
-              </li>
-              <li>
-                {opponent?.item5 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${opponent?.item5}.png`}
-                    alt="Item"
-                    width={25}
-                  />
-                ) : null}
-              </li>
-              <li className="ml-1">
-                {opponent?.summoner1Id === 4 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerFlash.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner1Id === 21 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerBarrier.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner1Id === 1 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerBoost.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner1Id === 14 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerDot.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner1Id === 3 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerExhaust.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner1Id === 6 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerHaste.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner1Id === 7 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerHeal.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner1Id === 13 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerMana.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner1Id === 11 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerSmite.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner1Id === 12 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerTeleport.png`}
-                    width={30}
-                  />
-                ) : null}
-              </li>
-              <li>
-                {opponent?.summoner2Id === 4 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerFlash.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner2Id === 21 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerBarrier.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner2Id === 1 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerBoost.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner2Id === 14 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerDot.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner2Id === 3 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerExhaust.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner2Id === 6 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerHaste.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner2Id === 7 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerHeal.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner2Id === 13 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerMana.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner2Id === 11 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerSmite.png`}
-                    width={30}
-                  />
-                ) : opponent?.summoner2Id === 12 ? (
-                  <img
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/SummonerTeleport.png`}
-                    width={30}
-                  />
-                ) : null}
-              </li>
-            </ul>
+    );
+  };
+
+  const PlayerStats = ({
+    participant,
+    kda,
+    isUser = true,
+  }: {
+    participant: ParticipantData | null;
+    kda: number;
+    isUser?: boolean;
+  }) => {
+    if (!participant) return null;
+
+    const csPerMin = calculateCsPerMin(
+      participant.timePlayed!,
+      participant.totalMinionsKilled!
+    );
+
+    return (
+      <div
+        className={`flex flex-col gap-2
+          items-start
+        `}
+      >
+        <div
+          className={`flex items-center gap-2 text-sm sm:text-base
+          }`}
+        >
+          <div
+            className={`flex items-center gap-1 
+            `}
+          >
+            <span className="font-semibold">{participant.kills}</span>
+            <span className="text-gray-400">/</span>
+            <span className="font-semibold text-red-400">
+              {participant.deaths}
+            </span>
+            <span className="text-gray-400">/</span>
+            <span className="font-semibold">{participant.assists}</span>
           </div>
-          <div className="flex flex-col items-center justify-center">
-            <img
-              src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${opponent?.championName}.png`}
-              className="w-[30px] h-[30px] md:w-[60px] md:h-[60px]"
-            />
+          <div className="text-xs sm:text-sm text-gray-300">
+            <span className="font-bold text-white text-sm sm:text-base">
+              {kda}
+            </span>{" "}
+            KDA
+          </div>
+        </div>
+
+        <div className="text-xs sm:text-sm text-gray-400">
+          {csPerMin} cs/min
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="w-full">
+      <div
+        className={`${
+          user?.win
+            ? "bg-gradient-to-r from-green-500/40 to-emerald-400/40"
+            : "bg-gradient-to-r from-red-500/40 to-rose-400/40"
+        } w-full p-3 sm:p-4 rounded-lg shadow-lg`}
+      >
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <img
+                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${user?.championName}.png`}
+                  alt={user?.championName!}
+                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border-2 border-white/20"
+                />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <PlayerStats participant={user} kda={userKda} isUser={true} />
+
+                <div className="flex gap-1 mt-2">
+                  <SummonerSpell spellId={user?.summoner1Id!} />
+                  <SummonerSpell spellId={user?.summoner2Id!} />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 p-2 bg-slate-800/60 rounded-md">
+              <div className="flex gap-1 justify-center sm:justify-start">
+                {user && (
+                  <>
+                    <ItemSlot itemId={user.item0!} />
+                    <ItemSlot itemId={user.item1!} />
+                    <ItemSlot itemId={user.item2!} />
+                    <ItemSlot itemId={user.item3!} />
+                    <ItemSlot itemId={user.item4!} />
+                    <ItemSlot itemId={user.item5!} />
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden sm:flex items-center justify-center">
+            <div className="w-px h-20 bg-white/20"></div>
+            <span className="absolute bg-white/10 px-2 py-1 rounded text-xs font-semibold text-white/70">
+              VS
+            </span>
+          </div>
+
+          <div className="sm:hidden flex items-center justify-center py-2">
+            <div className="h-px w-full bg-white/20 relative">
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/10 px-3 py-1 rounded text-xs font-semibold text-white/70">
+                VS
+              </span>
+            </div>
+          </div>
+
+          <div className="flex-1">
+            <div className="flex items-center gap-3 sm:flex-row">
+              <div className="flex-shrink-0">
+                <img
+                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${opponent?.championName}.png`}
+                  alt={opponent?.championName!}
+                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border-2 border-white/20"
+                />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <PlayerStats
+                  participant={opponent}
+                  kda={opponentKda}
+                  isUser={false}
+                />
+
+                <div className="flex gap-1 mt-2">
+                  <SummonerSpell spellId={opponent?.summoner1Id!} />
+                  <SummonerSpell spellId={opponent?.summoner2Id!} />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 p-2 bg-slate-800/60 rounded-md">
+              <div className="flex gap-1 justify-center">
+                <ItemSlot itemId={opponent?.item0!} />
+                <ItemSlot itemId={opponent?.item1!} />
+                <ItemSlot itemId={opponent?.item2!} />
+                <ItemSlot itemId={opponent?.item3!} />
+                <ItemSlot itemId={opponent?.item4!} />
+                <ItemSlot itemId={opponent?.item5!} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
 export default UserVsOpponent;
