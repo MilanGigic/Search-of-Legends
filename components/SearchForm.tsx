@@ -17,39 +17,48 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
 
   useEffect(() => {
     const fetchAccount = async () => {
-      if (gameName.trim() === "" || tagLine.trim() === "") {
-        return; // Wait until both fields are filled
-      }
+      if (gameName.trim() === "" || tagLine.trim() === "") return;
 
       setLoading(true);
       setError("");
-      try {
+
+      const fetchData = async (): Promise<DbSummonerInfo | null> => {
         const res = await fetch(
           `${BASE_URL}/api/account?gameName=${gameName}&tagLine=${tagLine}`
         );
 
         if (!res.ok) {
-          throw new Error(res.statusText || "Failed to fetch account");
-        }
-        const data: DbSummonerInfo = await res.json();
-        const region = getFrontendRegion(data.region);
+          // Retry once after a delay if first request fails
+          if (res.status === 404 || res.status === 500) {
+            await new Promise((r) => setTimeout(r, 1000));
+            const retryRes = await fetch(
+              `${BASE_URL}/api/account?gameName=${gameName}&tagLine=${tagLine}`
+            );
+            if (!retryRes.ok) throw new Error(retryRes.statusText);
+            return await retryRes.json();
+          }
 
-        if (region) {
-          setFrontendRegion(region);
+          throw new Error(res.statusText);
         }
+
+        return await res.json();
+      };
+
+      try {
+        const data = await fetchData();
+        if (!data) throw new Error("Empty data");
+
+        const region = getFrontendRegion(data.region);
+        if (region) setFrontendRegion(region);
 
         setAccountInfo(data);
       } catch (err: any) {
-        setError(err.message);
+        setError("Sorry, we couldn't find what you're looking for...");
         setAccountInfo(null);
       } finally {
         setLoading(false);
       }
     };
-
-    if (gameName.length === 0) {
-      setError("");
-    }
 
     // Delay search to avoid triggering on every keystroke instantly
     const delay = setTimeout(fetchAccount, 500); // 500ms debounce

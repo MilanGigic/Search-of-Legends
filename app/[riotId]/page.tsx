@@ -48,7 +48,7 @@ const AccountPage = async ({ params }: AccountPageProps) => {
             <UserStats puuid={puuid} matchHistory={matchHistory} />
           </div>
 
-          <div className="col-span-1 md:mx-auto md:col-span-2">
+          <div className="col-span-1 md:mx-auto md:col-span-2 w-full">
             <MatchHistorySection
               matchHistory={matchHistory}
               puuid={puuid}

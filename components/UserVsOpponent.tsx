@@ -120,7 +120,7 @@ const UserVsOpponent = ({
     return (
       <div
         className={`flex flex-col gap-2
-          items-start
+          ${isUser ? "items-start" : "items-end"}
         `}
       >
         <div
@@ -216,7 +216,7 @@ const UserVsOpponent = ({
           </div>
 
           <div className="flex-1">
-            <div className="flex items-center gap-3 sm:flex-row">
+            <div className="flex w-full items-center gap-3 sm:flex-row md:flex-row-reverse">
               <div className="flex-shrink-0">
                 <img
                   src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${opponent?.championName}.png`}
@@ -232,7 +232,7 @@ const UserVsOpponent = ({
                   isUser={false}
                 />
 
-                <div className="flex gap-1 mt-2">
+                <div className="flex gap-1 mt-2 justify-end">
                   <SummonerSpell spellId={opponent?.summoner1Id!} />
                   <SummonerSpell spellId={opponent?.summoner2Id!} />
                 </div>
@@ -240,7 +240,7 @@ const UserVsOpponent = ({
             </div>
 
             <div className="mt-3 p-2 bg-slate-800/60 rounded-md">
-              <div className="flex gap-1 justify-center">
+              <div className="flex gap-1 justify-end">
                 <ItemSlot itemId={opponent?.item0!} />
                 <ItemSlot itemId={opponent?.item1!} />
                 <ItemSlot itemId={opponent?.item2!} />
