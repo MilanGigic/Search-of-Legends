@@ -74,9 +74,6 @@ const GameMatchCard = ({
     }
   }, [game.info.gameCreation]);
 
-  console.log("Full User Data:", user);
-  console.log("Full Opponent Data:", opponent);
-
   return (
     <div className="container mx-auto text-white">
       {/* User vs Opponent */}

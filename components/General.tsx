@@ -1,4 +1,5 @@
 import { calculateCsPerMin, kda } from "@/lib/riot";
+import Image from "next/image";
 import Link from "next/link";
 
 const General = ({
@@ -91,7 +92,7 @@ const General = ({
       <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 border-b border-gray-600 bg-[#2A2A40] rounded-lg mb-2">
         {/* Champion Image */}
         <div className="flex-shrink-0">
-          <img
+          <Image
             src={getChampionImageUrl(participant.championName!)}
             width={40}
             height={40}
@@ -103,7 +104,7 @@ const General = ({
         {/* Player Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <img
+            <Image
               src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${participant.profileIcon}.png`}
               width={20}
               height={20}
@@ -135,7 +136,7 @@ const General = ({
             {/* Summoner Spells */}
             <div className="flex gap-0.5">
               {summoner1Url && (
-                <img
+                <Image
                   src={summoner1Url}
                   width={20}
                   height={20}
@@ -144,7 +145,7 @@ const General = ({
                 />
               )}
               {summoner2Url && (
-                <img
+                <Image
                   src={summoner2Url}
                   width={20}
                   height={20}
@@ -155,11 +156,11 @@ const General = ({
             </div>
 
             {/* Items */}
-            <div className="flex gap-0.5 ml-1">
+            <div className="flex gap-0.5">
               {[0, 1, 2, 3, 4, 5].map((itemSlot) => {
                 const itemId = getItemId(participant, itemSlot);
                 return itemId ? (
-                  <img
+                  <Image
                     key={itemSlot}
                     src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${itemId}.png`}
                     width={18}
@@ -176,6 +177,9 @@ const General = ({
         {/* Stats */}
         <div className="flex-shrink-0 text-right">
           <div className="text-sm sm:text-base font-bold text-white mb-1">
+            <span className="text-xs sm:text-sm font-normal text-slate-300 mx-0.5">
+              KDA
+            </span>
             {kda(participant.kills!, participant.deaths!, participant.assists!)}
           </div>
           <div className="text-xs sm:text-sm text-gray-300 mb-1">
