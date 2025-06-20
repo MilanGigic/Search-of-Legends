@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
         hostname: "raw.communitydragon.org",
         protocol: "https",
       },
+      {
+        hostname: "static.wikia.nocookie.net",
+        protocol: "https",
+      },
     ],
   },
 };

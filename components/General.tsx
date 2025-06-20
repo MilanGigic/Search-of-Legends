@@ -2,16 +2,24 @@ import { calculateCsPerMin, kda } from "@/lib/riot";
 import Image from "next/image";
 import Link from "next/link";
 
+type TabOption = "general" | "details" | "runes";
+
+interface ComponentState {
+  activeTab: TabOption;
+}
+
 const General = ({
   game,
   puuid,
   showGame,
   region,
+  isActive,
 }: {
   game: DbGameInfo;
   puuid: string;
   showGame: boolean;
   region: string;
+  isActive: ComponentState;
 }) => {
   const blueTeamParticipants =
     game.participants?.filter((p) => p.teamId === 100) || [];

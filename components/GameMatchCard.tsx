@@ -7,6 +7,12 @@ import Link from "next/link";
 import UserVsOpponent from "./UserVsOpponent";
 import General from "./General";
 
+type TabOption = "general" | "details" | "runes";
+
+interface ComponentState {
+  activeTab: TabOption;
+}
+
 const GameMatchCard = ({
   game,
   puuid,
@@ -22,7 +28,9 @@ const GameMatchCard = ({
   const [opponent, setOpponent] = useState<ParticipantData | null>(null);
   const [showGame, setShowGame] = useState<boolean>(false);
   const [localTime, setLocalTime] = useState<string>("");
-  const [queueId, setQueueId] = useState<string>("");
+  const [isActive, setIsActive] = useState<ComponentState>({
+    activeTab: "general",
+  });
 
   useEffect(() => {
     const currentUser = game.participants?.find((p) => p.puuid === puuid);
@@ -31,6 +39,7 @@ const GameMatchCard = ({
 
   useEffect(() => {
     setShowGame(false);
+    setIsActive({ activeTab: "general" });
   }, [currentPage]);
 
   useEffect(() => {
@@ -73,6 +82,10 @@ const GameMatchCard = ({
       console.error("Error formatting date:", error);
     }
   }, [game.info.gameCreation]);
+
+  const handleButtonClick = (tab: TabOption) => {
+    setIsActive({ activeTab: tab });
+  };
 
   return (
     <div className="container mx-auto text-white">
@@ -138,14 +151,29 @@ const GameMatchCard = ({
         <div className="m-0">
           <section className="flex justify-center max-w-3xl mx-auto w-full">
             <Button
-              className={`hover:bg-[#2A2A40] hover:text-slate-300 w-1/3 py-5 disabled:bg-blue-950/50 rounded-none`}
+              className={`hover:bg-[#2A2A40] hover:text-slate-300 w-1/3 py-5 rounded-none ${
+                isActive.activeTab === "general" &&
+                "bg-[#2A2A40] text-slate-300"
+              }`}
+              onClick={() => handleButtonClick("general")}
             >
               General
             </Button>
-            <Button className={`hover:bg-[#2A2A40] w-1/3 py-5 rounded-none`}>
+            <Button
+              className={`hover:bg-[#2A2A40] hover:text-slate-300 w-1/3 py-5 rounded-none ${
+                isActive.activeTab === "details" &&
+                "bg-[#2A2A40] text-slate-300"
+              }`}
+              onClick={() => handleButtonClick("details")}
+            >
               Details
             </Button>
-            <Button className={`hover:bg-[#2A2A40] w-1/3 py-5 rounded-none`}>
+            <Button
+              className={`hover:bg-[#2A2A40] hover:text-slate-300 w-1/3 py-5 rounded-none ${
+                isActive.activeTab === "runes" && "bg-[#2A2A40] text-slate-300"
+              }`}
+              onClick={() => handleButtonClick("runes")}
+            >
               Runes
             </Button>
           </section>
@@ -154,13 +182,14 @@ const GameMatchCard = ({
             puuid={puuid}
             showGame={showGame}
             region={region}
+            isActive={isActive}
           />
         </div>
       ) : (
         <div></div>
       )}
       <Button
-        className={`w-full items-center justify-center bg-[#2A2A40]/55 text-slate-300 hover:bg-[#2A2A40] rounded-t-none pt-2`}
+        className={`w-full items-center justify-center bg-[#2A2A40]/55 text-slate-300 hover:bg-[#2A2A40] rounded-none pt-2`}
         onClick={() => setShowGame(!showGame)}
       >
         {showGame ? <ArrowUpIcon /> : <ArrowDownIcon />}

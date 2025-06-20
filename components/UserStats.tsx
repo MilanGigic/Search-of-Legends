@@ -9,11 +9,11 @@ interface UserStatsProps {
 const UserStats = ({ matchHistory, puuid }: UserStatsProps) => {
   return (
     <div className="h-full flex flex-col gap-2">
-      <div className="m-2 shadow-md shadow-slate-800">
+      <div className="mr-2 mt-2 shadow-md shadow-slate-800">
         <ChampionPerformanceCard puuid={puuid} />
       </div>
-      <div>
-        <RolesPerformanceCard />
+      <div className="mr-2 shadow-md shadow-slate-800">
+        <RolesPerformanceCard puuid={puuid} />
       </div>
     </div>
   );

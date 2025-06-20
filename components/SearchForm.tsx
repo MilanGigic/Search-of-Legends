@@ -11,7 +11,6 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [inputValue, setInputValue] = useState<string>("");
-  const [frontendRegion, setFrontendRegion] = useState<string>("");
 
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL!;
 
@@ -48,12 +47,9 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
         const data = await fetchData();
         if (!data) throw new Error("Empty data");
 
-        const region = getFrontendRegion(data.region);
-        if (region) setFrontendRegion(region);
-
         setAccountInfo(data);
       } catch (err: any) {
-        setError("Sorry, we couldn't find what you're looking for...");
+        setError(`Sorry, we couldn't find what you're looking for: ${err}`);
         setAccountInfo(null);
       } finally {
         setLoading(false);
@@ -103,7 +99,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
 
       {error && (
         <div className="px-4 py-1 animate-pulse animate-duration-[3s] text-slate-300 text-start flex items-center bg-[#2A2A40] rounded-b-lg shadow border-x border-b border-gray-200 w-full h-[85px]">
-          Sorry, we couldn't find what you're looking for...
+          {error}
         </div>
       )}
       <div className="min-h-[90px] w-full flex justify-center items-center transition-all duration-300">
@@ -142,7 +138,35 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
                 </h1>
               </div>
               <h4 className="bg-[#1E2A78] text-[#EAEAEA] p-2 px-3 uppercase rounded-md font-semibold">
-                {frontendRegion}
+                {accountInfo.region === "euw1"
+                  ? "EUW"
+                  : accountInfo.region === "eun1"
+                  ? "EUNE"
+                  : accountInfo.region === "na1"
+                  ? "NA"
+                  : accountInfo.region === "kr"
+                  ? "KR"
+                  : accountInfo.region === "la1"
+                  ? "LAN"
+                  : accountInfo.region === "la2"
+                  ? "LAS"
+                  : accountInfo.region === "tr1"
+                  ? "TR"
+                  : accountInfo.region === "ru"
+                  ? "RU"
+                  : accountInfo.region === "oc1"
+                  ? "OCE"
+                  : accountInfo.region === "ph2"
+                  ? "PH"
+                  : accountInfo.region === "sg2"
+                  ? "SG"
+                  : accountInfo.region === "th2"
+                  ? "TH"
+                  : accountInfo.region === "tw2"
+                  ? "TW"
+                  : accountInfo.region === "vn2"
+                  ? "VN"
+                  : accountInfo.region}
               </h4>
             </Link>
           </div>
@@ -151,3 +175,20 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
     </div>
   );
 }
+
+//     br1: "BR",
+// la1: "LAN",
+// la2: "LAS",
+// na1: "NA",
+// eun1: "EUNE",
+// euw1: "EUW",
+// tr1: "TR",
+// ru: "RU",
+// jp1: "JP",
+// kr: "KR",
+// oc1: "OCE",
+// ph2: "PH",
+// sg2: "SG",
+// th2: "TH",
+// tw2: "TW",
+// vn2: "VN",
