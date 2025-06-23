@@ -551,6 +551,31 @@ const MatchHistorySection = ({
         <PaginationControls position="bottom" />
       </div>
     </div>
+    // <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-6 border">
+    //   {/* <div className="col-span-1">
+    //     <UserStats matchHistory={matchHistory} puuid={puuid} />
+    //   </div> */}
+    //   <div className="col-span-1">
+    //     <div className="flex items-center w-full justify-center bg-[#1E1E2F]">
+    //       <SearchForm placeholder={"Search for a specific champion..."} />
+    //     </div>
+    //     <div className="max-w-[722px] md:max-w-[765px] shadow-2xl shadow-[#2A2A40] mt-5">
+    //       <PaginationControls position="top" />
+    //       <Suspense>
+    //         {currentGames.map((game, index) => (
+    //           <GameMatchCard
+    //             key={index}
+    //             game={game.data!}
+    //             puuid={puuid}
+    //             region={region}
+    //             currentPage={currentPage}
+    //           />
+    //         ))}
+    //       </Suspense>
+    //       <PaginationControls position="bottom" />
+    //     </div>
+    //   </div>
+    // </div>
   );
 };
 export default MatchHistorySection;

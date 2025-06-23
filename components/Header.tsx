@@ -26,7 +26,7 @@ const Header = ({ showSearch = false }: { showSearch?: boolean }) => {
               Leaderboard
             </Link>
             {showSearch && (
-              <div className="flex flex-col h-full items-center justify-center">
+              <div className="flex h-full items-center justify-center">
                 <SearchForm
                   placeholder={"Enter Summoner Name (e.g. Faker#KR1)"}
                 />

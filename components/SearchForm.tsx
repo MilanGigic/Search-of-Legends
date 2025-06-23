@@ -1,5 +1,4 @@
 "use client";
-import getFrontendRegion from "@/lib/actions/match-history/getFrontendRegion";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
