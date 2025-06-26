@@ -6,7 +6,7 @@ const RolesPerformanceCard = async ({ puuid }: { puuid: string }) => {
   console.log("Role performance data:", data);
 
   return (
-    <div className="p-5 mr-2 border border-gray-700/70 mt-3 rounded-md flex flex-col gap-1 bg-[#1E1E2F] shadow-lg shadow-[#2A2A40]">
+    <div className="p-5 py-3 border border-gray-700/70 mt-3 rounded-md flex flex-col gap-1 bg-[#1E1E2F] shadow-lg shadow-[#2A2A40]">
       <div>
         <ul className="grid grid-cols-4 text-slate-300 font-semibold">
           <li className="text-center col-span-2">Role</li>

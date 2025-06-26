@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import TopFiveChampions from "./TopFiveChampions";
+import Spotlight from "./ui/spotlight";
 
 const HomePage = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -108,17 +109,15 @@ const HomePage = () => {
   }
   return (
     <div className="container h-screen flex flex-col items-center justify-between">
+      <Spotlight />
       <div className="w-3xl flex flex-col mt-24 items-center text-center gap-4">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="font-bold text-4xl md:text-5xl text-[#E2E6F2]"
+          className="font-bold text-4xl md:text-5xl text-shadow-2xs flex items-center justify-center"
         >
-          Welcome to{" "}
-          <span className="text-4xl md:text-5xl text-cyan-500 items-center text-center">
-            SoL
-          </span>
+          SoL
         </motion.h1>
         <div className="text-[#9CAACF] font-light text-sm md:text-base lg:text-lg ">
           <motion.p
@@ -175,7 +174,7 @@ const HomePage = () => {
         >
           <TopFiveChampions />
         </motion.div>
-        <div className="border w-full">Top 10 players</div>
+        <div className="border w-full">Top 5 players</div>
       </section>
 
       <div className="text-white flex flex-col items-center w-full">

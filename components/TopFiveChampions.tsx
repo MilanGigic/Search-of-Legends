@@ -2,12 +2,12 @@ import Image from "next/image";
 
 const TopFiveChampions = () => {
   return (
-    <div className="py-2 px-1 border border-gray-700/70 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624] shadow-[0_8px_20px_rgba(18,22,36,0.6)]">
-      <div>
+    <div className="py-2 px-1 border border-gray-700/70 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624] ">
+      <div className="shadow-2xl shadow-[#12162499]">
         <ul className="grid grid-cols-5 text-slate-300 font-semibold">
           <li className="text-center col-span-2">Champion</li>
           <li className="text-center">Tier</li>
-          <li className="text-center">WR</li>
+          <li className="text-center">Winrate</li>
           <li className="text-center">Pickrate</li>
         </ul>
         <ul className="px-1 py-1.5">
