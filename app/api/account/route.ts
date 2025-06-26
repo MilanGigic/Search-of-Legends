@@ -58,7 +58,6 @@ export async function GET(req: NextRequest) {
         tagLine: existingAccount?.tagLine,
         id: existingAccount.summonerId,
         region: existingAccount.region,
-        accountId: existingAccount.accountId,
         profileIconId: existingAccount.profileIconId,
         revisionDate: existingAccount.revisionDate,
         summonerLevel: existingAccount.summonerLevel,
@@ -97,12 +96,24 @@ export async function GET(req: NextRequest) {
       const summonerResult = await fetchSummonerFromAnyRegion(
         accountData.puuid
       );
+
+      if (!summonerResult) {
+        console.log("No summoner found for the given PUUID in any region.");
+        return NextResponse.json(
+          { error: "No summoner found for the given PUUID in any region." },
+          { status: 404 }
+        );
+      }
       const summonerData: SummonerInfo = summonerResult.data;
 
       console.log(`Found summoner in region: ${summonerResult.region}`);
 
+      console.log(
+        "Fetching summoner entries with url:",
+        `https://${summonerResult.region}.api.riotgames.com/lol/league/v4/entries/by-summoner/${accountData.puuid}?api_key=${API_KEY}`
+      );
       const entriesRes = await fetch(
-        `https://${summonerResult.region}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerData.id}?api_key=${API_KEY}`
+        `https://${summonerResult.region}.api.riotgames.com/lol/league/v4/entries/by-puuid/${accountData.puuid}?api_key=${API_KEY}`
       );
 
       console.log("Entries response status:", entriesRes.status);
@@ -117,12 +128,14 @@ export async function GET(req: NextRequest) {
 
       const entries: SummonerRankInfo[] = await entriesRes.json();
 
+      console.log("Account entries:", entries);
+
       // Find the ranked solo queue entry
       const soloQueueEntry = entries.find(
         (entry) => entry.queueType === "RANKED_SOLO_5x5"
       );
 
-      console.log("Riot entries:", entries);
+      console.log("Solo queue entries:", soloQueueEntry);
 
       if (summonerResult && soloQueueEntry) {
         completeData = {
@@ -130,7 +143,6 @@ export async function GET(req: NextRequest) {
           gameName: accountData.gameName,
           tagLine: accountData.tagLine,
           region: accountData.region,
-          accountId: summonerData.accountId,
           profileIconId: summonerData.profileIconId,
           summonerLevel: summonerData.summonerLevel,
           summonerId: summonerData.id,
@@ -144,6 +156,12 @@ export async function GET(req: NextRequest) {
         };
 
         if (accountData && soloQueueEntry && summonerData) {
+          console.log(
+            "Summoner data to be stored:",
+            accountData,
+            soloQueueEntry,
+            summonerData
+          );
           await db
             .insert(accounts)
             .values({
@@ -152,7 +170,6 @@ export async function GET(req: NextRequest) {
               tagLine: accountData.tagLine,
               region: summonerResult.region,
               summonerId: summonerData.id,
-              accountId: summonerData.accountId,
               profileIconId: summonerData.profileIconId,
               tier: soloQueueEntry.tier,
               rank: soloQueueEntry.rank,
@@ -170,7 +187,6 @@ export async function GET(req: NextRequest) {
                 tagLine: accountData.tagLine,
                 region: summonerResult.region,
                 summonerId: summonerData.id,
-                accountId: summonerData.accountId,
                 profileIconId: summonerData.profileIconId,
                 tier: soloQueueEntry.tier,
                 rank: soloQueueEntry.rank,

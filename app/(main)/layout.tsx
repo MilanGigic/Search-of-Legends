@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import Spotlight from "@/components/ui/spotlight";
 
 export default function MainLayout({
   children,
@@ -8,6 +9,7 @@ export default function MainLayout({
   return (
     <>
       <Header showSearch={false} />
+      <Spotlight />
       {children}
     </>
   );

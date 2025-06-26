@@ -7,7 +7,6 @@ export const accounts = pgTable("accounts", {
   region: varchar("region").notNull(),
   // Summoner info
   summonerId: varchar("summoner_id").notNull(),
-  accountId: varchar("account_id").notNull(),
   summonerLevel: integer("summoner_level").notNull(),
   profileIconId: integer("profile_icon_id").notNull(),
   tier: varchar("tier").notNull(),

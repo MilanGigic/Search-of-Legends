@@ -114,7 +114,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
         )}
 
         {!loading && accountInfo && (
-          <div className="px-4 py-1 bg-[#2A2A40] rounded-b-lg shadow border-x border-b border-gray-200 w-full">
+          <div className="px-4 py-1 bg-transparent/95 rounded-b-lg shadow border-x border-b border-gray-200 w-full">
             <Link
               href={`/${encodeURIComponent(
                 accountInfo.gameName

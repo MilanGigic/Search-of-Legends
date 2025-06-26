@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${bebasNeue.variable} ${inter.variable} antialiased bg-[#1E1E2F] bg-pattern`}
+        className={`${bebasNeue.variable} ${inter.variable} antialiased bg-[#0B0D1C]`}
       >
         <ThemeProvider
           attribute="class"

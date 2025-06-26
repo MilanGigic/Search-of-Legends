@@ -45,7 +45,6 @@ interface DbSummonerInfo {
   tagLine: string;
   region: string;
   summonerId: string;
-  accountId: string;
   summonerLevel: number;
   profileIconId: number;
   tier: string;
