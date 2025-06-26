@@ -99,7 +99,7 @@ const UserCard = ({
   }
 
   return (
-    <div className="container max-w-6xl mx-auto bg-[#1E1E2F] border-b shadow-[#2A2A40] h-[200] p-5">
+    <div className="container max-w-6xl mx-auto bg-[#1E1E2F] border-b shadow-[#2A2A40] px-5 pt-5">
       <div className="flex items-center">
         <img
           src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountData.profileIconId}.png`}
@@ -152,6 +152,14 @@ const UserCard = ({
           <p className="text-white">Unranked</p>
         )}
       </div>
+      <ul>
+        <Button className="border-none bg-transparent rounded-b-none text-slate-300 hover:bg-[#2A2A40]">
+          Overview
+        </Button>
+        <Button className="border-none bg-transparent rounded-b-none text-slate-300 hover:bg-[#2A2A40]">
+          Champions
+        </Button>
+      </ul>
     </div>
   );
 };

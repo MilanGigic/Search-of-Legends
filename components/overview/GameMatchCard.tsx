@@ -151,7 +151,7 @@ const GameMatchCard = ({
         <div className="m-0">
           <section className="flex justify-center max-w-3xl mx-auto w-full">
             <Button
-              className={`hover:bg-[#2A2A40] hover:text-slate-300 w-1/3 py-5 rounded-none ${
+              className={`hover:bg-[#2A2A40] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
                 isActive.activeTab === "general" &&
                 "bg-[#2A2A40] text-slate-300"
               }`}
@@ -160,7 +160,7 @@ const GameMatchCard = ({
               General
             </Button>
             <Button
-              className={`hover:bg-[#2A2A40] hover:text-slate-300 w-1/3 py-5 rounded-none ${
+              className={`hover:bg-[#2A2A40] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
                 isActive.activeTab === "details" &&
                 "bg-[#2A2A40] text-slate-300"
               }`}
@@ -169,7 +169,7 @@ const GameMatchCard = ({
               Details
             </Button>
             <Button
-              className={`hover:bg-[#2A2A40] hover:text-slate-300 w-1/3 py-5 rounded-none ${
+              className={`hover:bg-[#2A2A40] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
                 isActive.activeTab === "runes" && "bg-[#2A2A40] text-slate-300"
               }`}
               onClick={() => handleButtonClick("runes")}

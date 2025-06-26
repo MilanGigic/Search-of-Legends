@@ -2,7 +2,7 @@
 
 import pLimit from "p-limit";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import SearchForm from "./SearchForm";
+import SearchForm from "@/components/SearchForm";
 import GameMatchCard from "./GameMatchCard";
 import UserStats from "./UserStats";
 import checkDbGames from "@/lib/actions/checkDbGames";
@@ -486,7 +486,7 @@ const MatchHistorySection = ({
   const PaginationControls = ({ position }: { position: "top" | "bottom" }) => (
     <div
       className={`${
-        position === "top" ? "mt-4" : "py-3"
+        position === "top" ? "py-3`" : "py-3"
       } flex justify-center items-center space-x-2`}
     >
       <button
@@ -533,10 +533,9 @@ const MatchHistorySection = ({
         <UserStats games={games} matchHistory={matchHistory} puuid={puuid} />
       </div> */}
       <div className="max-w-[722px] md:max-w-[765px] shadow-2xl shadow-[#2A2A40]">
+        <SearchForm placeholder={"Search for a specific champion..."} />
+
         <PaginationControls position="top" />
-        <div className="flex items-center w-full justify-center bg-[#1E1E2F]">
-          <SearchForm placeholder={"Search for a specific champion..."} />
-        </div>
         <Suspense>
           {currentGames.map((game, index) => (
             <GameMatchCard

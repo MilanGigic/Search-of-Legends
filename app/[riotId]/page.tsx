@@ -1,6 +1,6 @@
-import MatchHistorySection from "@/components/MatchHistorySection";
+import MatchHistorySection from "@/components/overview/MatchHistorySection";
 import UserCard from "@/components/UserCard";
-import UserStats from "@/components/UserStats";
+import UserStats from "@/components/overview/UserStats";
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
 import fetchAllMatchIds from "@/lib/actions/match-history/fetchMatchIds";
