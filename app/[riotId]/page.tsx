@@ -40,23 +40,28 @@ const AccountPage = async ({ params }: AccountPageProps) => {
 
   const matchHistory: string[] = await fetchAllMatchIds(puuid, account.region);
   return (
-    <div className="bg-[#1E1E2F] min-h-screen p-4 bg-pattern">
-      <UserCard accountData={account} region={REGION} />
-      <div className="container max-w-[722px] md:max-w-6xl h-full mx-auto">
-        <div className="w-full grid grid-cols-1 md:grid-cols-3 mx-auto">
-          <div className="col-span-1">
-            <UserStats puuid={puuid} matchHistory={matchHistory} />
-          </div>
+    <div className="relative z-10 min-h-screen p-4">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="animated-grid" />
+      </div>
+      <main className="relative z-10 w-full flex flex-col items-center justify-center">
+        <UserCard accountData={account} region={REGION} />
+        <div className="max-w-8xl h-full">
+          <div className="w-full grid grid-cols-1 md:grid-cols-3">
+            <div className="col-span-1">
+              <UserStats puuid={puuid} matchHistory={matchHistory} />
+            </div>
 
-          <div className="col-span-1 md:mx-auto md:col-span-2 w-full">
-            <MatchHistorySection
-              matchHistory={matchHistory}
-              puuid={puuid}
-              region={REGION}
-            />
+            <div className="col-span-1 md:col-span-2 w-full">
+              <MatchHistorySection
+                matchHistory={matchHistory}
+                puuid={puuid}
+                region={REGION}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

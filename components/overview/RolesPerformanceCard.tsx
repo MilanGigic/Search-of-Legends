@@ -6,7 +6,7 @@ const RolesPerformanceCard = async ({ puuid }: { puuid: string }) => {
   console.log("Role performance data:", data);
 
   return (
-    <div className="p-5 py-3 border border-gray-700/70 mt-3 rounded-md flex flex-col gap-1 bg-[#1E1E2F] shadow-lg shadow-[#2A2A40]">
+    <div className="p-5 py-3 border border-gray-700/70 sm:mt-3 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624]  shadow-sm shadow-[#2A2A40]">
       <div>
         <ul className="grid grid-cols-4 text-slate-300 font-semibold">
           <li className="text-center col-span-2">Role</li>
@@ -189,26 +189,26 @@ const RolesPerformanceCard = async ({ puuid }: { puuid: string }) => {
                         SUPPORT
                       </h2>
                     </div>
-                    <div>
-                      <p>{role.gamesPlayed}</p>
-                    </div>
-                    <div>
-                      <p
-                        className={`${
-                          Math.round((role.wins / role.gamesPlayed) * 100) >= 52
-                            ? "text-emerald-600"
-                            : "text-red-700"
-                        }
+                  </div>
+                  <div>
+                    <p>{role.gamesPlayed}</p>
+                  </div>
+                  <div>
+                    <p
+                      className={`${
+                        Math.round((role.wins / role.gamesPlayed) * 100) >= 52
+                          ? "text-emerald-600"
+                          : "text-red-700"
+                      }
                   ${
                     Math.round((role.wins / role.gamesPlayed) * 100) === 50 &&
                     "text-white"
                   }
                   flex items-center justify-center`}
-                      >
-                        {Math.round((role.wins / role.gamesPlayed) * 100)}
-                        <span className="text-gray-300 text-xs">%</span>
-                      </p>
-                    </div>
+                    >
+                      {Math.round((role.wins / role.gamesPlayed) * 100)}
+                      <span className="text-gray-300 text-xs">%</span>
+                    </p>
                   </div>
                 </div>
               ) : null}

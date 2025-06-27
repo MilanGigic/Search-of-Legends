@@ -91,7 +91,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
     <div className="space-y-4 w-full flex flex-col justify-center items-center">
       <input
         placeholder={placeholder}
-        className="border-b border-gray-400 text-gray-200 focus:outline-none p-2 w-full text-center"
+        className="border-b border-gray-400 text-gray-200 focus:outline-none p-2 max-w-xs md:max-w-xl text-center"
         value={inputValue}
         onChange={(e) => handleRiotNameChange(e)}
       />
@@ -103,7 +103,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
       )}
       <div className="min-h-[90px] w-full flex justify-center items-center transition-all duration-300">
         {loading && (
-          <div className="flex gap-4 items-center p-4 rounded-lg bg-[#2A2A40] w-full h-[85px]">
+          <div className="flex gap-4 items-center p-4 rounded-lg bg-[#2A2A40] w-xs md:w-xl h-[85px]">
             <div className="w-14 h-14 rounded-full skeleton" />
             <div className="flex flex-col gap-2">
               <div className="w-40 h-4 skeleton" />
@@ -114,7 +114,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
         )}
 
         {!loading && accountInfo && (
-          <div className="px-4 py-1 bg-transparent/95 rounded-b-lg shadow border-x border-b border-gray-200 w-full">
+          <div className="px-4 py-1 bg-transparent/95 rounded-b-lg shadow border-x border-b border-gray-200 w-xs md:w-xl">
             <Link
               href={`/${encodeURIComponent(
                 accountInfo.gameName
@@ -129,14 +129,14 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
                   height={60}
                   className="rounded-full border-2 border-[#5C87F8] animate-pulse animate-duration-5000 mr-4"
                 />
-                <h1 className="text-[#EAEAEA] text-2xl flex flex-col">
+                <h1 className="text-[#EAEAEA] text-lg md:text-2xl flex flex-col">
                   {accountInfo.gameName}#{accountInfo.tagLine}
-                  <span className="text-sm text-gray-400">
+                  <span className="text-xs md:text-sm text-gray-400">
                     Level: {accountInfo.summonerLevel}
                   </span>
                 </h1>
               </div>
-              <h4 className="bg-[#1E2A78] text-[#EAEAEA] p-2 px-3 uppercase rounded-md font-semibold">
+              <h4 className="bg-[#1E2A78] text-[#EAEAEA] p-2 px-3 uppercase rounded-md font-normal md:font-semibold">
                 {accountInfo.region === "euw1"
                   ? "EUW"
                   : accountInfo.region === "eun1"

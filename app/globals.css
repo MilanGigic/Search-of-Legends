@@ -122,6 +122,15 @@
   }
 }
 
+@keyframes scrollBackground {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 200px 200px;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -156,5 +165,18 @@
     background-size: 500% 500%;
     z-index: 0;
     pointer-events: none;
+  }
+
+  .animated-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: 100px 100px;
+    opacity: 0.08;
+    background-image: linear-gradient(#4a5067 4px, transparent 1px),
+      linear-gradient(90deg, #4a5067 4px, transparent 1px);
+    animation: scrollBackground 25s linear infinite;
+    pointer-events: none;
+    mix-blend-mode: soft-light;
   }
 }

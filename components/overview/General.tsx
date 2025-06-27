@@ -140,24 +140,24 @@ const General = ({
           </div>
 
           {/* Items and Summoner Spells */}
-          <div className="flex items-center gap-1 flex-wrap">
+          <div className="flex items-center gap-0.5 flex-wrap">
             {/* Summoner Spells */}
             <div className="flex gap-0.5">
               {summoner1Url && (
                 <Image
                   src={summoner1Url}
-                  width={20}
-                  height={20}
-                  className="sm:w-6 sm:h-6 rounded"
+                  width={15}
+                  height={15}
+                  className="sm:w-5 sm:h-5 rounded"
                   alt="Summoner Spell"
                 />
               )}
               {summoner2Url && (
                 <Image
                   src={summoner2Url}
-                  width={20}
-                  height={20}
-                  className="sm:w-6 sm:h-6 rounded"
+                  width={15}
+                  height={15}
+                  className="sm:w-5.5 sm:h-5.5 rounded"
                   alt="Summoner Spell"
                 />
               )}
@@ -191,7 +191,7 @@ const General = ({
             {kda(participant.kills!, participant.deaths!, participant.assists!)}
           </div>
           <div className="text-xs sm:text-sm text-gray-300 mb-1">
-            {participant?.kills}/{" "}
+            {participant?.kills}/
             <span className="text-red-400">{participant?.deaths}</span>/
             {participant?.assists}
           </div>
@@ -210,7 +210,7 @@ const General = ({
   return (
     <div className="bg-[#1E1E2F]/20 w-full">
       {showGame ? (
-        <div className="p-3 sm:p-5 max-w-7xl mx-auto">
+        <div className="max-w-7xl">
           <div className="animate-fade-down animate-duration-300 animate-ease-in-out">
             {/* Mobile Layout: Stacked Teams */}
             <div className="block lg:hidden space-y-6">
@@ -274,7 +274,7 @@ const General = ({
             </div>
 
             {/* Desktop Layout: Side by Side */}
-            <div className="hidden lg:flex gap-8">
+            <div className="hidden lg:flex gap-0.5">
               {/* Blue Team */}
               <div className="flex-1">
                 <div className="flex justify-center items-center flex-col mb-6">

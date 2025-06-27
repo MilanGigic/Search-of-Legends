@@ -17,7 +17,7 @@ const ChampionPerformanceCard = async ({ puuid }: { puuid: string }) => {
 
   console.log("Top 5", top5);
   return (
-    <div className="pt-5 border border-gray-700/70 mt-3 rounded-md flex flex-col gap-1 bg-[#1E1E2F] shadow-lg shadow-[#2A2A40]">
+    <div className="pt-5 border border-gray-700/70 sm:mt-3 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#121624] to-[#1B1F35]  shadow-sm shadow-[#2A2A40]">
       <div>
         <ul className="grid grid-cols-4 text-slate-300 font-semibold">
           <li className="text-center col-start-2">KDA</li>

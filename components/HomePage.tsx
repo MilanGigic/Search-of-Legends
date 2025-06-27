@@ -13,6 +13,7 @@ import TopFiveChampions from "./TopFiveChampions";
 import Spotlight from "./ui/spotlight";
 import rammusOk from "@/assets/icons/rammus-ok.png";
 import zedShocked from "@/assets/icons/zed-shocked.png";
+import BackgroundShrooms from "./BackgroundShroom";
 
 const HomePage = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -48,7 +49,7 @@ const HomePage = () => {
 
   if (!isMounted) {
     return (
-      <div className="container h-screen flex flex-col items-center justify-between">
+      <div className="container h-full flex flex-col items-center justify-between">
         {/* Static version of your content */}
         <div className="w-3xl flex flex-col mt-24 items-center text-center gap-4">
           <h1 className="font-bold text-4xl md:text-5xl text-shadow-2xs flex items-center justify-center">
@@ -114,138 +115,190 @@ const HomePage = () => {
     );
   }
   return (
-    <div className="container h-screen flex flex-col items-center justify-between">
+    <div className="container relative  h-full flex flex-col items-center justify-between">
+      {/* <BackgroundShrooms /> */}
       <Spotlight />
-      <div className="w-3xl flex flex-col mt-14 items-center text-center gap-4">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="font-bold text-4xl md:text-5xl text-shadow-2xs flex items-center justify-center"
-        >
-          SoL
-        </motion.h1>
-        <div className="text-[#9CAACF] font-light text-sm md:text-base lg:text-lg ">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="mt-6 max-w-xl mx-auto text-lg text-muted-foreground"
-          >
-            Use the features we provide to learn the most important mechanics of
-            the game.
-          </motion.p>
-          <div className="flex items-center gap-1 justify-center text-center">
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-              className="text-[#9CAACF]"
-            >
-              Such as:{" "}
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              <Typewriter
-                options={{
-                  autoStart: true,
-                  loop: true,
-                  strings: ["Macro", "Micro", "Itemization", "Laning"],
-                  delay: 100,
-                  deleteSpeed: 50,
-                  wrapperClassName: "text-cyan-500",
-                }}
-              />
-            </motion.div>
-          </div>
-        </div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-          className="w-full"
-        >
-          <SearchForm placeholder={"Enter Summoner Name (e.g. Faker#KR1)"} />
-        </motion.div>
-      </div>
-      <section className="flex gap-12 items-center w-3xl mb-12">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.7 }}
-          className="w-full"
-        >
-          <TopFiveChampions />
-        </motion.div>
-        <div className="border w-full">Top 5 players</div>
-      </section>
 
-      <div className="text-white flex flex-col items-center w-full">
-        <div className="flex flex-col items-center gap-6 pb-8 w-full">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="flex items-center py-2 text-center justify-center w-full font-bold md:font-extrabold text-2xl md:text-4xl text-[#E2E6F2]"
-          >
-            You don&apos;t have time <br />
-            to study all the concepts by yourself?
-          </motion.h2>
-          <motion.p
+      <main className="relative z-10 w-full flex flex-col items-center justify-center">
+        <div className="w-3xl flex flex-col mt-14 items-center text-center gap-4 relative z-10">
+          <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-semibold text-base md:text-xl text-[#9CAACF]"
+            className="font-bold text-4xl md:text-5xl text-shadow-2xs flex items-center justify-center"
           >
-            We have just the thing for you!{" "}
-            <span>
-              <Image
-                src={rammusOk}
-                alt="Rammus OK"
-                width={40}
-                height={40}
-                className="inline-block ml-2"
-              />
-            </span>
-          </motion.p>
-        </div>
-        <div className="flex flex-col w-full px-5">
-          <motion.h1
-            ref={h1Ref}
-            initial={{ opacity: 0, x: -25 }} // Slide in from the left
-            animate={controls}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="flex items-center justify-start text-start font-bold text-[#E2E6F2] text-lg md:text-2xl"
-          >
-            Our AI Agent makes studying feel like a breeze!
+            SoL
           </motion.h1>
-
-          <motion.p
-            ref={pRef}
-            initial={{ opacity: 0, x: -25 }} // Slide in from the left
-            animate={controls}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="font-semibold text-base md:text-xl text-[#9CAACF] flex gap-2 items-center"
+          <div className="text-[#9CAACF] font-light text-sm md:text-base lg:text-lg ">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="mt-6 w-sm md:w-xl mx-auto text-lg text-muted-foreground"
+            >
+              Use the features we provide to learn the most important mechanics
+              of the game.
+            </motion.p>
+            <div className="flex items-center gap-1 justify-center text-center">
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="text-[#9CAACF]"
+              >
+                Such as:{" "}
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+              >
+                <Typewriter
+                  options={{
+                    autoStart: true,
+                    loop: true,
+                    strings: ["Macro", "Micro", "Itemization", "Laning"],
+                    delay: 100,
+                    deleteSpeed: 50,
+                    wrapperClassName: "text-cyan-500",
+                  }}
+                />
+              </motion.div>
+            </div>
+          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="w-full"
           >
-            You can try it out for free!
-            <span className="font-medium text-xs md:text-sm text-gray-400 italic">
-              No credit card needed.{" "}
+            <SearchForm placeholder={"Enter Summoner Name (e.g. Faker#KR1)"} />
+          </motion.div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 text-center">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="bg-white/5 p-4 rounded-xl backdrop-blur border border-gray-700 shadow-sm shadow-slate-800"
+          >
+            <h3 className="text-xl font-bold text-white">Champion Insights</h3>
+            <p className="text-sm text-muted-foreground mt-2">
+              Track top picks, winrates & matchups.
+            </p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.5 }}
+            className="bg-white/5 p-4 rounded-xl backdrop-blur border border-gray-700 shadow-sm shadow-slate-800"
+          >
+            <h3 className="text-xl font-bold text-white">Pro Player Stats</h3>
+            <p className="text-sm text-muted-foreground mt-2">
+              Explore how pros play in real time.
+            </p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="bg-white/5 p-4 rounded-xl backdrop-blur border border-gray-700 shadow-sm shadow-slate-800"
+          >
+            <h3 className="text-xl font-bold text-white">AI Learning</h3>
+            <p className="text-sm text-muted-foreground mt-2">
+              Let our agent guide you through macro concepts.
+            </p>
+          </motion.div>
+        </div>
+        <section className="flex flex-col sm:flex-row gap-3 md:gap-12 items-center w-sm sm:w-2xl md:w-3xl">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.7 }}
+            className="w-full"
+          >
+            <h2 className="text-2xl font-semibold mt-6 mb-4 text-white text-center">
+              Top Champions This Patch
+            </h2>
+            <TopFiveChampions />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.7 }}
+            className="border w-full"
+          >
+            <h2 className="text-2xl font-semibold mt-6 mb-4 text-white text-center">
+              Best of the Best
+            </h2>
+            Top 5 players
+          </motion.div>
+        </section>
+
+        <div className="text-white flex flex-col items-center w-full">
+          <div className="flex flex-col items-center gap-6 pb-8 w-full">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="flex items-center py-2 text-center justify-center w-sm md:w-2xl font-bold md:font-extrabold text-2xl md:text-4xl text-[#E2E6F2]"
+            >
+              You don&apos;t have time <br />
+              to study all the concepts by yourself?
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="font-semibold text-base md:text-xl text-[#9CAACF]"
+            >
+              We have just the thing for you!{" "}
               <span>
                 <Image
-                  src={zedShocked}
+                  src={rammusOk}
                   alt="Rammus OK"
                   width={40}
                   height={40}
-                  className="inline-block ml-2"
+                  className="inline-block ml-2 opacity-75"
                 />
               </span>
-            </span>
-          </motion.p>
+            </motion.p>
+          </div>
+          <div className="flex flex-col w-full px-5">
+            <motion.h1
+              ref={h1Ref}
+              initial={{ opacity: 0, x: -25 }} // Slide in from the left
+              animate={controls}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="flex items-center justify-start text-start font-bold w-sm md:w-xl text-[#E2E6F2] text-lg md:text-2xl"
+            >
+              Our AI Agent makes studying feel like a breeze!
+            </motion.h1>
+
+            <motion.p
+              ref={pRef}
+              initial={{ opacity: 0, x: -25 }} // Slide in from the left
+              animate={controls}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="font-semibold text-base md:text-xl text-[#9CAACF] flex flex-col sm:flex-row gap-2 items-center"
+            >
+              You can try it out for free!
+              <span className="font-medium text-xs md:text-sm text-gray-400 text-center items-center italic">
+                No credit card needed.{" "}
+                <span>
+                  <Image
+                    src={zedShocked}
+                    alt="Rammus OK"
+                    width={40}
+                    height={40}
+                    className="inline-block ml-2 opacity-50"
+                  />
+                </span>
+              </span>
+            </motion.p>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

@@ -88,10 +88,14 @@ const GameMatchCard = ({
   };
 
   return (
-    <div className="container mx-auto text-white">
+    <div className="container text-white">
       {/* User vs Opponent */}
-      <div className={`${showGame ? "rounded-t-md" : ""} bg-[#2A2A40] w-full`}>
-        <div className="max-w-[722px] md:max-w-[765px] mx-auto grid grid-cols-3 items-center py-1.5">
+      <div
+        className={`${
+          showGame ? "rounded-t-md" : ""
+        } from-[#121624] to-[#1B1F35]`}
+      >
+        <div className="max-w-[468px] md:max-w-[864px] grid grid-cols-3 items-center py-1.5">
           <h1 className="text-amber-500 text-sm md:text-base text-center">
             {user?.riotIdGameName}#{user?.riotIdTagline}
           </h1>
@@ -148,29 +152,29 @@ const GameMatchCard = ({
       <UserVsOpponent user={user} opponent={opponent} showGame={showGame} />
       {/* ----------------- */}
       {showGame ? (
-        <div className="m-0">
-          <section className="flex justify-center max-w-3xl mx-auto w-full">
+        <div className="">
+          <section className="flex justify-center max-w-3xl w-full">
             <Button
-              className={`hover:bg-[#2A2A40] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
+              className={`hover:bg-[#1B1F35] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
                 isActive.activeTab === "general" &&
-                "bg-[#2A2A40] text-slate-300"
+                "bg-[#1B1F35] text-slate-300"
               }`}
               onClick={() => handleButtonClick("general")}
             >
               General
             </Button>
             <Button
-              className={`hover:bg-[#2A2A40] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
+              className={`hover:bg-[#1B1F35] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
                 isActive.activeTab === "details" &&
-                "bg-[#2A2A40] text-slate-300"
+                "bg-[#1B1F35] text-slate-300"
               }`}
               onClick={() => handleButtonClick("details")}
             >
               Details
             </Button>
             <Button
-              className={`hover:bg-[#2A2A40] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
-                isActive.activeTab === "runes" && "bg-[#2A2A40] text-slate-300"
+              className={`hover:bg-[#1B1F35] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
+                isActive.activeTab === "runes" && "bg-[#1B1F35] text-slate-300"
               }`}
               onClick={() => handleButtonClick("runes")}
             >

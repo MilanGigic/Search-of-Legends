@@ -120,7 +120,9 @@ const UserVsOpponent = ({
     return (
       <div
         className={`flex flex-col gap-2
-          ${isUser ? "items-start" : "items-end"}
+         ${isUser ? "items-start" : "items-end"} sm:${
+          isUser ? "items-start" : "items-end"
+        }
         `}
       >
         <div
@@ -155,7 +157,7 @@ const UserVsOpponent = ({
   };
 
   return (
-    <div className="w-full">
+    <div className="max-w-[468px] md:max-w-[864px]">
       <div
         className={`${
           user?.win
@@ -232,7 +234,7 @@ const UserVsOpponent = ({
                   isUser={false}
                 />
 
-                <div className="flex gap-1 mt-2 justify-end">
+                <div className="flex gap-1 mt-2 justify-start sm:justify-end">
                   <SummonerSpell spellId={opponent?.summoner1Id!} />
                   <SummonerSpell spellId={opponent?.summoner2Id!} />
                 </div>
@@ -240,7 +242,7 @@ const UserVsOpponent = ({
             </div>
 
             <div className="mt-3 p-2 bg-slate-800/60 rounded-md">
-              <div className="flex gap-1 justify-end">
+              <div className="flex gap-1 justify-center sm:justify-end">
                 <ItemSlot itemId={opponent?.item0!} />
                 <ItemSlot itemId={opponent?.item1!} />
                 <ItemSlot itemId={opponent?.item2!} />

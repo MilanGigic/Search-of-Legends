@@ -25,7 +25,7 @@ export default function Spotlight() {
   return (
     <div
       ref={spotlightRef}
-      className="pointer-events-none fixed inset-0 z-0 transition-all duration-700 ease-out"
+      className="pointer-events-none fixed inset-0 z-50 transition-all duration-700 ease-out"
     />
   );
 }

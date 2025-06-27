@@ -36,7 +36,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Spotlight />
+          {/* <div className="absolute inset-0 z-0 pointer-events-none">
+            <div className="animated-grid" />
+          </div> */}
           {children}
         </ThemeProvider>
       </body>

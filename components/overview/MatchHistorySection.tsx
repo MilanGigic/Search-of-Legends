@@ -528,12 +528,11 @@ const MatchHistorySection = ({
   );
 
   return (
-    <div className="mt-5">
-      {/* <div className="h-full border">
-        <UserStats games={games} matchHistory={matchHistory} puuid={puuid} />
-      </div> */}
-      <div className="max-w-[722px] md:max-w-[765px] shadow-2xl shadow-[#2A2A40]">
-        <SearchForm placeholder={"Search for a specific champion..."} />
+    <div className="mt-5 max-w-[468px] md:max-w-[864px] ">
+      <div className="bg-gradient-to-b w-full from-[#121624] to-[#1B1F35] shadow-2xl shadow-[#2A2A40]">
+        <div className="flex items-center w-full justify-center bg-[#1E1E2F]">
+          <SearchForm placeholder={"Search for a specific champion..."} />
+        </div>
 
         <PaginationControls position="top" />
         <Suspense>
@@ -550,31 +549,6 @@ const MatchHistorySection = ({
         <PaginationControls position="bottom" />
       </div>
     </div>
-    // <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-6 border">
-    //   {/* <div className="col-span-1">
-    //     <UserStats matchHistory={matchHistory} puuid={puuid} />
-    //   </div> */}
-    //   <div className="col-span-1">
-    //     <div className="flex items-center w-full justify-center bg-[#1E1E2F]">
-    //       <SearchForm placeholder={"Search for a specific champion..."} />
-    //     </div>
-    //     <div className="max-w-[722px] md:max-w-[765px] shadow-2xl shadow-[#2A2A40] mt-5">
-    //       <PaginationControls position="top" />
-    //       <Suspense>
-    //         {currentGames.map((game, index) => (
-    //           <GameMatchCard
-    //             key={index}
-    //             game={game.data!}
-    //             puuid={puuid}
-    //             region={region}
-    //             currentPage={currentPage}
-    //           />
-    //         ))}
-    //       </Suspense>
-    //       <PaginationControls position="bottom" />
-    //     </div>
-    //   </div>
-    // </div>
   );
 };
 export default MatchHistorySection;

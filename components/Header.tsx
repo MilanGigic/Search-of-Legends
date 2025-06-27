@@ -3,7 +3,6 @@
 import Link from "next/link";
 
 // Shadcn
-import { House } from "lucide-react";
 import { Button } from "./ui/button";
 import SearchForm from "./SearchForm";
 
@@ -14,8 +13,8 @@ const Header = ({ showSearch = false }: { showSearch?: boolean }) => {
         <div className="flex items-center justify-between w-full">
           <Link href="/">
             <Button className="flex items-center px-5 py-2  cursor-pointer bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-300 hover:to-blue-200  font-bold text-lg transition-colors duration-200">
-              <span className="hidden sm:block">Home</span>
-              <House className="text-white" />
+              <span className="absolute top-0 w-[106px] h-12 [@media(pointer:coarse)]:hidden"></span>
+              <span>SoL</span>
             </Button>
           </Link>
           <ul className="flex items-center gap-2 sm:gap-5">
@@ -23,6 +22,7 @@ const Header = ({ showSearch = false }: { showSearch?: boolean }) => {
               href="/leaderboard"
               className="bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-300 hover:to-blue-200  font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"
             >
+              <span className="absolute top-0 w-[106px] h-12 [@media(pointer:coarse)]:hidden"></span>
               Leaderboard
             </Link>
             {showSearch && (
@@ -36,10 +36,11 @@ const Header = ({ showSearch = false }: { showSearch?: boolean }) => {
               href="/champions"
               className="bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-300 hover:to-blue-200  font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"
             >
+              <span className="absolute top-0 w-[106px] h-12 [@media(pointer:coarse)]:hidden"></span>
               Champions
             </Link>
           </ul>
-          <div className="flex items-center">
+          <div className="hidden md:flex items-center">
             <Link href="/">
               <Button
                 variant="outline"

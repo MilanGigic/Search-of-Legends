@@ -99,7 +99,7 @@ const UserCard = ({
   }
 
   return (
-    <div className="container max-w-6xl mx-auto bg-[#1E1E2F] border-b shadow-[#2A2A40] px-5 pt-5">
+    <div className="container max-w-6xl mx-auto bg-gradient-to-b from-[#1B1F35] to-[#121624]  border-b shadow-[#2A2A40] px-5 pt-5">
       <div className="flex items-center">
         <img
           src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountData.profileIconId}.png`}
