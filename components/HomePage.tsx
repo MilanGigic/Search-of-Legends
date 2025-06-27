@@ -11,6 +11,8 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import TopFiveChampions from "./TopFiveChampions";
 import Spotlight from "./ui/spotlight";
+import rammusOk from "@/assets/icons/rammus-ok.png";
+import zedShocked from "@/assets/icons/zed-shocked.png";
 
 const HomePage = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -46,22 +48,19 @@ const HomePage = () => {
 
   if (!isMounted) {
     return (
-      <div className="container bg-[#2A2A40]/60 shadow-2xl shadow-violet-300 h-screen flex flex-col items-center justify-center">
+      <div className="container h-screen flex flex-col items-center justify-between">
         {/* Static version of your content */}
-        <div className="w-3xl flex flex-col flex-1 justify-center items-center text-center gap-4">
-          <h1 className="font-bold text-4xl md:text-5xl text-white">
-            Welcome to{" "}
-            <span className="text-4xl md:text-5xl text-cyan-300 items-center text-center">
-              SoL
-            </span>
+        <div className="w-3xl flex flex-col mt-24 items-center text-center gap-4">
+          <h1 className="font-bold text-4xl md:text-5xl text-shadow-2xs flex items-center justify-center">
+            SoL
           </h1>
-          <div className="text-gray-300 font-light text-sm md:text-base lg:text-lg ">
+          <div className="text-[#9CAACF] font-light text-sm md:text-base lg:text-lg ">
             <p className="mt-6 max-w-xl mx-auto text-lg text-muted-foreground">
               Use the features we provide to learn the most important mechanics
               of the game.
             </p>
             <div className="flex items-center gap-1 justify-center text-center">
-              <p>Such as: </p>
+              <p className="text-[#9CAACF]">Such as: </p>
               <div>
                 <Typewriter
                   options={{
@@ -80,6 +79,13 @@ const HomePage = () => {
             <SearchForm placeholder={"Enter Summoner Name (e.g. Faker#KR1)"} />
           </div>
         </div>
+
+        <section className="flex gap-12 items-center w-3xl">
+          <div className="w-full">
+            <TopFiveChampions />
+          </div>
+          <div className="border w-full">Top 5 players</div>
+        </section>
         <br />
         <div className="text-white flex flex-col items-center w-full">
           <div className="flex flex-col items-center gap-6 pb-8 w-full">
@@ -110,7 +116,7 @@ const HomePage = () => {
   return (
     <div className="container h-screen flex flex-col items-center justify-between">
       <Spotlight />
-      <div className="w-3xl flex flex-col mt-24 items-center text-center gap-4">
+      <div className="w-3xl flex flex-col mt-14 items-center text-center gap-4">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -165,7 +171,7 @@ const HomePage = () => {
           <SearchForm placeholder={"Enter Summoner Name (e.g. Faker#KR1)"} />
         </motion.div>
       </div>
-      <section className="flex gap-12 items-center w-3xl">
+      <section className="flex gap-12 items-center w-3xl mb-12">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -194,7 +200,16 @@ const HomePage = () => {
             transition={{ duration: 0.8 }}
             className="font-semibold text-base md:text-xl text-[#9CAACF]"
           >
-            We have just the thing for you!
+            We have just the thing for you!{" "}
+            <span>
+              <Image
+                src={rammusOk}
+                alt="Rammus OK"
+                width={40}
+                height={40}
+                className="inline-block ml-2"
+              />
+            </span>
           </motion.p>
         </div>
         <div className="flex flex-col w-full px-5">
@@ -217,7 +232,16 @@ const HomePage = () => {
           >
             You can try it out for free!
             <span className="font-medium text-xs md:text-sm text-gray-400 italic">
-              No credit card needed.
+              No credit card needed.{" "}
+              <span>
+                <Image
+                  src={zedShocked}
+                  alt="Rammus OK"
+                  width={40}
+                  height={40}
+                  className="inline-block ml-2"
+                />
+              </span>
             </span>
           </motion.p>
         </div>
