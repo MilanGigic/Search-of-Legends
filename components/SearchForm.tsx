@@ -91,7 +91,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
     <div className="space-y-4 w-full flex flex-col justify-center items-center">
       <input
         placeholder={placeholder}
-        className="border-b border-gray-400 text-gray-200 focus:outline-none p-2 max-w-xs md:max-w-xl text-center"
+        className="border-b border-slate-400/50 text-gray-200 focus:outline-none p-2 w-[250px] md:w-md text-center"
         value={inputValue}
         onChange={(e) => handleRiotNameChange(e)}
       />

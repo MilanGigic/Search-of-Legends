@@ -77,7 +77,7 @@ const ChampionPerformanceCard = async ({ puuid }: { puuid: string }) => {
         </ul>
       </div>
       <Link href="/#">
-        <Button className="w-full items-center justify-center bg-[#2A2A40]/55 text-slate-300 hover:bg-[#2A2A40] rounded-t-none py-2 mt-2 cursor-pointer rounded-b-md">
+        <Button className="w-full items-center justify-center bg-[#2A2A40]/55 text-slate-300 hover:bg-[#2A2A40] transition-colors duration-50 rounded-t-none py-2 mt-2 cursor-pointer rounded-b-md">
           More Champions...
         </Button>
       </Link>

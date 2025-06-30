@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/ui/theme-provider";
-import Spotlight from "@/components/ui/spotlight";
 
 const bebasNeue = Bebas_Neue({
   variable: "--font-bebas-neue",
@@ -26,21 +24,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body
         className={`${bebasNeue.variable} ${inter.variable} antialiased bg-[#0B0D1C]`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {/* <div className="absolute inset-0 z-0 pointer-events-none">
-            <div className="animated-grid" />
-          </div> */}
-          {children}
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );

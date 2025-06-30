@@ -153,7 +153,7 @@ const GameMatchCard = ({
       {/* ----------------- */}
       {showGame ? (
         <div className="">
-          <section className="flex justify-center max-w-3xl w-full">
+          <section className="flex justify-center w-full">
             <Button
               className={`hover:bg-[#1B1F35] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
                 isActive.activeTab === "general" &&

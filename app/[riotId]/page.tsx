@@ -46,20 +46,15 @@ const AccountPage = async ({ params }: AccountPageProps) => {
       </div>
       <main className="relative z-10 w-full flex flex-col items-center justify-center">
         <UserCard accountData={account} region={REGION} />
-        <div className="max-w-8xl h-full">
-          <div className="w-full grid grid-cols-1 md:grid-cols-3">
-            <div className="col-span-1">
-              <UserStats puuid={puuid} matchHistory={matchHistory} />
-            </div>
 
-            <div className="col-span-1 md:col-span-2 w-full">
-              <MatchHistorySection
-                matchHistory={matchHistory}
-                puuid={puuid}
-                region={REGION}
-              />
-            </div>
-          </div>
+        <div className="w-full flex flex-col md:flex-row h-full justify-center items-center md:items-start">
+          <UserStats puuid={puuid} matchHistory={matchHistory} />
+
+          <MatchHistorySection
+            matchHistory={matchHistory}
+            puuid={puuid}
+            region={REGION}
+          />
         </div>
       </main>
     </div>

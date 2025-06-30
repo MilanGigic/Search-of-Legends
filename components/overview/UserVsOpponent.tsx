@@ -119,10 +119,8 @@ const UserVsOpponent = ({
 
     return (
       <div
-        className={`flex flex-col gap-2
-         ${isUser ? "items-start" : "items-end"} sm:${
-          isUser ? "items-start" : "items-end"
-        }
+        className={`flex flex-col gap-0.5
+         items-start sm:${isUser ? "items-start" : "items-end"}
         `}
       >
         <div
@@ -157,15 +155,15 @@ const UserVsOpponent = ({
   };
 
   return (
-    <div className="max-w-[468px] md:max-w-[864px]">
+    <div className="">
       <div
         className={`${
           user?.win
             ? "bg-gradient-to-r from-green-500/40 to-emerald-400/40"
             : "bg-gradient-to-r from-red-500/40 to-rose-400/40"
-        } w-full p-3 sm:p-4 shadow-lg`}
+        } w-full p-2 sm:p-4 shadow-lg`}
       >
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-6">
           <div className="flex-1">
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0">
@@ -179,14 +177,14 @@ const UserVsOpponent = ({
               <div className="flex-1 min-w-0">
                 <PlayerStats participant={user} kda={userKda} isUser={true} />
 
-                <div className="flex gap-1 mt-2">
+                <div className="flex gap-1 mt-0.5 sm:mt-2">
                   <SummonerSpell spellId={user?.summoner1Id!} />
                   <SummonerSpell spellId={user?.summoner2Id!} />
                 </div>
               </div>
             </div>
 
-            <div className="mt-3 p-2 bg-slate-800/60 rounded-md">
+            <div className="mt-1 sm:mt-3 p-2 bg-slate-800/60 rounded-md">
               <div className="flex gap-1 justify-center sm:justify-start">
                 {user && (
                   <>
@@ -234,14 +232,14 @@ const UserVsOpponent = ({
                   isUser={false}
                 />
 
-                <div className="flex gap-1 mt-2 justify-start sm:justify-end">
+                <div className="flex gap-1 mt-0.5 sm:mt-2 justify-start sm:justify-end">
                   <SummonerSpell spellId={opponent?.summoner1Id!} />
                   <SummonerSpell spellId={opponent?.summoner2Id!} />
                 </div>
               </div>
             </div>
 
-            <div className="mt-3 p-2 bg-slate-800/60 rounded-md">
+            <div className="mt-1 sm:mt-3 p-2 bg-slate-800/60 rounded-md">
               <div className="flex gap-1 justify-center sm:justify-end">
                 <ItemSlot itemId={opponent?.item0!} />
                 <ItemSlot itemId={opponent?.item1!} />

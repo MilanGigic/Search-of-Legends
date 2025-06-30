@@ -453,7 +453,7 @@ const MatchHistorySection = ({
 
   if (isLoading && validGames.length === 0) {
     return (
-      <div className="mx-auto mt-5 text-center">
+      <div className="mt-5 text-center">
         <div className="text-white">
           {dbChecked ? "Loading remaining matches..." : "Checking database..."}
         </div>
@@ -468,7 +468,7 @@ const MatchHistorySection = ({
 
   if (validGames.length === 0 && !isLoading) {
     return (
-      <div className="mx-auto mt-5 text-center">
+      <div className="mt-5 text-center">
         <div className="text-white">
           {failedMatches.length === matchHistory.length
             ? "Failed to load matches"
@@ -486,7 +486,7 @@ const MatchHistorySection = ({
   const PaginationControls = ({ position }: { position: "top" | "bottom" }) => (
     <div
       className={`${
-        position === "top" ? "py-3`" : "py-3"
+        position === "top" ? "py-5`" : "py-3"
       } flex justify-center items-center space-x-2`}
     >
       <button
@@ -528,26 +528,20 @@ const MatchHistorySection = ({
   );
 
   return (
-    <div className="mt-5 max-w-[468px] md:max-w-[864px] ">
-      <div className="bg-gradient-to-b w-full from-[#121624] to-[#1B1F35] shadow-2xl shadow-[#2A2A40]">
-        <div className="flex items-center w-full justify-center bg-[#1E1E2F]">
-          <SearchForm placeholder={"Search for a specific champion..."} />
-        </div>
-
-        <PaginationControls position="top" />
-        <Suspense>
-          {currentGames.map((game, index) => (
-            <GameMatchCard
-              key={index}
-              game={game.data!}
-              puuid={puuid}
-              region={region}
-              currentPage={currentPage}
-            />
-          ))}
-        </Suspense>
-        <PaginationControls position="bottom" />
-      </div>
+    <div className="bg-gradient-to-b w-full from-[#121624] to-[#1B1F35] shadow-2xl shadow-[#2A2A40] mt-5 max-w-2xl">
+      <PaginationControls position="top" />
+      <Suspense>
+        {currentGames.map((game, index) => (
+          <GameMatchCard
+            key={index}
+            game={game.data!}
+            puuid={puuid}
+            region={region}
+            currentPage={currentPage}
+          />
+        ))}
+      </Suspense>
+      <PaginationControls position="bottom" />
     </div>
   );
 };

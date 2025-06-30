@@ -97,7 +97,7 @@ const General = ({
     const summoner2Url = getSummonerSpellImageUrl(participant.summoner2Id!);
 
     return (
-      <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 border-b border-gray-600 bg-[#2A2A40] rounded-lg mb-2">
+      <div className="flex items-center gap-1 sm:gap-2 p-1 sm:p-2 border-b border-gray-600 bg-[#2A2A40] rounded-lg mb-2">
         {/* Champion Image */}
         <div className="flex-shrink-0">
           <Image
@@ -111,7 +111,7 @@ const General = ({
 
         {/* Player Info */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-1 mb-1">
             <Image
               src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${participant.profileIcon}.png`}
               width={20}
@@ -146,18 +146,18 @@ const General = ({
               {summoner1Url && (
                 <Image
                   src={summoner1Url}
-                  width={15}
-                  height={15}
-                  className="sm:w-5 sm:h-5 rounded"
+                  width={24}
+                  height={24}
+                  className="w-6 h-6 sm:w-5 sm:h-5 rounded"
                   alt="Summoner Spell"
                 />
               )}
               {summoner2Url && (
                 <Image
                   src={summoner2Url}
-                  width={15}
-                  height={15}
-                  className="sm:w-5.5 sm:h-5.5 rounded"
+                  width={24}
+                  height={24}
+                  className="w-6 h-6 sm:w-5.5 sm:h-5.5 rounded"
                   alt="Summoner Spell"
                 />
               )}
@@ -171,9 +171,9 @@ const General = ({
                   <Image
                     key={itemSlot}
                     src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${itemId}.png`}
-                    width={18}
-                    height={18}
-                    className="sm:w-5 sm:h-5 rounded"
+                    width={20}
+                    height={20}
+                    className="w-5 h-5 rounded"
                     alt="Item"
                   />
                 ) : null;
@@ -210,13 +210,13 @@ const General = ({
   return (
     <div className="bg-[#1E1E2F]/20 w-full">
       {showGame ? (
-        <div className="max-w-7xl">
+        <div className="">
           <div className="animate-fade-down animate-duration-300 animate-ease-in-out">
             {/* Mobile Layout: Stacked Teams */}
-            <div className="block lg:hidden space-y-6">
+            <div className="block lg:hidden space-y-2">
               {/* Blue Team */}
-              <div className="bg-gray-800 rounded-lg p-4">
-                <div className="flex justify-center items-center mb-4">
+              <div className="bg-gray-800 rounded-lg p-2 sm:p-4">
+                <div className="flex justify-center items-center mb-1 sm:mb-4">
                   <div className="text-center">
                     <h2 className="text-xl font-bold text-blue-400 mb-1">
                       Blue Team
@@ -244,8 +244,8 @@ const General = ({
               </div>
 
               {/* Red Team */}
-              <div className="bg-gray-800 rounded-lg p-4">
-                <div className="flex justify-center items-center mb-4">
+              <div className="bg-gray-800 rounded-lg p-2 sm:p-4">
+                <div className="flex justify-center items-center mb-1">
                   <div className="text-center">
                     <h2 className="text-xl font-bold text-red-400 mb-1">
                       Red Team
