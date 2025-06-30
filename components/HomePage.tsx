@@ -49,7 +49,7 @@ const HomePage = () => {
 
   if (!isMounted) {
     return (
-      <div className="container h-full flex flex-col items-center justify-between">
+      <div className="container h-full flex flex-col items-center justify-between bg-transparent">
         {/* Static version of your content */}
         <div className="w-3xl flex flex-col mt-24 items-center text-center gap-4">
           <h1 className="font-bold text-4xl md:text-5xl text-shadow-2xs flex items-center justify-center">
@@ -115,7 +115,7 @@ const HomePage = () => {
     );
   }
   return (
-    <div className="container relative  h-full flex flex-col items-center justify-between">
+    <div className="container relative h-full flex flex-col items-center justify-between">
       {/* <BackgroundShrooms /> */}
       <Spotlight />
 

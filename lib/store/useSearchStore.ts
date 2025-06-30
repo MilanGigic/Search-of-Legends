@@ -3,6 +3,10 @@ import { create } from "zustand";
 type SearchStore = {
   championVideoKeySpell: string | null;
   setChampionVideoKeySpell: (spell: string) => void;
+  isOpen: boolean;
+  open: () => void;
+  close: () => void;
+  toggle: () => void;
   hydrateFromCookies: () => void;
 };
 
@@ -17,6 +21,11 @@ export const useSearchStore = create<SearchStore>((set) => {
         document.cookie = `championVideoKeySpell=${spell}; path=/; max-age=86400`;
       }
     },
+    isOpen: false,
+    open: () => set({ isOpen: true }),
+    close: () => set({ isOpen: false }),
+    toggle: () => set((state) => ({ isOpen: !state.isOpen })),
+    // Hydrate from cookies on initial load
     hydrateFromCookies: () => {
       if (typeof document !== "undefined") {
         const cookies = document.cookie.split(";");

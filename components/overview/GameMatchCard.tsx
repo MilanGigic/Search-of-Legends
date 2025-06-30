@@ -140,7 +140,7 @@ const GameMatchCard = ({
             </div>
           </div>
           <Link
-            href={`${opponent?.riotIdGameName}-${opponent?.riotIdTagline}?region=${region}`}
+            href={`${opponent?.riotIdGameName}-${opponent?.riotIdTagline}`}
             className="hover:text-amber-500 transition-colors duration-200"
           >
             <h1 className="items-center text-sm md:text-base text-center overflow-hidden text-wrap">

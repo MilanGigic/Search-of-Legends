@@ -1,3 +1,4 @@
+import Sidebar from "@/components/AppSidebar";
 import Header from "@/components/Header";
 
 export default function RiotIdLayout({
@@ -8,6 +9,7 @@ export default function RiotIdLayout({
   return (
     <>
       <Header showSearch={true} />
+      <Sidebar />
       {children}
     </>
   );
