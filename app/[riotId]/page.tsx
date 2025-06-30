@@ -15,7 +15,10 @@ interface AccountPageProps {
 const AccountPage = async ({ params }: AccountPageProps) => {
   const { riotId } = await params;
   const decodedRiotId = decodeURIComponent(riotId);
-  const [gameName, tagLine] = decodedRiotId.split("-");
+  const separator = decodedRiotId.lastIndexOf("-");
+  if (separator === -1) return notFound();
+  const gameName = decodedRiotId.slice(0, separator);
+  const tagLine = decodedRiotId.slice(separator + 1);
   console.log("Parsed gameName and tagLine:", { gameName, tagLine });
 
   if (!gameName || !tagLine) {
@@ -23,36 +26,48 @@ const AccountPage = async ({ params }: AccountPageProps) => {
     return notFound();
   }
 
-  const account = await db.query.accounts.findFirst({
+  const existingAccount = await db.query.accounts.findFirst({
     where: and(eq(accounts.gameName, gameName), eq(accounts.tagLine, tagLine)),
   });
 
-  if (!account) {
-    console.error(
-      `No account found for gameName: ${gameName}, tagLine: ${tagLine}`
+  let account: DbSummonerInfo | null = null;
+
+  if (!existingAccount) {
+    const accountRes = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/account?gameName=${gameName}&tagLine=${tagLine}`,
+      { headers: { "Content-Type": "application/json" } }
     );
-    return notFound();
+
+    if (!accountRes.ok) {
+      console.error("Failed to fetch account data:", accountRes.statusText);
+      return notFound();
+    }
+
+    account = await accountRes.json();
   }
 
-  const puuid = account.puuid;
+  const accountData = existingAccount ?? account!;
+  const puuid = accountData.puuid;
+  const REGION = getRegionalEndpoint(accountData.region);
 
-  const REGION = getRegionalEndpoint(account.region);
-
-  const matchHistory: string[] = await fetchAllMatchIds(puuid, account.region);
+  const matchHistory: string[] = await fetchAllMatchIds(
+    puuid,
+    accountData.region
+  );
   return (
     <div className="relative z-10 min-h-screen p-4">
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="animated-grid" />
       </div>
       <main className="relative z-10 w-full flex flex-col items-center justify-center">
-        <UserCard accountData={account} region={REGION} />
+        <UserCard accountData={accountData} region={REGION} />
 
         <div className="w-full flex flex-col md:flex-row h-full justify-center items-center md:items-start">
           <UserStats puuid={puuid} matchHistory={matchHistory} />
 
           <MatchHistorySection
             matchHistory={matchHistory}
-            puuid={puuid}
+            puuid={puuid!}
             region={REGION}
           />
         </div>
