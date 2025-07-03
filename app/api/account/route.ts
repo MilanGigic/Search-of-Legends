@@ -200,9 +200,6 @@ export async function GET(req: NextRequest) {
             });
         }
       }
-
-      // Store the region in your database for future use
-      // You can add a 'region' column to your accounts table
     } catch (error) {
       console.log("Failed to fetch summoner from any region:", error);
     }

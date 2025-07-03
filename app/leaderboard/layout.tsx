@@ -1,14 +1,15 @@
 import Header from "@/components/Header";
 
-export default function MainLayout({
+const LeaderboardLayout = ({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) => {
   return (
-    <>
+    <div>
       <Header showSearch={true} />
       {children}
-    </>
+    </div>
   );
-}
+};
+export default LeaderboardLayout;

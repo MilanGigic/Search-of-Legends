@@ -19,6 +19,9 @@ function getRegionalEndpoint(region: string): string {
     vn2: "sea",
   };
 
+  if (!region) {
+    throw new Error("Region is undefined or invalid.");
+  }
   const routingValue = regionMap[region.toLowerCase()];
   return routingValue;
 }

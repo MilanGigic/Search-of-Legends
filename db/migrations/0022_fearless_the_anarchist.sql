@@ -1,0 +1,1 @@
+ALTER TABLE "challenger_players" RENAME COLUMN "summoner_name" TO "puuid";

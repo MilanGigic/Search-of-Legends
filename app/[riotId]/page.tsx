@@ -47,6 +47,11 @@ const AccountPage = async ({ params }: AccountPageProps) => {
   }
 
   const accountData = existingAccount ?? account!;
+
+  if (!accountData?.region) {
+    console.error("Missing region for account:", accountData);
+    return notFound();
+  }
   const puuid = accountData.puuid;
   const REGION = getRegionalEndpoint(accountData.region);
 
@@ -54,6 +59,7 @@ const AccountPage = async ({ params }: AccountPageProps) => {
     puuid,
     accountData.region
   );
+
   return (
     <div className="relative z-10 min-h-screen p-4">
       <div className="fixed inset-0 z-0 pointer-events-none">

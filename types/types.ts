@@ -4,6 +4,11 @@ interface Account {
   tagLine: string;
   region: string;
 }
+interface AccountData {
+  puuid: string;
+  gameName: string;
+  tagLine: string;
+}
 
 interface SummonerInfo {
   id: string;
@@ -29,6 +34,27 @@ interface SummonerRankInfo {
   freshBlood: boolean;
   inactive: boolean;
   miniSeries?: MiniSeriesDTO; // Optional in case the player isn't in a promo series
+}
+
+interface LeagueEntry {
+  summonerId: string;
+  puuid: string;
+  leaguePoints: number;
+  rank: string;
+  wins: number;
+  losses: number;
+  veteran: boolean;
+  inactive: boolean;
+  freshBlood: boolean;
+  hotStreak: boolean;
+}
+
+interface LeagueData {
+  tier: string;
+  leagueId: string;
+  queue: string;
+  name: string;
+  entries: LeagueEntry[];
 }
 
 interface CompleteSummonerInfo extends SummonerInfo {

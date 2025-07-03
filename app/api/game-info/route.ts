@@ -153,6 +153,12 @@ export async function GET(req: NextRequest) {
       bans: newGameBans,
     };
 
+    transformedData.participants.map(async (participant) => {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/account?gameName=${participant.riotIdGameName}&tagLine=${participant.riotIdTagline}`
+      );
+    });
+
     return NextResponse.json(transformedData, { status: 200 });
   } catch (error) {
     console.error(`Failed to fetch game info for gameId: ${gameId}`, error);

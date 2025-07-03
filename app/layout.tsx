@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/Header";
+import Spotlight from "@/components/ui/spotlight";
 
 const bebasNeue = Bebas_Neue({
   variable: "--font-bebas-neue",
@@ -28,6 +30,10 @@ export default function RootLayout({
       <body
         className={`${bebasNeue.variable} ${inter.variable} antialiased bg-[#0B0D1C]`}
       >
+        <div className="fixed inset-0 z-0 pointer-events-none">
+          <div className="animated-grid" />
+        </div>
+        <Spotlight />
         {children}
       </body>
     </html>

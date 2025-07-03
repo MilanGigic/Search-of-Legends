@@ -2,7 +2,7 @@ import Image from "next/image";
 
 const TopFiveChampions = () => {
   return (
-    <div className="py-2 px-1 border border-gray-700/70 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624] ">
+    <div className="py-2 px-1 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624] ">
       <div className="shadow-2xl shadow-[#12162499]">
         <ul className="grid grid-cols-5 text-slate-300 font-semibold">
           <li className="text-center col-span-2">Champion</li>
