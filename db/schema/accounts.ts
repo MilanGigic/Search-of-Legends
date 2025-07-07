@@ -24,16 +24,3 @@ export const accounts = pgTable("accounts", {
   revisionDate: bigint("revision_date", { mode: "number" }).notNull(),
   lastUpdated: bigint("last_updated", { mode: "number" }).notNull(),
 });
-
-export const leaderboardPlayers = pgTable("leaderboard_players", {
-  summonerId: varchar("summoner_id").primaryKey(),
-  gameName: varchar("game_name").notNull(),
-  tagLine: varchar("tag_line").notNull(),
-  puuid: varchar("puuid").notNull(),
-  tier: text("tier"), // NEW: Challenger / Grandmaster / Master
-  leaguePoints: integer("league_points").notNull(),
-  wins: integer("wins").notNull(),
-  losses: integer("losses").notNull(),
-  rank: integer("rank").notNull(),
-  updatedAt: timestamp("created_at").defaultNow(),
-});

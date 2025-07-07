@@ -8,21 +8,48 @@ if (!RIOT_API_KEY) {
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export const fetchMatchDetails = async (matchId: string, REGION: string) => {
-  const res = await fetch(
-    `https://${REGION}.api.riotgames.com/lol/match/v5/matches/${matchId}`,
-    {
-      headers: { "X-Riot-Token": RIOT_API_KEY },
-    }
-  );
+  const url = `https://${REGION}.api.riotgames.com/lol/match/v5/matches/${matchId}`;
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 1000;
 
-  if (!res.ok) {
-    console.error(`Error fetching match ${matchId}:`, await res.text());
-    throw new Error(`Failed to fetch match ${matchId}`);
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetch(url, {
+        headers: { "X-Riot-Token": RIOT_API_KEY },
+      });
+
+      if (res.status === 429) {
+        const retryAfter = Number(res.headers.get("Retry-After")) || 1;
+        console.warn(
+          `⚠️ Rate limited on ${matchId}. Retrying in ${retryAfter}s...`
+        );
+        await delay(retryAfter * 1000);
+        continue;
+      }
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Fetch failed [${res.status}]: ${errorText}`);
+      }
+
+      const matchData: RiotMatchDto = await res.json();
+      return matchData;
+    } catch (error) {
+      console.error(
+        `❌ Attempt ${attempt} failed for match ${matchId}:`,
+        error
+      );
+      if (attempt < MAX_RETRIES) {
+        await delay(RETRY_DELAY * attempt); // exponential backoff
+      } else {
+        throw new Error(
+          `Failed to fetch match ${matchId} after ${MAX_RETRIES} attempts`
+        );
+      }
+    }
   }
 
-  const matchData: RiotMatchDto = await res.json();
-
-  return matchData;
+  throw new Error(`Unreachable retry error on ${matchId}`);
 };
 
 export const fetchMatchDetailsInBatch = async (
@@ -40,57 +67,47 @@ export const fetchMatchDetailsInSmallBatch = async (
   REGION: string,
   puuid: string
 ) => {
-  if (matchIds.length === 0) {
-    return [];
-  }
+  if (matchIds.length === 0) return [];
 
-  console.log(`Fetching ${matchIds.length} matches in region ${REGION}`);
+  console.log(`📦 Fetching ${matchIds.length} matches in region ${REGION}`);
 
-  const allMatchData: any[] = [];
-  const MAX_CONCURRENT = 5; // Limit concurrent requests to avoid rate limits
+  const allMatchData: RiotMatchDto[] = [];
+  const MAX_CONCURRENT = 5;
 
-  // Process matches in smaller concurrent batches
   for (let i = 0; i < matchIds.length; i += MAX_CONCURRENT) {
     const batch = matchIds.slice(i, i + MAX_CONCURRENT);
-    console.log(`Processing batch: matches ${i + 1}-${i + batch.length}`);
+    console.log(`🔄 Batch ${i / MAX_CONCURRENT + 1}: ${batch.length} matches`);
 
     const batchResults = await Promise.allSettled(
-      batch.map(async (matchId) => {
+      batch.map(async (matchId, index) => {
         try {
-          console.log(`Fetching match ${matchId}...`);
+          await delay(100 * index); // Slight stagger to avoid burst
           const matchData = await fetchMatchDetails(matchId, REGION);
-          console.log(`Fetched match ${matchId}, inserting data...`);
           await insertMatchData(matchData, puuid);
-          console.log(`Inserted data for match ${matchId}`);
           return matchData;
         } catch (err) {
-          console.error(`Failed match ${matchId}:`, err);
-          throw err;
+          console.error(`❌ Failed match ${matchId}:`, err);
+          return null;
         }
       })
     );
 
-    // Collect successful results
     batchResults.forEach((result, index) => {
-      if (result.status === "fulfilled") {
+      if (result.status === "fulfilled" && result.value) {
         allMatchData.push(result.value);
       } else {
-        console.error(
-          `Failed to process match ${batch[index]}:`,
-          result.reason
-        );
+        console.warn(`❌ Could not process match ${batch[index]}`);
       }
     });
 
-    // Rate limiting delay between batches
     if (i + MAX_CONCURRENT < matchIds.length) {
-      console.log(`Waiting 1.2 seconds before next batch...`);
-      await delay(1200); // Slightly longer delay for safety
+      console.log(`⏳ Waiting 1.2 seconds before next batch...`);
+      await delay(1200);
     }
   }
 
   console.log(
-    `Finished fetching ${allMatchData.length}/${matchIds.length} matches successfully.`
+    `✅ Finished: ${allMatchData.length}/${matchIds.length} matches processed successfully.`
   );
   return allMatchData;
 };

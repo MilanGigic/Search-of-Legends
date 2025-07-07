@@ -88,7 +88,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
   };
 
   return (
-    <div className="space-y-4 w-full flex flex-col justify-center items-center">
+    <div className="w-full flex flex-col justify-center items-center">
       <input
         placeholder={placeholder}
         className="border-b border-slate-400/50 text-gray-200 focus:outline-none p-2 w-[200px] md:w-md text-center"
@@ -114,7 +114,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
         )}
 
         {!loading && accountInfo && (
-          <div className="px-4 py-1 bg-transparent/95 rounded-b-lg shadow border-x border-b border-gray-200 w-xs md:w-xl">
+          <div className="px-4 bg-transparent/95 rounded-b-lg shadow border-x border-b border-slate-400/50 w-[200px] md:w-md">
             <Link
               href={`/${encodeURIComponent(
                 accountInfo.gameName

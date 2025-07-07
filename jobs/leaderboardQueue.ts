@@ -2,7 +2,7 @@
 import { Queue, Worker, Job } from "bullmq";
 import { redisConnection } from "./redis";
 import { db } from "@/db";
-import { leaderboardPlayers } from "@/db/schema";
+import { accounts } from "@/db/schema";
 import dotenv from "dotenv";
 import pLimit from "p-limit";
 
@@ -37,6 +37,7 @@ export const leaderboardWorker = new Worker(
   "leaderboard",
   async (job: Job) => {
     console.log("Worker started: Fetching leaderboard...");
+    console.log("🔥 Job STARTED at", new Date().toISOString());
 
     // 1. Fetch Challenger and Grandmaster
     const tiers = [
@@ -78,101 +79,224 @@ export const leaderboardWorker = new Worker(
 
     // 3. Fetch account info with rate limiting
     console.log("Preparing to fetch account info for each entry...");
-    const jobs = sortedEntries.map((entry, i) =>
-      limit(async () => {
-        await delay(50 * i);
-        console.log(
-          `Fetching account info for PUUID: ${entry.puuid} (Rank ${i + 1})`
-        );
-        const accountRes = await fetch(
-          `https://europe.api.riotgames.com/riot/account/v1/accounts/by-puuid/${entry.puuid}?api_key=${process.env.RIOT_API_KEY}`
-        );
-
-        if (!accountRes.ok) {
-          console.warn(
-            `Failed to fetch account for ${entry.puuid}: ${accountRes.statusText}`
-          );
-          return;
-        }
-
-        const accountData: AccountData = await accountRes.json();
-
-        console.log(
-          `Upserting player: ${accountData.gameName}#${
-            accountData.tagLine
-          } (Rank ${i + 1})`
-        );
-        await db
-          .insert(leaderboardPlayers)
-          .values({
-            summonerId: entry.summonerId,
-            puuid: entry.puuid!,
-            gameName: accountData.gameName,
-            tagLine: accountData.tagLine,
-            tier: entry.tier!,
-            leaguePoints: entry.leaguePoints,
-            wins: entry.wins,
-            losses: entry.losses,
-            rank: i + 1,
-            updatedAt: new Date(),
-          })
-          .onConflictDoUpdate({
-            target: [leaderboardPlayers.summonerId],
-            set: {
-              puuid: entry.puuid!,
-              gameName: accountData.gameName,
-              tagLine: accountData.tagLine,
-              tier: entry.tier!,
-              leaguePoints: entry.leaguePoints,
-              wins: entry.wins,
-              losses: entry.losses,
-              rank: i + 1,
-              updatedAt: new Date(),
-            },
-          });
-        console.log(
-          `Player upserted: ${accountData.gameName}#${
-            accountData.tagLine
-          } (Rank ${i + 1})`
-        );
-      })
-    );
-
     const BATCH_SIZE = 90;
-    const BATCH_DELAY = 130000; // 2 minutes 10 seconds (Riot gives 100 req / 2 mins)
+    const BATCH_DELAY = 130000; // 2 minutes 10 seconds
 
-    for (let i = 0; i < jobs.length; i += BATCH_SIZE) {
-      const batch = jobs.slice(i, i + BATCH_SIZE);
+    console.log(`🔍 DEBUG: Starting batch loop`);
+    console.log(`🔍 Total entries: ${sortedEntries.length}`);
+    console.log(`🔍 Batch size: ${BATCH_SIZE}`);
+    console.log(
+      `🔍 Expected batches: ${Math.ceil(sortedEntries.length / BATCH_SIZE)}`
+    );
+    for (let i = 0; i < sortedEntries.length; i += BATCH_SIZE) {
       console.log(
-        `🔄 Processing batch ${i / BATCH_SIZE + 1} (${batch.length} jobs)...`
+        `🔍 DEBUG: Loop iteration, i=${i}, condition=${
+          i < sortedEntries.length
+        }`
+      );
+      const batchEntries = sortedEntries.slice(i, i + BATCH_SIZE);
+      const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
+      const totalBatches = Math.ceil(sortedEntries.length / BATCH_SIZE);
+
+      console.log(
+        `🔄 Processing batch ${i / BATCH_SIZE + 1} (${
+          batchEntries.length
+        } entries)...`
       );
 
-      await Promise.all(batch); // Wait for this batch to finish
+      const batchJobs = batchEntries.map((entry, j) =>
+        limit(async () => {
+          const globalRank = i + j + 1; // This gives the correct global rank
+          const entryInBatch = j + 1;
+          console.log(
+            `⏳ [Batch ${i / BATCH_SIZE + 1}] Starting entry ${j + 1}/${
+              batchEntries.length
+            } (Puuid: ${entry.puuid})`
+          );
+          // Add a short delay to space requests a bit more
+          await delay(100 * j);
 
-      if (i + BATCH_SIZE < jobs.length) {
-        console.log(`⏳ Waiting ${BATCH_DELAY / 1000}s before next batch...`);
+          try {
+            console.log(
+              `🌐 Fetching account info for puuid: ${entry.puuid}...`
+            );
+            const accountRes = await fetch(
+              `https://europe.api.riotgames.com/riot/account/v1/accounts/by-puuid/${entry.puuid}?api_key=${process.env.RIOT_API_KEY}`
+            );
+
+            if (!accountRes.ok) {
+              console.warn(
+                `⚠️ Failed to fetch account for ${entry.puuid}: ${accountRes.statusText}`
+              );
+              return;
+            }
+
+            const accountData: AccountData = await accountRes.json();
+
+            console.log(
+              `🌐 Fetching summoner info for puuid: ${accountData.puuid}...`
+            );
+            const summonerRes = await fetch(
+              `https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${accountData.puuid}?api_key=${process.env.RIOT_API_KEY}`
+            );
+
+            if (!summonerRes.ok) {
+              console.warn(
+                `⚠️ Failed to fetch summoner for ${accountData.puuid}: ${summonerRes.statusText}`
+              );
+              return;
+            }
+
+            const summonerInfo: SummonerInfo = await summonerRes.json();
+
+            console.log(
+              `💾 Upserting account ${accountData.gameName}#${
+                accountData.tagLine
+              } (Rank ${i + j + 1}) into database...`
+            );
+            await db
+              .insert(accounts)
+              .values({
+                puuid: entry.puuid!,
+                gameName: accountData.gameName,
+                tagLine: accountData.tagLine,
+                region: "euw1", // Assuming all players are from EUW for simplicity
+                summonerId: entry.summonerId,
+                summonerLevel: summonerInfo.summonerLevel,
+                profileIconId: summonerInfo.profileIconId,
+                tier: entry.tier!,
+                rank: String(i + j + 1), // i = offset, j = index in this batch
+                leaguePoints: entry.leaguePoints,
+                wins: entry.wins,
+                losses: entry.losses,
+                lastUpdated: Number(new Date()),
+                revisionDate: Number(new Date()),
+              })
+              .onConflictDoUpdate({
+                target: [accounts.puuid],
+                set: {
+                  puuid: entry.puuid!,
+                  gameName: accountData.gameName,
+                  tagLine: accountData.tagLine,
+                  profileIconId: summonerInfo.profileIconId,
+                  summonerLevel: summonerInfo.summonerLevel,
+                  tier: entry.tier!,
+                  leaguePoints: entry.leaguePoints,
+                  wins: entry.wins,
+                  losses: entry.losses,
+                  rank: String(i + j + 1),
+                  lastUpdated: Number(new Date()),
+                },
+              });
+
+            console.log(
+              `✅ Upserted ${accountData.gameName}#${
+                accountData.tagLine
+              } (Rank ${i + j + 1})`
+            );
+            return {
+              success: true,
+              rank: globalRank,
+              player: `${accountData.gameName}#${accountData.tagLine}`,
+            };
+          } catch (error) {
+            console.error(
+              `❌ Error processing entry at rank ${globalRank}:`,
+              error
+            );
+            return { success: false, rank: globalRank, error: error };
+          }
+        })
+      );
+
+      console.log(
+        `⏳ Waiting for all jobs in batch ${i / BATCH_SIZE + 1} to complete...`
+      );
+      try {
+        const results = await Promise.all(batchJobs);
+
+        // Log batch completion stats
+        const successful = results.filter((r) => r?.success).length;
+        const failed = results.filter((r) => r && !r.success).length;
+        const total = results.length;
+
+        console.log(
+          `📊 Batch ${batchNumber} completed: ${successful}/${total} successful, ${failed} failed`
+        );
+
+        if (failed > 0) {
+          console.log(
+            `⚠️ Failed entries in batch ${batchNumber}:`,
+            results
+              .filter((r) => r && !r.success)
+              .map((r) => `Rank ${r?.rank}: ${r?.error}`)
+          );
+        }
+      } catch (error) {
+        console.error(`❌ Batch ${batchNumber} failed:`, error);
+      }
+
+      const hasMoreBatches = i + BATCH_SIZE < sortedEntries.length;
+
+      if (hasMoreBatches) {
+        console.log(
+          `⏳ Waiting ${BATCH_DELAY / 1000}s before next batch (batch ${
+            batchNumber + 1
+          })...`
+        );
         await delay(BATCH_DELAY);
+      } else {
+        console.log(
+          `🎉 All batches completed! Processed ${sortedEntries.length} entries total.`
+        );
       }
     }
 
     console.log("✅ Leaderboard sync complete.");
+    console.log("✅ Job COMPLETED at", new Date().toISOString());
   },
   {
     connection: redisConnection,
   }
 );
 
-// Optional: schedule the job
-export async function scheduleLeaderboardSync() {
-  console.log("Scheduling leaderboard sync job...");
-  await leaderboardQueue.add(
-    "sync-leaderboard",
-    {},
-    {
-      repeat: { every: 1000 * 60 * 10 }, // every 10 minutes
-      removeOnComplete: true,
-      removeOnFail: true,
-    }
-  );
-  console.log("Leaderboard sync job scheduled.");
+// Add event handlers to debug worker activity
+leaderboardWorker.on("ready", () => {
+  console.log("🟢 Worker is ready and waiting for jobs");
+});
+
+leaderboardWorker.on("active", (job) => {
+  console.log(`🔄 Worker picked up job: ${job.id}`);
+});
+
+leaderboardWorker.on("completed", (job) => {
+  console.log(`✅ Job completed: ${job.id}`);
+});
+
+leaderboardWorker.on("failed", (job, err) => {
+  console.error(`❌ Job failed: ${job?.id}`, err);
+});
+
+leaderboardWorker.on("error", (err) => {
+  console.error("❌ Worker error:", err);
+});
+
+// Add a manual trigger function for testing
+export async function triggerLeaderboardSync() {
+  console.log("🚀 Manually triggering leaderboard sync...");
+  const job = await leaderboardQueue.add("sync-leaderboard", {});
+  console.log(`📋 Job added with ID: ${job.id}`);
+  return job;
+}
+
+// If this file is run directly, trigger a manual sync
+if (require.main === module) {
+  console.log("🏃 Running leaderboard sync manually...");
+  triggerLeaderboardSync()
+    .then(() => {
+      console.log("✅ Manual trigger completed");
+    })
+    .catch((err) => {
+      console.error("❌ Manual trigger failed:", err);
+    });
 }

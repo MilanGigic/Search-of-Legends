@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import {
+  accounts,
   matchBans,
   matchDetails,
   matches,
@@ -15,9 +16,22 @@ export default async function insertMatchData(
   const { info, metadata } = matchData;
   const matchId = metadata.matchId;
 
+  const userGameName = info.participants.find((p) => p.puuid === puuid);
+  const userTagLine = info.participants.find((p) => p.puuid === puuid);
+
   if (!matchId || !puuid) {
     console.error("Invalid match data or PUUID");
     return;
+  }
+
+  const account = await db.query.accounts.findFirst({
+    where: (accounts, { eq }) => eq(accounts.puuid, puuid),
+  });
+
+  if (!account) {
+    await fetch(
+      `/api/account?gameName=${userGameName?.riotIdGameName}&tagLine=${userTagLine?.riotIdTagline}`
+    );
   }
 
   // Insert into matches table

@@ -12,7 +12,6 @@ interface AccountData {
 
 interface SummonerInfo {
   id: string;
-  accountId: string;
   puuid: string;
   profileIconId: number;
   revisionDate: number;

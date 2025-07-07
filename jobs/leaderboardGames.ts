@@ -1,65 +1,80 @@
-import { delay, Job, Queue, Worker } from "bullmq";
-import dotenv from "dotenv";
+// File: jobs/leaderboardGames.ts
+import { Job, Queue, Worker } from "bullmq";
 import { redisConnection } from "./redis";
 import { db } from "@/db";
+import { accounts } from "@/db/schema";
 import fetchAllMatchIds from "@/lib/actions/match-history/fetchMatchIds";
 import { fetchMatchDetailsInSmallBatch } from "@/lib/actions/match-history/fetchMatchDetails";
+import getRegionalEndpoint from "@/lib/actions/match-history/getRegionalEndpoint";
 
-dotenv.config();
-
-console.log("Initializing leaderboard games queue...");
+const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export const leaderboardGamesQueue = new Queue("leaderboard-games", {
   connection: redisConnection,
 });
 
-console.log("Leaderboard games queue created.");
-
 export const leaderboardGamesWorker = new Worker(
   "leaderboard-games",
-  async (job: Job) => {
-    console.log("Worker started: Fetching leaderboard games...");
+  async (job: Job<{ puuid: string; region: string; summonerName: string }>) => {
+    const { puuid, region, summonerName } = job.data;
 
-    const players = await db.query.leaderboardPlayers.findMany();
+    try {
+      const routing = getRegionalEndpoint(region.toLowerCase());
 
-    for (let i = 0; i < players.length; i++) {
-      const player = players[i];
-      if (!player || !player.puuid) {
-        console.warn(`Player ${i + 1} has no PUUID, skipping...`);
-        continue;
-      }
+      console.log(`🎮 Syncing matches for ${summonerName}`);
 
-      try {
-        console.log(
-          `(${i + 1}/${players.length}) Fetching match IDs for ${
-            player.puuid
-          }...`
-        );
+      // Introduce a small delay before fetching
+      await delay(600);
 
-        const matchIds: string[] = await fetchAllMatchIds(player.puuid, "euw1");
+      const matchIds = await fetchAllMatchIds(puuid, region);
 
-        await fetchMatchDetailsInSmallBatch(matchIds, "euw1", player.puuid);
-      } catch (error) {
-        console.error(`❌ Failed to sync ${player.puuid}:`, error);
-      }
+      // Delay to avoid burst limit
+      await delay(600);
 
-      await delay(1200); // Delay to avoid rate limiting
+      console.log(
+        `📥 Fetching ${matchIds.length} match details for ${summonerName}`
+      );
+      await fetchMatchDetailsInSmallBatch(matchIds, routing, puuid);
+
+      console.log(`✅ Synced ${matchIds.length} matches for ${summonerName}`);
+    } catch (err) {
+      console.error(`❌ Failed to sync matches for ${summonerName}:`, err);
     }
-    console.log("✅ Completed syncing leaderboard games.");
   },
   {
     connection: redisConnection,
   }
 );
 
-export async function scheduleLeaderboardSyncJob() {
-  await leaderboardGamesQueue.add(
-    "sync-leaderboard",
-    {},
-    {
-      repeat: { every: 1000 * 60 * 10 }, // every 10 minutes
-      removeOnComplete: true,
-      removeOnFail: true,
-    }
-  );
+// Schedule individual jobs for each leaderboard player
+export async function enqueueLeaderboardMatchJobs() {
+  console.log("📅 Enqueuing leaderboard match jobs...");
+
+  const players = await db.query.accounts.findMany();
+
+  for (let i = 0; i < players.length; i++) {
+    const player = players[i];
+    if (!player.puuid) continue;
+
+    await leaderboardGamesQueue.add(
+      `sync-${player.summonerId}`,
+      {
+        jobId: `sync-${player.summonerId}`,
+        puuid: player.puuid,
+        region: "euw1", // Assuming all players are from EUW for simplicity
+        summonerName: player.gameName,
+      },
+      {
+        removeOnComplete: true,
+        removeOnFail: true,
+        delay: i * 2000, // Delay each job slightly to reduce initial burst
+      }
+    );
+  }
+
+  console.log("🚀 All leaderboard player jobs enqueued.");
+}
+
+if (require.main === module) {
+  enqueueLeaderboardMatchJobs();
 }

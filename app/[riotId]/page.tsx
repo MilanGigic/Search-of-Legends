@@ -2,7 +2,7 @@ import MatchHistorySection from "@/components/overview/MatchHistorySection";
 import UserCard from "@/components/UserCard";
 import UserStats from "@/components/overview/UserStats";
 import { db } from "@/db";
-import { accounts } from "@/db/schema";
+import { accounts, matches } from "@/db/schema";
 import fetchAllMatchIds from "@/lib/actions/match-history/fetchMatchIds";
 import getRegionalEndpoint from "@/lib/actions/match-history/getRegionalEndpoint";
 import { and, eq } from "drizzle-orm";
@@ -25,6 +25,17 @@ const AccountPage = async ({ params }: AccountPageProps) => {
     console.error("Error: Invalid riotId format");
     return notFound();
   }
+
+  const mikypuuid =
+    "6lrEhvGg5AXB65zQP5UqZbIye_pD-tEy4pc3RDn-nXe-m0zQ_gR5wJWNAW2KXzA-QGrqbjqjf6lLZQ";
+
+  const playerMatches = await db
+    .select()
+    .from(matches)
+    .where(eq(matches.puuid, mikypuuid));
+
+  console.log(`Found ${playerMatches.length} matches for ${mikypuuid}`);
+  console.dir(playerMatches, { depth: null });
 
   const existingAccount = await db.query.accounts.findFirst({
     where: and(eq(accounts.gameName, gameName), eq(accounts.tagLine, tagLine)),

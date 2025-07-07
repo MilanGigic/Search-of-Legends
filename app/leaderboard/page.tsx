@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 
 interface ChallengerPlayer {
@@ -7,6 +8,8 @@ interface ChallengerPlayer {
   gameName: string;
   tagLine: string;
   puuid: string;
+  profileIconId: number;
+  summonerLevel: number;
   tier: string; // Challenger, Grandmaster, Master
   leaguePoints: number;
   wins: number;
@@ -84,7 +87,15 @@ const LeaderboardPage = () => {
             <>
               <div className="text-2xl font-bold text-gray-300 mb-2">2nd</div>
               <div className="text-lg font-semibold mb-1">
-                {topThree[1].gameName}#{topThree[1].tagLine}
+                <Image
+                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${topThree[1].profileIconId}.png`}
+                  alt={topThree[1].gameName}
+                  width={50}
+                  height={50}
+                />
+                <span>
+                  {topThree[1].gameName}#{topThree[1].tagLine}
+                </span>
               </div>
               <div className="text-sm text-gray-400 mb-2">
                 {calculateWinRate(topThree[1].wins, topThree[1].losses)}% WR
@@ -102,7 +113,15 @@ const LeaderboardPage = () => {
             <>
               <div className="text-3xl font-bold text-yellow-200 mb-2">1st</div>
               <div className="text-xl font-bold mb-1">
-                {topThree[0].gameName}#{topThree[0].tagLine}
+                <Image
+                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${topThree[0].profileIconId}.png`}
+                  alt={topThree[0].gameName}
+                  width={50}
+                  height={50}
+                />
+                <span>
+                  {topThree[0].gameName}#{topThree[0].tagLine}
+                </span>
               </div>
               <div className="text-sm text-yellow-200 mb-2">
                 {calculateWinRate(topThree[0].wins, topThree[0].losses)}% WR
@@ -120,7 +139,15 @@ const LeaderboardPage = () => {
             <>
               <div className="text-xl font-bold text-orange-300 mb-2">3rd</div>
               <div className="text-lg font-semibold mb-1">
-                {topThree[2].gameName}#{topThree[2].tagLine}
+                <Image
+                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${topThree[2].profileIconId}.png`}
+                  alt={topThree[2].gameName}
+                  width={50}
+                  height={50}
+                />
+                <span>
+                  {topThree[2].gameName}#{topThree[2].tagLine}
+                </span>
               </div>
               <div className="text-sm text-orange-400 mb-2">
                 {calculateWinRate(topThree[2].wins, topThree[2].losses)}% WR
@@ -152,7 +179,12 @@ const LeaderboardPage = () => {
             <span className="text-center font-bold text-lg">{player.rank}</span>
             <span className="col-span-2 text-start flex items-center">
               <span className="p-2 px-3 border rounded-md mr-3 bg-blue-600 text-xs">
-                C
+                <Image
+                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${player.profileIconId}.png`}
+                  alt={player.gameName}
+                  width={50}
+                  height={50}
+                />
               </span>
               <span className="font-semibold">
                 {player.gameName}#{player.tagLine}

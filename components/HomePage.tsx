@@ -13,7 +13,7 @@ import TopFiveChampions from "./TopFiveChampions";
 import Spotlight from "./ui/spotlight";
 import rammusOk from "@/assets/icons/rammus-ok.png";
 import zedShocked from "@/assets/icons/zed-shocked.png";
-import BackgroundShrooms from "./BackgroundShroom";
+import TopFivePlayers from "./TopFivePlayers";
 
 const HomePage = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -114,13 +114,15 @@ const HomePage = () => {
       </div>
     );
   }
+
+  // 4xl/5xl sm/base lg xl
   return (
     <div className="container relative h-full flex flex-col items-center justify-between">
       {/* <BackgroundShrooms /> */}
       <Spotlight />
 
       <main className="relative z-10 w-full flex flex-col items-center justify-center">
-        <div className="w-3xl flex flex-col mt-14 items-center text-center gap-4 relative z-10">
+        <div className="w-3xl flex flex-col mt-12 items-center text-center gap-4 relative z-10">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -134,16 +136,15 @@ const HomePage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="mt-6 w-sm md:w-xl mx-auto text-lg text-muted-foreground"
+              className="mt-6 w-sm md:w-xl mx-auto text-lg text-slate-300"
             >
-              Use the features we provide to learn the most important mechanics
-              of the game.
+              Learn the most important mechanics of the game.
             </motion.p>
             <div className="flex items-center gap-1 justify-center text-center">
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
                 className="text-[#9CAACF]"
               >
                 Such as:{" "}
@@ -151,7 +152,7 @@ const HomePage = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
               >
                 <Typewriter
                   options={{
@@ -175,15 +176,17 @@ const HomePage = () => {
             <SearchForm placeholder={"Enter Summoner Name (e.g. Faker#KR1)"} />
           </motion.div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 text-center">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-16 text-center">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.6, duration: 0.5 }}
             className="bg-white/5 p-4 rounded-xl backdrop-blur border border-gray-700 shadow-sm shadow-slate-800"
           >
-            <h3 className="text-xl font-bold text-white">Champion Insights</h3>
-            <p className="text-sm text-muted-foreground mt-2">
+            <h3 className="text-lg font-bold text-gray-200">
+              Champion Insights
+            </h3>
+            <p className="text-sm text-slate-300 mt-2">
               Track top picks, winrates & matchups.
             </p>
           </motion.div>
@@ -193,8 +196,10 @@ const HomePage = () => {
             transition={{ delay: 0.8, duration: 0.5 }}
             className="bg-white/5 p-4 rounded-xl backdrop-blur border border-gray-700 shadow-sm shadow-slate-800"
           >
-            <h3 className="text-xl font-bold text-white">Pro Player Stats</h3>
-            <p className="text-sm text-muted-foreground mt-2">
+            <h3 className="text-lg font-bold text-gray-200">
+              Pro Player Stats
+            </h3>
+            <p className="text-sm text-slate-300 mt-2">
               Explore how pros play in real time.
             </p>
           </motion.div>
@@ -204,20 +209,20 @@ const HomePage = () => {
             transition={{ delay: 0.6, duration: 0.5 }}
             className="bg-white/5 p-4 rounded-xl backdrop-blur border border-gray-700 shadow-sm shadow-slate-800"
           >
-            <h3 className="text-xl font-bold text-white">AI Learning</h3>
-            <p className="text-sm text-muted-foreground mt-2">
+            <h3 className="text-lg font-bold text-gray-200">AI Learning</h3>
+            <p className="text-sm text-slate-300 mt-2">
               Let our agent guide you through macro concepts.
             </p>
           </motion.div>
         </div>
-        <section className="flex flex-col sm:flex-row gap-3 md:gap-12 items-center w-sm sm:w-2xl md:w-3xl">
+        <section className="flex flex-col sm:flex-row gap-4 md:gap-12 items-center w-sm sm:w-2xl md:w-3xl">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.7 }}
             className="w-full"
           >
-            <h2 className="text-2xl font-semibold mt-6 mb-4 text-white text-center">
+            <h2 className="text-lg font-semibold my-4 text-gray-200 text-center">
               Top Champions This Patch
             </h2>
             <TopFiveChampions />
@@ -226,22 +231,22 @@ const HomePage = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.7 }}
-            className="border w-full"
+            className="w-full"
           >
-            <h2 className="text-2xl font-semibold mt-6 mb-4 text-white text-center">
+            <h2 className="text-lg font-semibold my-4 text-gray-200 text-center">
               Best of the Best
             </h2>
-            Top 5 players
+            <TopFivePlayers />
           </motion.div>
         </section>
 
         <div className="text-white flex flex-col items-center w-full">
-          <div className="flex flex-col items-center gap-6 pb-8 w-full">
+          <div className="flex flex-col items-center gap-4 pb-8 w-full">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="flex items-center py-2 text-center justify-center w-sm md:w-2xl font-bold md:font-extrabold text-2xl md:text-4xl text-[#E2E6F2]"
+              className="flex items-center py-4 text-center justify-center w-sm md:w-2xl font-bold md:font-extrabold text-2xl md:text-4xl text-[#E2E6F2]"
             >
               You don&apos;t have time <br />
               to study all the concepts by yourself?
@@ -250,7 +255,7 @@ const HomePage = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-semibold text-base md:text-xl text-[#9CAACF]"
+              className="font-semibold text-base md:text-lg text-[#9CAACF]"
             >
               We have just the thing for you!{" "}
               <span>
@@ -280,7 +285,7 @@ const HomePage = () => {
               initial={{ opacity: 0, x: -25 }} // Slide in from the left
               animate={controls}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="font-semibold text-base md:text-xl text-[#9CAACF] flex flex-col sm:flex-row gap-2 items-center"
+              className="font-semibold text-base md:text-lg text-[#9CAACF] flex flex-col sm:flex-row gap-2 items-center"
             >
               You can try it out for free!
               <span className="font-medium text-xs md:text-sm text-gray-400 text-center items-center italic">
