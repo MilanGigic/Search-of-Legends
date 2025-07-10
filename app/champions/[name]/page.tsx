@@ -2,7 +2,6 @@
 
 import SpellCard from "@/components/champions-page/SpellCard";
 import { useSearchStore } from "@/lib/store/useSearchStore";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -192,9 +191,14 @@ const ChampionPage = () => {
   // VIDEO URL SAMPLE https://d28xe8vt774jo5.cloudfront.net/champion-abilities/0084/ability_0084_R1.mp4
 
   return (
-    <div className="bg-[#1E1E2F] flex items-center justify-center text-gray-100">
+    <div className="flex shiny-dots-bg items-center justify-center text-gray-100">
       <div
-        className={`container bg-[#2A2A40] border-x shadow-2xl ${shadowColor} min-h-screen border-gray-500 flex flex-col py-7`}
+        className={`container border-x shadow-2xl ${shadowColor} min-h-screen z-10 border-gray-500 flex flex-col py-7`}
+        style={{
+          backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${completedName}_0.jpg)`,
+          backgroundSize: "100% 100%",
+          backgroundRepeat: "no-repeat",
+        }}
       >
         {isLoading && (
           <div className="loader animate-spin ease-linear rounded-full border-y-4 border-cyan-500 h-12 w-12" />
@@ -211,6 +215,7 @@ const ChampionPage = () => {
                   className="w-full h-full rounded-lg p-0 m-0"
                   controls
                   loop
+                  muted
                   preload="auto"
                 >
                   <source src={videoUrl} type="video/mp4" />
@@ -248,8 +253,12 @@ const ChampionPage = () => {
                     <p className="text-start text-gray-300 italic text-sm">
                       Cooldown -{" "}
                       {spell.cooldown.map((cd, index) => (
-                        <span key={index} className="text-sm text-gray-500">
-                          {cd}/
+                        <span
+                          key={index}
+                          className="text-sm text-yellow-500 font-semibold"
+                        >
+                          {cd}
+                          {index < spell.cooldown.length - 1 ? "/" : ""}
                         </span>
                       ))}
                     </p>
@@ -257,18 +266,7 @@ const ChampionPage = () => {
                 </div>
               ))}
           </div>
-          <div className="flex flex-col h-full items-center justify-center">
-            <h1 className="font-bold text-4xl flex justify-center">
-              {championId}
-            </h1>
-            <Image
-              src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${completedName}_0.jpg`}
-              alt={championId}
-              width={300}
-              height={250}
-              className="rounded-lg px-0 mx-0"
-            />
-          </div>
+          <div></div>
           <div className="mt-10 flex flex-col items-center pr-20">
             <h1 className="font-bold text-3xl mb-10">Combos</h1>
           </div>

@@ -1,13 +1,13 @@
-// jobs/debugLeaderboardQueue.ts
+// jobs/debugaccountQueue.ts
 import { Queue } from "bullmq";
 import { redisConnection } from "./redis";
 
-const leaderboardQueue = new Queue("leaderboard", {
+const accountQueue = new Queue("account", {
   connection: redisConnection,
 });
 
 async function debug() {
-  const repeatableJobs = await leaderboardQueue.getRepeatableJobs();
+  const repeatableJobs = await accountQueue.getRepeatableJobs();
   console.log("📋 Existing repeatable jobs:");
   console.log(repeatableJobs);
 }

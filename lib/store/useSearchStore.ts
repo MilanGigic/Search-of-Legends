@@ -1,8 +1,12 @@
 import { create } from "zustand";
 
+type PageContent = "overview" | "champions" | "live";
+
 type SearchStore = {
   championVideoKeySpell: string | null;
   setChampionVideoKeySpell: (spell: string) => void;
+  pageContent: PageContent | null;
+  setPageContent: (content: PageContent) => void;
   isOpen: boolean;
   open: () => void;
   close: () => void;
@@ -19,6 +23,13 @@ export const useSearchStore = create<SearchStore>((set) => {
       set({ championVideoKeySpell: spell });
       if (typeof document !== "undefined") {
         document.cookie = `championVideoKeySpell=${spell}; path=/; max-age=86400`;
+      }
+    },
+    pageContent: null,
+    setPageContent: (content: PageContent) => {
+      set({ pageContent: content });
+      if (typeof document !== "undefined") {
+        document.cookie = `pageContent=${content}; path=/; max-age=86400`;
       }
     },
     isOpen: false,

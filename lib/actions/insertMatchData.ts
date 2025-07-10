@@ -8,6 +8,7 @@ import {
   matchParticipants,
   matchTeams,
 } from "@/db/schema";
+import { fetchWithRateLimit } from "../riot";
 
 export default async function insertMatchData(
   matchData: RiotMatchDto,
@@ -29,7 +30,7 @@ export default async function insertMatchData(
   });
 
   if (!account) {
-    await fetch(
+    await fetchWithRateLimit(
       `/api/account?gameName=${userGameName?.riotIdGameName}&tagLine=${userTagLine?.riotIdTagline}`
     );
   }

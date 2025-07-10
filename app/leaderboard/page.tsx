@@ -1,7 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useState, useEffect, useMemo } from "react";
+import { FaCrown } from "react-icons/fa";
+import { GiMedal } from "react-icons/gi";
 
 interface ChallengerPlayer {
   summonerId: string;
@@ -22,6 +25,9 @@ const LeaderboardPage = () => {
   const [players, setPlayers] = useState<ChallengerPlayer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const playersPerPage = 25;
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -45,8 +51,48 @@ const LeaderboardPage = () => {
 
     return () => clearInterval(interval);
   }, []);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
 
-  // NEED TO FETCH THE GAMES FOR THE LEADERBOARD PLAYERS
+  const topThree = players.slice(0, 3);
+  const remainingPlayers = players.slice(3);
+
+  const paginatedPlayers = remainingPlayers.slice(
+    (currentPage - 1) * playersPerPage,
+    currentPage * playersPerPage
+  );
+  const totalPages = Math.ceil(remainingPlayers.length / playersPerPage);
+
+  const pageNumbers = useMemo(() => {
+    const pages = [];
+    const maxVisiblePages = 4;
+
+    if (totalPages <= 1) return [1];
+
+    pages.push(1);
+
+    if (currentPage > 3) {
+      pages.push("...");
+    }
+
+    const startPage = Math.max(2, currentPage - 2);
+    const endPage = Math.min(totalPages - 1, currentPage + 2);
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    if (currentPage + maxVisiblePages < totalPages) {
+      pages.push("...");
+    }
+
+    if (totalPages > 1) {
+      pages.push(totalPages);
+    }
+
+    return pages;
+  }, [currentPage, totalPages]);
 
   const calculateWinRate = (wins: number, losses: number) => {
     const total = wins + losses;
@@ -55,7 +101,7 @@ const LeaderboardPage = () => {
   };
 
   const formatLP = (lp: number) => {
-    return `${lp.toLocaleString()} LP`;
+    return `${lp.toLocaleString()}`;
   };
 
   if (loading) {
@@ -74,135 +120,192 @@ const LeaderboardPage = () => {
     );
   }
 
-  const topThree = players.slice(0, 3);
-  const remainingPlayers = players.slice(3);
+  const PaginationControls = ({ position }: { position: "top" | "bottom" }) => (
+    <div className={`py-4 flex justify-center items-center space-x-2`}>
+      <button
+        onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+        disabled={currentPage === 1}
+        className="px-3 py-1 bg-gray-700 hover:bg-gray-700/50 disabled:hover:bg-gray-700 transition-colors duration-100 text-white rounded disabled:opacity-50"
+      >
+        Previous
+      </button>
+      <span className="text-white">
+        {pageNumbers.map((page, index) =>
+          page === "..." ? (
+            <span key={`${position}-${index}`} className="px-3 py-1">
+              ...
+            </span>
+          ) : (
+            <button
+              key={`${position}-${index}`}
+              onClick={() => setCurrentPage(Number(page))}
+              className={`px-1 py-1 rounded cursor-pointer ${
+                currentPage === page
+                  ? "text-amber-500 font-bold"
+                  : "text-gray-300 hover:text-gray-400"
+              }`}
+            >
+              {page}
+            </button>
+          )
+        )}
+      </span>
+      <button
+        onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+        disabled={currentPage === totalPages}
+        className="px-3 py-1 bg-gray-700 hover:bg-gray-700/50 disabled:hover:bg-gray-700 transition-colors duration-100 text-white rounded disabled:opacity-50"
+      >
+        Next
+      </button>
+    </div>
+  );
 
   return (
-    <div className="text-white max-w-5xl h-full my-5 container mx-auto flex flex-col items-center justify-center">
-      {/* Top 3 Podium */}
-      <div className="flex w-full border justify-between py-5 px-10 bg-gradient-to-b from-[#121624] to-[#1B1F35] z-100">
+    <div className="text-white max-w-5xl h-full my-4 flex flex-col z-10 mx-auto items-center justify-center">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-3 sm:gap-6 py-6 px-6 bg-gradient-to-b from-[#121624] to-[#1B1F35] z-10">
         {/* 2nd Place */}
-        <div className="mt-7 h-[250px] border border-gray-600 rounded-lg p-4 flex flex-col items-center justify-center bg-gradient-to-b from-gray-700 to-gray-800">
-          {topThree[1] && (
-            <>
-              <div className="text-2xl font-bold text-gray-300 mb-2">2nd</div>
-              <div className="text-lg font-semibold mb-1">
-                <Image
-                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${topThree[1].profileIconId}.png`}
-                  alt={topThree[1].gameName}
-                  width={50}
-                  height={50}
-                />
-                <span>
-                  {topThree[1].gameName}#{topThree[1].tagLine}
-                </span>
-              </div>
-              <div className="text-sm text-gray-400 mb-2">
-                {calculateWinRate(topThree[1].wins, topThree[1].losses)}% WR
-              </div>
-              <div className="text-xl font-bold text-yellow-400">
-                {formatLP(topThree[1].leaguePoints)}
-              </div>
-            </>
-          )}
-        </div>
+        <Link
+          href={`/${encodeURIComponent(
+            topThree[1].gameName!
+          )}-${encodeURIComponent(topThree[1].tagLine!)}`}
+          className="relative bg-black/30 ring-1 order-2 sm:order-1 ring-gray-400 rounded-xl shadow-[0_0_30px_rgba(192,192,192,0.5)] sm:hover:scale-105 transition-transform duration-300 backdrop-blur-lg p-4 flex flex-col items-center justify-center sm:min-h-[250px] mt-6"
+          style={{
+            backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${topThree[1]?.profileIconId}.png)`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="absolute inset-0 bg-black/60 rounded-xl"></div>
+          <div className="relative z-10 text-center">
+            <div className="text-3xl font-extrabold text-white mb-2">
+              2nd
+              <GiMedal className="text-gray-300 text-3xl mb-1 drop-shadow-md flex w-full justify-center" />
+            </div>
+            <div className="text-lg font-semibold text-white mb-1">
+              {topThree[1].gameName}#{topThree[1].tagLine}
+            </div>
+            <div className="text-sm text-gray-300 mb-2">
+              {calculateWinRate(topThree[1].wins, topThree[1].losses)}% WR
+            </div>
+            <div className="text-xl font-bold bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text">
+              {formatLP(topThree[1].leaguePoints)}
+            </div>
+          </div>
+        </Link>
 
         {/* 1st Place */}
-        <div className="mt-2 h-[250px] border border-yellow-400 rounded-lg p-4 flex flex-col items-center justify-center bg-gradient-to-b from-yellow-600 to-yellow-700">
-          {topThree[0] && (
-            <>
-              <div className="text-3xl font-bold text-yellow-200 mb-2">1st</div>
-              <div className="text-xl font-bold mb-1">
-                <Image
-                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${topThree[0].profileIconId}.png`}
-                  alt={topThree[0].gameName}
-                  width={50}
-                  height={50}
-                />
-                <span>
-                  {topThree[0].gameName}#{topThree[0].tagLine}
-                </span>
-              </div>
-              <div className="text-sm text-yellow-200 mb-2">
-                {calculateWinRate(topThree[0].wins, topThree[0].losses)}% WR
-              </div>
-              <div className="text-2xl font-bold text-yellow-100">
-                {formatLP(topThree[0].leaguePoints)}
-              </div>
-            </>
-          )}
-        </div>
+        <Link
+          href={`/${encodeURIComponent(
+            topThree[0].gameName!
+          )}-${encodeURIComponent(topThree[0].tagLine!)}`}
+          className="relative bg-black/60 ring-1 ring-yellow-400 rounded-xl shadow-[0_0_40px_rgba(255,215,0,0.6)] sm:scale-105 sm:hover:scale-110 transition-transform duration-300 p-4 flex order-1 sm:order-2 flex-col items-center justify-center sm:min-h-[280px]"
+          style={{
+            backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${topThree[0]?.profileIconId}.png)`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="absolute inset-0 bg-black/60 rounded-xl"></div>
+          <div className="relative z-10 text-center">
+            <div className="text-4xl font-extrabold text-white mb-2">
+              <FaCrown className="text-yellow-400 text-3xl mb-1 drop-shadow-md flex items-center justify-center w-full" />{" "}
+              1st
+            </div>
+            <div className="text-lg font-semibold text-white mb-1">
+              {topThree[0].gameName}#{topThree[0].tagLine}
+            </div>
+            <div className="text-sm text-gray-300 mb-2">
+              {calculateWinRate(topThree[0].wins, topThree[0].losses)}% WR
+            </div>
+            <div className="text-2xl font-bold bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text">
+              {formatLP(topThree[0].leaguePoints)}
+            </div>
+          </div>
+        </Link>
 
         {/* 3rd Place */}
-        <div className="mt-12 h-[250px] border border-orange-600 rounded-lg p-4 flex flex-col items-center justify-center bg-gradient-to-b from-orange-700 to-orange-800">
-          {topThree[2] && (
-            <>
-              <div className="text-xl font-bold text-orange-300 mb-2">3rd</div>
-              <div className="text-lg font-semibold mb-1">
-                <Image
-                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${topThree[2].profileIconId}.png`}
-                  alt={topThree[2].gameName}
-                  width={50}
-                  height={50}
-                />
-                <span>
-                  {topThree[2].gameName}#{topThree[2].tagLine}
-                </span>
-              </div>
-              <div className="text-sm text-orange-400 mb-2">
-                {calculateWinRate(topThree[2].wins, topThree[2].losses)}% WR
-              </div>
-              <div className="text-lg font-bold text-orange-200">
-                {formatLP(topThree[2].leaguePoints)}
-              </div>
-            </>
-          )}
-        </div>
+        <Link
+          href={`/${encodeURIComponent(
+            topThree[2].gameName!
+          )}-${encodeURIComponent(topThree[2].tagLine!)}`}
+          className="relative bg-black/30 ring-1 ring-orange-400 rounded-xl shadow-[0_0_30px_rgba(205,127,50,0.5)] sm:hover:scale-105 transition-transform duration-300 backdrop-blur-lg order-3 p-4 flex flex-col items-center justify-center sm:min-h-[250px] mt-6"
+          style={{
+            backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${topThree[2]?.profileIconId}.png)`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="absolute inset-0 bg-black/60 rounded-xl"></div>
+          <div className="relative z-10 text-center">
+            <div className="text-3xl font-extrabold text-white mb-2">
+              3rd
+              <GiMedal className="text-orange-400 text-3xl mb-1 drop-shadow-md flex w-full justify-center" />
+            </div>
+            <div className="text-lg font-semibold text-white mb-1">
+              {topThree[2].gameName}#{topThree[2].tagLine}
+            </div>
+            <div className="text-sm text-gray-300 mb-2">
+              {calculateWinRate(topThree[2].wins, topThree[2].losses)}% WR
+            </div>
+            <div className="text-xl font-bold bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text">
+              {formatLP(topThree[2].leaguePoints)}
+            </div>
+          </div>
+        </Link>
       </div>
 
       {/* Table Header */}
-      <ul className="w-full grid grid-cols-6 py-3 px-4 border-t border-gray-600 bg-gray-800">
-        <li className="text-center font-semibold">Rank</li>
-        <li className="col-span-2 font-semibold">Player</li>
+      <ul className="w-full grid grid-cols-7 py-3 sm:px-4 bg-gray-800">
+        <li className="text-center font-semibold mr-8">Rank</li>
+        <li className="col-span-3 font-semibold text-center mr-8 sm:mr-32">
+          Player
+        </li>
         <li className="text-center font-semibold">W/L</li>
         <li className="text-center font-semibold">Winrate</li>
         <li className="text-center font-semibold">LP</li>
       </ul>
 
       {/* Player List */}
-      <section className="flex flex-col w-full border-x border-b bg-gradient-to-b from-[#1B1F35] to-[#121624] z-100">
-        {remainingPlayers.map((player, index) => (
-          <div
+      <section className="flex flex-col w-full bg-gradient-to-b from-[#1B1F35] to-[#121624] z-10">
+        <PaginationControls position="top" />
+        {paginatedPlayers.map((player, index) => (
+          <Link
+            href={`/${encodeURIComponent(
+              player.gameName!
+            )}-${encodeURIComponent(player.tagLine!)}`}
             key={player.summonerId}
-            className="w-full grid grid-cols-6 py-4 px-4 cursor-pointer hover:opacity-85 transition-all duration-100 border-b border-gray-700 hover:bg-gray-800/50"
+            className="w-full grid grid-cols-7 py-1 gap-1 cursor-pointer hover:opacity-85 transition-all duration-100 border-b border-gray-700 hover:bg-gray-800/50 even:bg-white/2"
           >
-            <span className="text-center font-bold text-lg">{player.rank}</span>
-            <span className="col-span-2 text-start flex items-center">
-              <span className="p-2 px-3 border rounded-md mr-3 bg-blue-600 text-xs">
+            <span className="text-center flex flex-col items-center justify-center font-bold text-base sm:text-lg">
+              {player.rank}
+            </span>
+            <span className="col-span-3 text-start flex items-center">
+              <span className="p-0.5 sm:p-2 sm:px-3 rounded-md sm:mr-3 text-xs">
                 <Image
-                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${player.profileIconId}.png`}
+                  src={`https://ddragon.leagueoflegends.com/cdn/15.13.1/img/profileicon/${player.profileIconId}.png`}
                   alt={player.gameName}
                   width={50}
                   height={50}
+                  className="w-5 sm:w-12"
                 />
               </span>
-              <span className="font-semibold">
+              <span className="text-xs sm:text-base font-normal sm:font-semibold">
                 {player.gameName}#{player.tagLine}
               </span>
             </span>
-            <span className="text-center text-sm text-gray-300">
-              {player.wins}W / {player.losses}L
+            <span className="text-center flex items-center justify-center text-xs sm:text-sm text-gray-300">
+              <span className="text-green-400 mr-0.5">{player.wins}</span> /{" "}
+              <span className="text-red-400 ml-0.5">{player.losses}</span>
             </span>
-            <span className="text-center font-semibold">
+            <span className="text-center flex flex-col items-center justify-center font-semibold">
               {calculateWinRate(player.wins, player.losses)}%
             </span>
-            <span className="text-center">
-              <span className="font-bold text-yellow-400">
-                {formatLP(player.leaguePoints)}
-              </span>
+            <span className="font-bold flex flex-col items-center justify-center bg-gradient-to-r from-sky-900 to-cyan-300 text-transparent bg-clip-text">
+              {formatLP(player.leaguePoints)}
             </span>
-          </div>
+          </Link>
         ))}
+        <PaginationControls position="bottom" />
       </section>
 
       {/* Last Updated */}

@@ -1,3 +1,4 @@
+import { fetchWithRateLimit } from "@/lib/riot";
 import insertMatchData from "../insertMatchData";
 
 const RIOT_API_KEY = process.env.RIOT_API_KEY;
@@ -14,7 +15,7 @@ export const fetchMatchDetails = async (matchId: string, REGION: string) => {
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const res = await fetch(url, {
+      const res = await fetchWithRateLimit(url, {
         headers: { "X-Riot-Token": RIOT_API_KEY },
       });
 

@@ -1,8 +1,6 @@
-// File: jobs/leaderboardGames.ts
 import { Job, Queue, Worker } from "bullmq";
 import { redisConnection } from "./redis";
 import { db } from "@/db";
-import { accounts } from "@/db/schema";
 import fetchAllMatchIds from "@/lib/actions/match-history/fetchMatchIds";
 import { fetchMatchDetailsInSmallBatch } from "@/lib/actions/match-history/fetchMatchDetails";
 import getRegionalEndpoint from "@/lib/actions/match-history/getRegionalEndpoint";
@@ -13,14 +11,14 @@ dotenv.config();
 
 console.log("Initializing leaderboard games queue...");
 
-export const leaderboardGamesQueue = new Queue("leaderboard-games", {
+export const gamesQueue = new Queue("leaderboard-games", {
   connection: redisConnection,
 });
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 const limit = pLimit(18);
 
-export const leaderboardGamesWorker = new Worker(
+export const gamesWorker = new Worker(
   "leaderboard-games",
   async (
     job: Job<{
@@ -44,7 +42,10 @@ export const leaderboardGamesWorker = new Worker(
       console.log(
         `Found ${matchIds.length} matches for ${job.data.gameName}#${job.data.tagLine})`
       );
-
+      console.log(
+        `🎮 Syncing matches for ${job.data.gameName}#${job.data.tagLine}`
+      );
+      console.log(`🔁 Region: ${job.data.region}`);
       await fetchMatchDetailsInSmallBatch(matchIds, routing, job.data.puuid);
       console.log(
         `✅ Finished syncing for ${job.data.gameName}#${job.data.tagLine}`
@@ -61,9 +62,9 @@ export const leaderboardGamesWorker = new Worker(
   }
 );
 
-// Schedule individual jobs for each leaderboard player
-export async function enqueueLeaderboardMatchJobs() {
-  console.log("📅 Enqueuing leaderboard match jobs...");
+// Schedule individual jobs for each player
+export async function enqueueMatchJobs() {
+  console.log("📅 Enqueuing match jobs...");
 
   const players = await db.query.accounts.findMany();
 
@@ -71,7 +72,7 @@ export async function enqueueLeaderboardMatchJobs() {
     const player = players[i];
     if (!player.puuid) continue;
 
-    await leaderboardGamesQueue.add(
+    await gamesQueue.add(
       `sync-${player.summonerId}`,
       {
         jobId: `sync-${player.summonerId}`,
@@ -88,9 +89,21 @@ export async function enqueueLeaderboardMatchJobs() {
     );
   }
 
-  console.log("🚀 All leaderboard player jobs enqueued.");
+  console.log("🚀 All player jobs enqueued.");
 }
 
+gamesWorker.on("completed", (job) => {
+  console.log(`✅ Completed match sync job: ${job.name}`);
+});
+
+gamesWorker.on("failed", (job, err) => {
+  console.error(`❌ Failed match sync job: ${job?.name}`, err);
+});
+
+gamesWorker.on("active", (job) => {
+  console.log(`🚀 Job started: ${job.name}`);
+});
+
 if (require.main === module) {
-  enqueueLeaderboardMatchJobs();
+  enqueueMatchJobs();
 }

@@ -13,6 +13,7 @@ import Master from "@/public/ranked-emblems/Rank=Master.png";
 import Grandmaster from "@/public/ranked-emblems/Rank=Grandmaster.png";
 import Challenger from "@/public/ranked-emblems/Rank=Challenger.png";
 import { useEffect, useState } from "react";
+import { useSearchStore } from "@/lib/store/useSearchStore";
 
 const UserCard = ({
   accountData,
@@ -99,7 +100,7 @@ const UserCard = ({
   }
 
   return (
-    <div className="container max-w-6xl mx-auto bg-gradient-to-b from-[#1B1F35] to-[#121624]  border-b shadow-[#2A2A40] px-5 pt-5">
+    <div className="container max-w-6xl mx-auto bg-gradient-to-b from-[#1B1F35] to-[#121624]  shadow-[#2A2A40] px-5 pt-5">
       <div className="flex items-center">
         <img
           src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountData.profileIconId}.png`}
@@ -152,14 +153,6 @@ const UserCard = ({
           <p className="text-white">Unranked</p>
         )}
       </div>
-      <ul>
-        <Button className="border-none bg-transparent rounded-b-none text-slate-300 hover:bg-[#2A2A40]">
-          Overview
-        </Button>
-        <Button className="border-none bg-transparent rounded-b-none text-slate-300 hover:bg-[#2A2A40]">
-          Champions
-        </Button>
-      </ul>
     </div>
   );
 };

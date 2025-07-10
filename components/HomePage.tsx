@@ -15,7 +15,7 @@ import rammusOk from "@/assets/icons/rammus-ok.png";
 import zedShocked from "@/assets/icons/zed-shocked.png";
 import TopFivePlayers from "./TopFivePlayers";
 
-const HomePage = () => {
+const HomePage = ({ topFive }: { topFive: DbSummonerInfo[] }) => {
   const [isMounted, setIsMounted] = useState(false);
   const controls = useAnimation();
   const h1Ref = useRef(null);
@@ -47,73 +47,73 @@ const HomePage = () => {
     };
   }, [isMounted, controls]);
 
-  if (!isMounted) {
-    return (
-      <div className="container h-full flex flex-col items-center justify-between bg-transparent text-white">
-        {/* Static version of your content */}
-        <div className="w-3xl flex flex-col mt-24 items-center text-center gap-4">
-          <h1 className="font-bold text-4xl md:text-5xl text-shadow-2xs flex items-center justify-center">
-            SoL
-          </h1>
-          <div className="text-[#9CAACF] font-light text-sm md:text-base lg:text-lg ">
-            <p className="mt-6 max-w-xl mx-auto text-lg text-muted-foreground">
-              Use the features we provide to learn the most important mechanics
-              of the game.
-            </p>
-            <div className="flex items-center gap-1 justify-center text-center">
-              <p className="text-[#9CAACF]">Such as: </p>
-              <div>
-                <Typewriter
-                  options={{
-                    autoStart: true,
-                    loop: true,
-                    strings: ["Macro", "Micro", "Itemization", "Laning"],
-                    delay: 100,
-                    deleteSpeed: 50,
-                    wrapperClassName: "text-cyan-500",
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="w-full">
-            <SearchForm placeholder={"Enter Summoner Name (e.g. Faker#KR1)"} />
-          </div>
-        </div>
+  // if (!isMounted) {
+  //   return (
+  //     <div className="container h-full flex flex-col items-center justify-between bg-transparent text-white">
+  //       {/* Static version of your content */}
+  //       <div className="w-3xl flex flex-col mt-24 items-center text-center gap-4">
+  //         <h1 className="font-bold text-4xl md:text-5xl text-shadow-2xs flex items-center justify-center">
+  //           SoL
+  //         </h1>
+  //         <div className="text-[#9CAACF] font-light text-sm md:text-base lg:text-lg ">
+  //           <p className="mt-6 max-w-xl mx-auto text-lg text-muted-foreground">
+  //             Use the features we provide to learn the most important mechanics
+  //             of the game.
+  //           </p>
+  //           <div className="flex items-center gap-1 justify-center text-center">
+  //             <p className="text-[#9CAACF]">Such as: </p>
+  //             <div>
+  //               <Typewriter
+  //                 options={{
+  //                   autoStart: true,
+  //                   loop: true,
+  //                   strings: ["Macro", "Micro", "Itemization", "Laning"],
+  //                   delay: 100,
+  //                   deleteSpeed: 50,
+  //                   wrapperClassName: "text-cyan-500",
+  //                 }}
+  //               />
+  //             </div>
+  //           </div>
+  //         </div>
+  //         <div className="w-full">
+  //           <SearchForm placeholder={"Enter Summoner Name (e.g. Faker#KR1)"} />
+  //         </div>
+  //       </div>
 
-        <section className="flex gap-12 items-center w-3xl">
-          <div className="w-full">
-            <TopFiveChampions />
-          </div>
-          <div className="border w-full">Top 5 players</div>
-        </section>
-        <br />
-        <div className="text-white flex flex-col items-center w-full">
-          <div className="flex flex-col items-center gap-6 pb-8 w-full">
-            <h2 className="flex items-center py-2 text-center justify-center w-full font-bold md:font-extrabold text-2xl md:text-4xl bg-gradient-to-r from-cyan-200 via-pink-200 to-sky-300 text-transparent bg-clip-text">
-              You don&apos;t have time <br />
-              to study all the concepts by yourself?
-            </h2>
-            <p className="font-semibold text-base md:text-xl text-cyan-100">
-              We have just the thing for you!
-            </p>
-          </div>
-          <div className="flex flex-col w-full px-5">
-            <h1 className="flex items-center justify-start text-start font-bold text-lg md:text-2xl">
-              Our AI Agent makes studying feel like a breeze!
-            </h1>
+  //       <section className="flex gap-12 items-center w-3xl">
+  //         <div className="w-full">
+  //           <TopFiveChampions />
+  //         </div>
+  //         <div className="border w-full">Top 5 players</div>
+  //       </section>
+  //       <br />
+  //       <div className="text-white flex flex-col items-center w-full">
+  //         <div className="flex flex-col items-center gap-6 pb-8 w-full">
+  //           <h2 className="flex items-center py-2 text-center justify-center w-full font-bold md:font-extrabold text-2xl md:text-4xl bg-gradient-to-r from-cyan-200 via-pink-200 to-sky-300 text-transparent bg-clip-text">
+  //             You don&apos;t have time <br />
+  //             to study all the concepts by yourself?
+  //           </h2>
+  //           <p className="font-semibold text-base md:text-xl text-cyan-100">
+  //             We have just the thing for you!
+  //           </p>
+  //         </div>
+  //         <div className="flex flex-col w-full px-5">
+  //           <h1 className="flex items-center justify-start text-start font-bold text-lg md:text-2xl">
+  //             Our AI Agent makes studying feel like a breeze!
+  //           </h1>
 
-            <p className="font-semibold text-base md:text-xl flex gap-2 items-center">
-              You can try it out for free!
-              <span className="font-medium text-xs md:text-sm text-gray-400 italic">
-                No credit card needed.
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  //           <p className="font-semibold text-base md:text-xl flex gap-2 items-center">
+  //             You can try it out for free!
+  //             <span className="font-medium text-xs md:text-sm text-gray-400 italic">
+  //               No credit card needed.
+  //             </span>
+  //           </p>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // 4xl/5xl sm/base lg xl
   return (
@@ -236,7 +236,7 @@ const HomePage = () => {
             <h2 className="text-lg font-semibold my-4 text-gray-200 text-center">
               Best of the Best
             </h2>
-            <TopFivePlayers />
+            <TopFivePlayers topFive={topFive} />
           </motion.div>
         </section>
 

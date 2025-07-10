@@ -120,7 +120,7 @@ const UserVsOpponent = ({
     return (
       <div
         className={`flex flex-col gap-0.5
-         items-start sm:${isUser ? "items-start" : "items-end"}
+         items-start ${isUser ? "" : "sm:items-end  "}
         `}
       >
         <div

@@ -84,25 +84,17 @@ const ChampionCard = ({
   }, [name]);
 
   return (
-    <div className="border rounded-md hover:shadow-2xl hover:shadow-cyan-900 transition-colors duration-500 h-[586px] w-[250px]">
-      <Link
-        href={`/champions/${completedName}`}
-        className="flex flex-col items-center"
-      >
-        <Image
-          src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${completedName}_0.jpg`}
-          alt={name}
-          width={250}
-          height={250}
-          className="rounded-lg"
-        />
-        <h1 className="font-bold text-2xl mt-2">{name}</h1>
-        <h3 className="font-semibold text-lg text-gray-400 italic w-[220px] overflow-hidden flex items-center text-center justify-center h-[60px]">
-          {title}
-        </h3>
-        <p className="mb-2">{role}</p>
-      </Link>
-    </div>
+    <Link
+      href={`/champions/${completedName}`}
+      className="relative  ring-1 order-2 sm:order-1 ring-gray-400 rounded-xl shadow-[0_0_30px_rgba(192,192,192,0.5)] sm:hover:scale-105 transition-transform duration-300 p-4 flex flex-col items-center justify-end sm:h-[125px] sm:w-[145px]"
+      style={{
+        backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${completedName}_0.jpg)`,
+        backgroundSize: "100% 100%",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <h1 className="font-bold text-base text-yellow-400/95">{name}</h1>
+    </Link>
   );
 };
 export default ChampionCard;

@@ -1,3 +1,4 @@
+import Sidebar from "@/components/AppSidebar";
 import Header from "@/components/Header";
 
 const LeaderboardLayout = ({
@@ -6,10 +7,11 @@ const LeaderboardLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <div>
+    <>
       <Header showSearch={true} />
+      <Sidebar />
       {children}
-    </div>
+    </>
   );
 };
 export default LeaderboardLayout;

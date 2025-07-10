@@ -164,6 +164,38 @@
   }
 }
 
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes sparkle {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 @layer utilities {
   .bg-pattern {
     @apply bg-[#0B0D1C] relative overflow-hidden;
@@ -202,5 +234,105 @@
     animation: scrollBackground 25s linear infinite;
     pointer-events: none;
     mix-blend-mode: soft-light;
+  }
+
+  .shiny-dots-bg {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: #000000;
+    background-image: radial-gradient(
+        circle at 20% 20%,
+        rgba(255, 255, 255, 0.3) 1px,
+        transparent 1.5px
+      ),
+      radial-gradient(
+        circle at 65% 65%,
+        rgba(255, 255, 255, 0.3) 1px,
+        transparent 1px
+      ),
+      radial-gradient(
+        circle at 40% 40%,
+        rgba(255, 255, 255, 0.3) 1px,
+        transparent 1.5px
+      );
+    background-size: 50px 50px, 30px 30px, 70px 70px;
+    animation: scrollBackground 15s linear infinite;
+    background-position: 0 0, 25px 25px, 10px 10px;
+    overflow: hidden;
+  }
+
+  .shiny-dots-bg::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        circle at 10% 10%,
+        rgba(255, 255, 255, 0.3) 0.5px,
+        transparent 0.5px
+      ),
+      radial-gradient(
+        circle at 90% 90%,
+        rgba(255, 255, 255, 0.3) 0.5px,
+        transparent 0.5px
+      ),
+      radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 255, 255, 0.3) 0.5px,
+        transparent 0.5px
+      ),
+      radial-gradient(
+        circle at 30% 70%,
+        rgba(255, 255, 255, 0.3) 0.5px,
+        transparent 0.5px
+      ),
+      radial-gradient(
+        circle at 70% 30%,
+        rgba(255, 255, 255, 0.3) 0.5px,
+        transparent 0.5px
+      );
+    background-size: 80px 80px, 60px 60px, 90px 90px, 40px 40px, 100px 100px;
+    background-position: 0 0, 20px 20px, 40px 40px, 15px 15px, 35px 35px;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+
+  .shiny-dots-bg::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        circle at 25% 75%,
+        rgba(255, 255, 255, 0.6) 0.3px,
+        transparent 0.3px
+      ),
+      radial-gradient(
+        circle at 75% 25%,
+        rgba(255, 255, 255, 0.6) 0.3px,
+        transparent 0.3px
+      ),
+      radial-gradient(
+        circle at 60% 60%,
+        rgba(255, 255, 255, 0.6) 0.3px,
+        transparent 0.3px
+      ),
+      radial-gradient(
+        circle at 15% 45%,
+        rgba(255, 255, 255, 0.6) 0.3px,
+        transparent 0.3px
+      ),
+      radial-gradient(
+        circle at 85% 55%,
+        rgba(255, 255, 255, 0.6) 0.3px,
+        transparent 0.3px
+      );
+    background-size: 120px 120px, 95px 95px, 110px 110px, 65px 65px, 85px 85px;
+    background-position: 10px 10px, 30px 30px, 20px 20px, 45px 45px, 25px 25px;
+    animation: shimmer 6s ease-in-out infinite;
   }
 }

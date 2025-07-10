@@ -1,3 +1,8 @@
+import pLimit from "p-limit";
+
+const limit = pLimit(18); // ~90% of the 20/sec limit
+export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
 export const calculateAccurateGameDuration = (maxTimePlayer: number) => {
   const totalMinutes = Math.floor((maxTimePlayer * 1000) / 60000);
   const totalSeconds = Math.floor(((maxTimePlayer * 1000) % 60000) / 1000);
@@ -240,4 +245,10 @@ export default function getQueueInfo(queueId: number) {
         isRanked: false,
       };
   }
+}
+
+export async function fetchWithRateLimit(url: string, opts?: RequestInit) {
+  return limit(async () => {
+    return fetch(url, opts);
+  });
 }

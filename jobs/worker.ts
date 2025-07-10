@@ -1,4 +1,4 @@
-import "@/jobs/leaderboardQueue"; // Sync challenger/gm/master players
-import "@/jobs/leaderboardGames"; // Sync their matches
+import "./accountsQueue";
+import "./gamesQueue";
 
 console.log("✅ All BullMQ workers registered.");

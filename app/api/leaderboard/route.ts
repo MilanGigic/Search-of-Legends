@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
-import { asc, desc, eq, or } from "drizzle-orm";
+import { asc, desc, eq, or, sql } from "drizzle-orm";
 
 export async function GET() {
   try {
@@ -12,8 +12,13 @@ export async function GET() {
       .where(
         or(eq(accounts.tier, "CHALLENGER"), eq(accounts.tier, "GRANDMASTER"))
       )
-      .orderBy(asc(accounts.rank))
-      .limit(500); // Get top 500 players
+      .orderBy(
+        sql`CASE 
+        WHEN ${accounts.rank} ~ '^[0-9]+$' THEN CAST(${accounts.rank} AS INTEGER) END`
+      )
+      .limit(502); // Get top 500 players
+
+    console.log("Top 500 players ranked by ascending:", players);
 
     return NextResponse.json(players);
   } catch (error) {

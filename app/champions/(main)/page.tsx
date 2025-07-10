@@ -61,11 +61,9 @@ const ChampionsPage = () => {
     setSearchQuery(e.target.value);
   };
 
-  // NEXT TO DO: START IMPLEMENTING THE BUILD ITEMIZATIONS, MOST POPULAR RUNES, SPELLS, SUMMONERS, IF FINISHED, START IMPLEMENTING ACCOUNT STATS COMPONENT
-
   return (
-    <div className="bg-[#1E1E2F] bg-pattern flex items-center justify-center text-gray-100">
-      <div className="container bg-[#2A2A40]/50 border-x py-4 shadow-2xl min-h-screen shadow-purple-800 border-gray-500 flex flex-col items-center justify-center">
+    <div className="flex items-center justify-center min-h-screen text-gray-100">
+      <div className="container bg-[#2A2A40]/50 pt-16 border-x p-4 shadow-2xl min-h-screen border-gray-500 flex flex-col items-center justify-start">
         <input
           placeholder="Search for a champion..."
           type="search"
@@ -81,7 +79,7 @@ const ChampionsPage = () => {
         </div>
         {posts && !isLoading && (
           <div className="container flex flex-col items-center justify-center">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-10 gap-2">
               {filteredChampions.map((champion) => (
                 <div
                   key={champion.id}
