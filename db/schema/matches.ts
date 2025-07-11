@@ -1,4 +1,4 @@
-import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 import { accounts } from "./accounts";
 
 export const matches = pgTable("matches", {
@@ -151,4 +151,45 @@ export const matchBans = pgTable("match_bans", {
     .notNull(),
   championId: integer("champion_id"),
   pickTurn: integer("pick_turn"),
+});
+
+// Perk Stats (Stat Shards)
+export const perkStats = pgTable("perk_stats", {
+  id: serial("id").primaryKey(),
+  matchId: text("match_id").references(() => matches.matchId), // Reference to match
+  defense: integer("defense").notNull(), // Defense stat shard ID
+  flex: integer("flex").notNull(), // Flex stat shard ID
+  offense: integer("offense").notNull(), // Offense stat shard ID
+});
+
+// Perk Style Selections (Individual Runes)
+export const perkStyleSelections = pgTable("perk_style_selections", {
+  id: serial("id").primaryKey(),
+  matchId: text("match_id").references(() => matches.matchId), // Reference to match
+  perk: integer("perk").notNull(), // Rune ID
+  var1: integer("var1").default(0), // Variance 1
+  var2: integer("var2").default(0), // Variance 2
+  var3: integer("var3").default(0), // Variance 3
+});
+
+// Perk Styles (Rune Trees)
+export const perkStyles = pgTable("perk_styles", {
+  id: serial("id").primaryKey(),
+  matchId: text("match_id").references(() => matches.matchId), // Reference to match
+  description: text("description"), // e.g. "7203_Domination"
+  style: integer("style").notNull(), // Style ID
+  // Foreign key to selections (handled via relations)
+});
+
+// Main Perks Table (Connects everything)
+export const perks = pgTable("perks", {
+  id: serial("id").primaryKey(),
+  matchId: text("match_id").references(() => matches.matchId), // Reference to match
+  puuid: text("puuid").references(() => matchParticipants.puuid), // Reference to player
+  statPerksId: integer("stat_perks_id").references(() => perkStats.id),
+  primaryStyleId: integer("primary_style_id").references(() => perkStyles.id),
+  secondaryStyleId: integer("secondary_style_id").references(
+    () => perkStyles.id
+  ),
+  createdAt: timestamp("created_at").defaultNow(),
 });

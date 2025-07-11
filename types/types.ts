@@ -64,6 +64,30 @@ interface CompleteAccountInfo extends Account {
   summonerInfo?: SummonerInfo;
 }
 
+interface PerksDto {
+  statPerks: PerkStatsDto;
+  styles: PerkStyleDto[];
+}
+
+type PerkStatsDto = {
+  defense: number;
+  flex: number;
+  offense: number;
+};
+
+type PerkStyleDto = {
+  description: string;
+  selections: PerkStyleSelectionDto[];
+  style: number;
+};
+
+type PerkStyleSelectionDto = {
+  perk: number;
+  var1: number;
+  var2: number;
+  var3: number;
+};
+
 interface DbSummonerInfo {
   puuid: string;
   gameName: string;
@@ -94,7 +118,7 @@ interface DbGameInfo {
     tournamentCode: string | null;
     createdAt: Date | null;
   };
-  participants: (ParticipantData & { matchId: string })[];
+  participants: (DbParticipantData & { matchId: string })[];
   objectives: {
     matchId: string;
     baron: string;
@@ -113,6 +137,35 @@ interface DbGameInfo {
     matchId: string;
     championId: number | null;
     pickTurn: number | null;
+  }[];
+  perkStats: {
+    matchId: string | null;
+    id: number;
+    defense: number;
+    flex: number;
+    offense: number;
+  }[];
+  perkStyleSelections: {
+    matchId: string | null;
+    id: number;
+    perk: number | null;
+    var1: number | null;
+    var2: number | null;
+    var3: number | null;
+  }[];
+  perkStyles: {
+    matchId: string | null;
+    id: number;
+    description: string | null;
+    style: number;
+  }[];
+  perks: {
+    puuid: string | null;
+    matchId: string | null;
+    statPerksId: number | null;
+    primaryStyleId: number | null;
+    secondaryStyleId: number | null;
+    createdAt: Date | null;
   }[];
 }
 
@@ -246,6 +299,97 @@ interface ParticipantData {
 
   summoner1Id: number | null;
   summoner2Id: number | null;
+  perks: PerksDto;
+
+  // Team-related
+  teamId: number | null;
+  teamEarlySurrendered: number | null;
+  win: number | null;
+
+  // Miscellaneous
+  timePlayed: number | null;
+  totalMinionsKilled: number | null;
+}
+interface DbParticipantData {
+  // Performance metrics
+  assists: number | null;
+  baronKills: number | null;
+  bountyLevel: number | null;
+  champExperience: number | null;
+  champLevel: number | null;
+  championId: number | null;
+  championName: string | null;
+  championTransform: number | null;
+
+  // Damage-related fields
+  damageDealtToBuildings: number | null;
+  damageDealtToObjectives: number | null;
+  damageDealtToTurrets: number | null;
+  damageSelfMitigated: number | null;
+  deaths: number | null;
+
+  // Damage breakdown
+  magicDamageDealt: number | null;
+  magicDamageDealtToChampions: number | null;
+  magicDamageTaken: number | null;
+  physicalDamageDealt: number | null;
+  physicalDamageDealtToChampions: number | null;
+  physicalDamageTaken: number | null;
+  trueDamageDealt: number | null;
+  trueDamageDealtToChampions: number | null;
+  trueDamageTaken: number | null;
+  totalDamageDealt: number | null;
+  totalDamageDealtToChampions: number | null;
+  totalDamageTaken: number | null;
+
+  // Kill-related fields
+  doubleKills: number | null;
+  dragonKills: number | null;
+  firstBloodAssist: number | null;
+  firstBloodKill: number | null;
+  firstTowerAssist: number | null;
+  firstTowerKill: number | null;
+  killingSprees: number | null;
+  kills: number | null;
+  largestKillingSpree: number | null;
+  largestMultiKill: number | null;
+  pentaKills: number | null;
+  quadraKills: number | null;
+  tripleKills: number | null;
+
+  // Economic fields
+  goldEarned: number | null;
+  goldSpent: number | null;
+  itemsPurchased: number | null;
+
+  // Items
+  item0: number | null;
+  item1: number | null;
+  item2: number | null;
+  item3: number | null;
+  item4: number | null;
+  item5: number | null;
+  item6: number | null;
+
+  // Position and lane
+  individualPosition: string | null;
+  teamPosition: string | null;
+  lane: string | null;
+  role: string | null;
+
+  // Summoner-related fields
+  participantId: number | null;
+  puuid: string | null;
+  summonerId: string | null;
+  summonerLevel: number | null;
+  summonerName: string | null;
+  profileIcon: number | null;
+  riotIdGameName: string | null;
+  riotIdTagline: string | null;
+  queueId: number;
+
+  summoner1Id: number | null;
+  summoner2Id: number | null;
 
   // Team-related
   teamId: number | null;
@@ -299,18 +443,6 @@ interface ChallengesDto {
   legendaryCount?: number;
   takedownsFirst25Minutes?: number;
   // Add other challenge fields as needed
-}
-
-// Perks Interface (minimal example, expand as needed)
-interface PerksDto {
-  // Define perks structure based on your specific needs
-  statPerks: PerkStatsDto;
-}
-
-interface PerkStatsDto {
-  defense: number;
-  flex: number;
-  offense: number;
 }
 
 interface ChampionDetailData {
