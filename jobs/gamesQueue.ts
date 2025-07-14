@@ -73,9 +73,9 @@ export async function enqueueMatchJobs() {
     if (!player.puuid) continue;
 
     await gamesQueue.add(
-      `sync-${player.summonerId}`,
+      `sync-${player.puuid}`,
       {
-        jobId: `sync-${player.summonerId}`,
+        jobId: `sync-${player.puuid}`,
         puuid: player.puuid,
         region: player.region || "euw1", // Assuming all players are from EUW for simplicity
         gameName: player.gameName,

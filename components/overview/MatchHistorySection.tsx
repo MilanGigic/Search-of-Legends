@@ -216,6 +216,11 @@ const MatchHistorySection = ({
 
         clearTimeout(timeoutId);
 
+        if (res.status === 429) {
+          console.log("Waiting for riot rate limiter");
+          setFailedMatches((prev) => [...prev, matchId]);
+          await delay(1000 * 60 * 2);
+        }
         if (!res.ok) {
           console.error(
             `HTTP error fetching game info for ${matchId}: ${res.status} ${res.statusText}`

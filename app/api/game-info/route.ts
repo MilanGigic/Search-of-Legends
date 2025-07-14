@@ -11,6 +11,7 @@ import {
   perkStyleSelections,
 } from "@/db/schema";
 import insertMatchData from "@/lib/actions/insertMatchData";
+import { delay } from "@/lib/riot";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -138,6 +139,11 @@ export async function GET(req: NextRequest) {
       return new Response(errorText, { status: res.status });
     }
 
+    if (res.status === 429) {
+      console.log("Rate limit");
+      await delay(1000 * 60 * 2);
+    }
+
     const data: RiotMatchDto = await res.json();
 
     await insertMatchData(data, puuid);
@@ -200,12 +206,6 @@ export async function GET(req: NextRequest) {
       perkStyles: newPerkStyles,
       perks: newPerks,
     };
-
-    transformedData.participants.map(async (participant) => {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/account?gameName=${participant.riotIdGameName}&tagLine=${participant.riotIdTagline}`
-      );
-    });
 
     return NextResponse.json(transformedData, { status: 200 });
   } catch (error) {

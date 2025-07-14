@@ -34,7 +34,7 @@ export default async function insertMatchData(
   });
 
   if (!account) {
-    await fetchWithRateLimit(
+    await fetch(
       `/api/account?gameName=${userGameName?.riotIdGameName}&tagLine=${userTagLine?.riotIdTagline}`
     );
   }
@@ -126,7 +126,6 @@ export default async function insertMatchData(
         role: p.role,
         participantId: p.participantId,
         puuid: p.puuid,
-        summonerId: p.summonerId,
         summoner1Id: p.summoner1Id,
         summoner2Id: p.summoner2Id,
         summonerLevel: p.summonerLevel,

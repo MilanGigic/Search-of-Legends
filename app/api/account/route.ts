@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
 import fetchSummonerFromAnyRegion from "@/lib/actions/region";
+import { delay } from "@/lib/riot";
 import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -47,7 +48,7 @@ export async function GET(req: NextRequest) {
     const ONE_HOUR = 60 * 60 * 1000; // Cache for 1 hour
 
     if (
-      existingAccount?.summonerId &&
+      existingAccount?.puuid &&
       existingAccount?.lastUpdated &&
       now - existingAccount?.lastUpdated < ONE_HOUR
     ) {
@@ -56,7 +57,6 @@ export async function GET(req: NextRequest) {
         puuid: existingAccount?.puuid,
         gameName: existingAccount?.gameName,
         tagLine: existingAccount?.tagLine,
-        id: existingAccount.summonerId,
         region: existingAccount.region,
         profileIconId: existingAccount.profileIconId,
         revisionDate: existingAccount.revisionDate,
@@ -76,6 +76,11 @@ export async function GET(req: NextRequest) {
 
     const accountResponse = await fetch(accountUrl);
     console.log("Riot API accountResponse status:", accountResponse.status);
+
+    if (accountResponse.status === 429) {
+      console.log("Waiting for riot api rate limiter");
+      await delay(60 * 1000 * 2);
+    }
 
     if (!accountResponse.ok) {
       const errorData = await accountResponse.json();
@@ -141,10 +146,9 @@ export async function GET(req: NextRequest) {
           puuid: accountData.puuid,
           gameName: accountData.gameName,
           tagLine: accountData.tagLine,
-          region: accountData.region,
+          region: summonerResult.region,
           profileIconId: summonerData.profileIconId,
           summonerLevel: summonerData.summonerLevel,
-          summonerId: summonerData.id,
           tier: soloQueueEntry.tier,
           rank: soloQueueEntry.rank,
           leaguePoints: soloQueueEntry.leaguePoints,
@@ -168,7 +172,6 @@ export async function GET(req: NextRequest) {
               gameName: accountData.gameName,
               tagLine: accountData.tagLine,
               region: summonerResult.region,
-              summonerId: summonerData.id,
               profileIconId: summonerData.profileIconId,
               tier: soloQueueEntry.tier,
               rank: soloQueueEntry.rank,
@@ -185,7 +188,6 @@ export async function GET(req: NextRequest) {
                 gameName: accountData.gameName,
                 tagLine: accountData.tagLine,
                 region: summonerResult.region,
-                summonerId: summonerData.id,
                 profileIconId: summonerData.profileIconId,
                 tier: soloQueueEntry.tier,
                 rank: soloQueueEntry.rank,

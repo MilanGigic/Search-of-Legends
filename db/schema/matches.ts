@@ -99,7 +99,6 @@ export const matchParticipants = pgTable("match_participants", {
   // Summoner-related fields
   participantId: integer("participant_id"),
   puuid: text("puuid"),
-  summonerId: text("summoner_id"),
   summonerLevel: integer("summoner_level"),
   summonerName: text("summoner_name"),
   profileIcon: integer("profile_icon"),

@@ -78,10 +78,10 @@ const General = ({
   };
 
   const getItemId = (
-    participant: ParticipantData,
+    participant: DbParticipantData,
     itemSlot: number
   ): number | null => {
-    const itemKey = `item${itemSlot}` as keyof ParticipantData;
+    const itemKey = `item${itemSlot}` as keyof DbParticipantData;
     const itemId = participant[itemKey];
     return typeof itemId === "number" ? itemId : null;
   };
@@ -90,7 +90,7 @@ const General = ({
     participant,
     isBlueTeam,
   }: {
-    participant: ParticipantData;
+    participant: DbParticipantData;
     isBlueTeam: boolean;
   }) => {
     const summoner1Url = getSummonerSpellImageUrl(participant.summoner1Id!);

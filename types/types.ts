@@ -93,7 +93,6 @@ interface DbSummonerInfo {
   gameName: string;
   tagLine: string;
   region: string;
-  summonerId: string;
   summonerLevel: number;
   profileIconId: number;
   tier: string;
@@ -289,7 +288,6 @@ interface ParticipantData {
   // Summoner-related fields
   participantId: number | null;
   puuid: string | null;
-  summonerId: string | null;
   summonerLevel: number | null;
   summonerName: string | null;
   profileIcon: number | null;
@@ -380,7 +378,6 @@ interface DbParticipantData {
   // Summoner-related fields
   participantId: number | null;
   puuid: string | null;
-  summonerId: string | null;
   summonerLevel: number | null;
   summonerName: string | null;
   profileIcon: number | null;

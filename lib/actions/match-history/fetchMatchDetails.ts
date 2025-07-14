@@ -82,7 +82,7 @@ export const fetchMatchDetailsInSmallBatch = async (
     const batchResults = await Promise.allSettled(
       batch.map(async (matchId, index) => {
         try {
-          await delay(100 * index); // Slight stagger to avoid burst
+          await delay(200 * index); // Slight stagger to avoid burst
           const matchData = await fetchMatchDetails(matchId, REGION);
           await insertMatchData(matchData, puuid);
           return matchData;
