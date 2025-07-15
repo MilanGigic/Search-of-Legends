@@ -161,7 +161,7 @@ const UserVsOpponent = ({
           user?.win
             ? "bg-gradient-to-r from-green-500/40 to-emerald-400/40"
             : "bg-gradient-to-r from-red-500/40 to-rose-400/40"
-        } w-full p-2 sm:p-4 shadow-lg`}
+        } w-full p-2 sm:px-4 shadow-lg`}
       >
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-6">
           <div className="flex-1">

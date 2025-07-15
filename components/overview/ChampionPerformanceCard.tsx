@@ -4,7 +4,13 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-const ChampionPerformanceCard = async ({ puuid }: { puuid: string }) => {
+const ChampionPerformanceCard = async ({
+  puuid,
+  riotId,
+}: {
+  puuid: string;
+  riotId: string;
+}) => {
   const champions = await fetchChampions();
   console.log("Champions:", champions);
 
@@ -17,7 +23,7 @@ const ChampionPerformanceCard = async ({ puuid }: { puuid: string }) => {
 
   console.log("Top 5", top5);
   return (
-    <div className="pt-5 border border-gray-700/70 sm:mt-3 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#121624] to-[#1B1F35]  shadow-sm shadow-[#2A2A40]">
+    <div className="pt-5 border border-gray-700/70 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#121624] to-[#1B1F35]  shadow-sm shadow-[#2A2A40]">
       <div>
         <ul className="grid grid-cols-4 text-slate-300 font-semibold">
           <li className="text-center col-start-2">KDA</li>
@@ -76,7 +82,7 @@ const ChampionPerformanceCard = async ({ puuid }: { puuid: string }) => {
           ))}
         </ul>
       </div>
-      <Link href="/#">
+      <Link href={`/${riotId}/champions`}>
         <Button className="w-full items-center justify-center bg-[#2A2A40]/55 text-slate-300 hover:bg-[#2A2A40] transition-colors duration-50 rounded-t-none py-2 mt-2 cursor-pointer rounded-b-md">
           More Champions...
         </Button>

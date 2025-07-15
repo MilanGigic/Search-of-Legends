@@ -103,7 +103,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
       )}
       <div className="min-h-[90px] w-full flex justify-center items-center transition-all duration-300">
         {loading && (
-          <div className="flex gap-4 items-center p-4 rounded-lg bg-[#2A2A40] w-xs md:w-xl h-[85px]">
+          <div className="flex gap-4 items-center p-4 rounded-lg bg-[#2A2A40] w-[200px] md:w-md h-[85px]">
             <div className="w-14 h-14 rounded-full skeleton" />
             <div className="flex flex-col gap-2">
               <div className="w-40 h-4 skeleton" />
@@ -114,7 +114,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
         )}
 
         {!loading && accountInfo && (
-          <div className="px-4 bg-transparent/95 rounded-b-lg shadow border-x border-b border-slate-400/50 w-[200px] md:w-md">
+          <div className="px-4 bg-gradient-to-b from-[#121624] to-[#1B1F35] rounded-b-lg shadow border-x border-b border-slate-400/50 w-[200px] md:w-md">
             <Link
               href={`/${encodeURIComponent(
                 accountInfo.gameName

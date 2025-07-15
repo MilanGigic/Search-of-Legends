@@ -15,6 +15,7 @@ export async function getChampionPerformance(puuid: string) {
       avgCS: sql<number>`AVG(${matchParticipants.totalMinionsKilled})`,
       avgTime: sql<number>`AVG(${matchParticipants.timePlayed})`,
       wins: sql<number>`SUM(CASE WHEN ${matchParticipants.win} = 1 THEN 1 ELSE 0 END)`,
+      avgDamageDealt: sql<number>`AVG(${matchParticipants.totalDamageDealtToChampions})`,
     })
     .from(matchParticipants)
     .where(eq(matchParticipants.puuid, puuid))
@@ -41,9 +42,11 @@ export async function getChampionPerformance(puuid: string) {
         avgDeaths: stat.avgDeaths,
         avgAssists: stat.avgAssists,
         kda: userKda,
-        csPerMin: (stat.avgCS / (stat.avgTime / 60)).toFixed(1),
+        csPerMin: Number((stat.avgCS / (stat.avgTime / 60)).toFixed(1)),
         championName: champ?.name || "Unknown",
         championImage: champ?.image || "",
+        avgDamageDealt: stat.avgDamageDealt,
+        avgTime: stat.avgTime,
       };
     })
   );
