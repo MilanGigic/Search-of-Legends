@@ -98,13 +98,13 @@ const VideoCarousel = () => {
         <h2 className="text-gray-400">We recommend these VODs</h2>
       </div>
 
-      <section className="border h-2/3 w-full bg-gray-900 rounded-lg p-4">
+      <section className="h-2/3 w-full rounded-lg p-4">
         <div className="flex items-center justify-center gap-2 h-full">
           {/* Previous Button */}
           <button
             onClick={goToPrevious}
             disabled={currentIndex === 0 || isTransitioning}
-            className={`h-[104px] rounded-md rounded-l-none border border-gray-600 w-[23px] flex items-center justify-center transition-all duration-200 ${
+            className={`h-[104px] rounded-l-md  border-l border-y border-gray-600 w-[23px] flex items-center justify-center transition-all duration-200 ${
               currentIndex === 0
                 ? "bg-gray-800 text-gray-600 cursor-not-allowed"
                 : "bg-gray-700 text-white hover:bg-gray-600 hover:border-gray-500"
@@ -155,7 +155,7 @@ const VideoCarousel = () => {
           <button
             onClick={goToNext}
             disabled={currentIndex >= maxIndex || isTransitioning}
-            className={`h-[104px] rounded-md rounded-r-none border border-gray-600 w-[23px] flex items-center justify-center transition-all duration-200 ${
+            className={`h-[104px] rounded-r-md  border-r border-y border-gray-600 w-[23px] flex items-center justify-center transition-all duration-200 ${
               currentIndex >= maxIndex
                 ? "bg-gray-800 text-gray-600 cursor-not-allowed"
                 : "bg-gray-700 text-white hover:bg-gray-600 hover:border-gray-500"

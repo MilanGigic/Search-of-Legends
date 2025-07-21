@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import UserVsOpponent from "./UserVsOpponent";
 import General from "./General";
+import Details from "./Details";
+import Runes from "./Runes";
 
 type TabOption = "general" | "details" | "runes";
 
@@ -24,13 +26,14 @@ const GameMatchCard = ({
   region: string;
   currentPage: number;
 }) => {
-  const [user, setUser] = useState<ParticipantData | null>(null);
-  const [opponent, setOpponent] = useState<ParticipantData | null>(null);
+  const [user, setUser] = useState<DbParticipantData | null>(null);
+  const [opponent, setOpponent] = useState<DbParticipantData | null>(null);
   const [showGame, setShowGame] = useState<boolean>(false);
   const [localTime, setLocalTime] = useState<string>("");
   const [isActive, setIsActive] = useState<ComponentState>({
     activeTab: "general",
   });
+  const [matchEvents, setMatchEvents] = useState<MatchTimelineDto | null>(null);
 
   useEffect(() => {
     const currentUser = game.participants?.find((p) => p.puuid === puuid);
@@ -53,6 +56,33 @@ const GameMatchCard = ({
       setOpponent(opponentParticipant || null);
     }
   }, [user, puuid, game]);
+
+  useEffect(() => {
+    const fetchMatchEvents = async () => {
+      console.log(
+        "Fetching match events for matchId:",
+        game.info.matchId,
+        "region:",
+        region
+      );
+      const eventsRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/match-events?matchId=${game.info.matchId}&region=${region}`
+      );
+
+      if (!eventsRes.ok) {
+        console.error(
+          `Fetching match events failed: ${eventsRes.statusText}: status:${eventsRes.status}`
+        );
+      }
+
+      const matchEvents: MatchTimelineDto = await eventsRes.json();
+      console.log("Fetched match events:", matchEvents);
+      setMatchEvents(matchEvents);
+    };
+
+    console.log("showGame changed:", showGame);
+    fetchMatchEvents();
+  }, [showGame]);
 
   useEffect(() => {
     if (!game.info.gameCreation) return;
@@ -181,13 +211,26 @@ const GameMatchCard = ({
               Runes
             </Button>
           </section>
-          <General
-            game={game}
-            puuid={puuid}
-            showGame={showGame}
-            region={region}
-            isActive={isActive}
-          />
+          {isActive.activeTab === "general" ? (
+            <General
+              game={game}
+              puuid={puuid}
+              showGame={showGame}
+              region={region}
+              isActive={isActive}
+            />
+          ) : isActive.activeTab === "details" ? (
+            <Details
+              game={game}
+              puuid={puuid}
+              showGame={showGame}
+              region={region}
+              isActive={isActive}
+              matchEvents={matchEvents!}
+            />
+          ) : isActive.activeTab === "runes" ? (
+            <Runes />
+          ) : null}
         </div>
       ) : (
         <div></div>

@@ -30,8 +30,8 @@ const UserVsOpponent = ({
   opponent,
   showGame,
 }: {
-  user: ParticipantData | null;
-  opponent: ParticipantData | null;
+  user: DbParticipantData | null;
+  opponent: DbParticipantData | null;
   showGame: boolean;
 }) => {
   const userKda = user
@@ -52,7 +52,7 @@ const UserVsOpponent = ({
     <div className={`${size} flex-shrink-0`}>
       {itemId ? (
         <img
-          src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/item/${itemId}.png`}
+          src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/item/${itemId}.png`}
           alt="Item"
           className="w-full h-full object-cover rounded-sm"
         />
@@ -79,7 +79,7 @@ const UserVsOpponent = ({
       <div className={`${size} flex-shrink-0`}>
         {spellName ? (
           <img
-            src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/spell/${spellName}.png`}
+            src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/spell/${spellName}.png`}
             alt="Summoner Spell"
             className="w-full h-full object-cover rounded-sm"
             onError={(e) => {
@@ -106,7 +106,7 @@ const UserVsOpponent = ({
     kda,
     isUser = true,
   }: {
-    participant: ParticipantData | null;
+    participant: DbParticipantData | null;
     kda: number;
     isUser?: boolean;
   }) => {
@@ -168,7 +168,7 @@ const UserVsOpponent = ({
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0">
                 <img
-                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${user?.championName}.png`}
+                  src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/champion/${user?.championName}.png`}
                   alt={user?.championName!}
                   className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border-2 border-white/20"
                 />
@@ -219,7 +219,7 @@ const UserVsOpponent = ({
             <div className="flex w-full items-center gap-3 sm:flex-row md:flex-row-reverse">
               <div className="flex-shrink-0">
                 <img
-                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${opponent?.championName}.png`}
+                  src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/champion/${opponent?.championName}.png`}
                   alt={opponent?.championName!}
                   className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border-2 border-white/20"
                 />

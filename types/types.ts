@@ -35,6 +35,117 @@ interface SummonerRankInfo {
   miniSeries?: MiniSeriesDTO; // Optional in case the player isn't in a promo series
 }
 
+interface MatchTimelineDto {
+  metadata: Metadata;
+  info: TimelineInfo;
+}
+
+interface Metadata {
+  dataVersion: string;
+  matchId: string;
+  participants: string[];
+}
+
+interface TimelineInfo {
+  endOfGameResult: string;
+  frameInterval: number;
+  frames: Frame[];
+}
+
+interface Frame {
+  events: Events[];
+  participantFrames: Record<string, ParticipantFrame>;
+}
+
+type EventType =
+  | "PAUSE_END"
+  | "ITEM_PURCHASED"
+  | "SKILL_LEVEL_UP"
+  | "WARD_PLACED"; // extend this as needed
+
+interface Events {
+  realTimestamp?: number;
+  timestamp: number;
+  type: EventType;
+  itemId?: number;
+  participantId?: number;
+  skillSlot?: number;
+  ward_type?: string;
+}
+
+type ItemEvents = {
+  itemId: number;
+  timestamp: number;
+};
+
+interface GroupedItemEvent {
+  timestamp: number;
+  items: { itemId: number; count: number }[];
+}
+
+interface ParticipantFrame {
+  championStats: ChampionStats;
+  currentGold: number;
+  damageStats: DamageStats;
+  goldPerSecond: number;
+  jungleMinionsKilled: number;
+  level: number;
+  minionsKilled: number;
+  participantId: number;
+  position: Position;
+  timeEnemySpentControlled: number;
+  totalGold: number;
+  xp: number;
+}
+
+interface ChampionStats {
+  abilityHaste: number;
+  abilityPower: number;
+  armor: number;
+  armorPen: number;
+  armorPenPercent: number;
+  attackDamage: number;
+  attackSpeed: number;
+  bonusArmorPenPercent: number;
+  bonusMagicPenPercent: number;
+  ccReduction: number;
+  cooldownReduction: number;
+  health: number;
+  healthMax: number;
+  healthRegen: number;
+  lifesteal: number;
+  magicPen: number;
+  magicPenPercent: number;
+  magicResist: number;
+  movementSpeed: number;
+  omnivamp: number;
+  physicalVamp: number;
+  power: number;
+  powerMax: number;
+  powerRegen: number;
+  spellVamp: number;
+}
+
+interface DamageStats {
+  magicDamageDone: number;
+  magicDamageDoneToChampions: number;
+  magicDamageTaken: number;
+  physicalDamageDone: number;
+  physicalDamageDoneToChampions: number;
+  physicalDamageTaken: number;
+  totalDamageDone: number;
+  totalDamageDoneToChampions: number;
+  totalDamageTaken: number;
+  trueDamageDone: number;
+  trueDamageDoneToChampions: number;
+  trueDamageTaken: number;
+}
+
+interface Position {
+  x: number;
+  y: number;
+}
+
 interface LeagueEntry {
   summonerId: string;
   puuid: string;

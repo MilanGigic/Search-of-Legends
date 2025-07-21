@@ -273,7 +273,7 @@ const LeaderboardPage = () => {
             href={`/${encodeURIComponent(
               player.gameName!
             )}-${encodeURIComponent(player.tagLine!)}`}
-            key={player.summonerId}
+            key={index}
             className="w-full grid grid-cols-7 py-1 gap-1 cursor-pointer hover:opacity-85 transition-all duration-100 border-b border-gray-700 hover:bg-gray-800/50 even:bg-white/2"
           >
             <span className="text-center flex flex-col items-center justify-center font-bold text-base sm:text-lg">

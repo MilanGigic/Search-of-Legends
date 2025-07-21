@@ -152,6 +152,20 @@ export const matchBans = pgTable("match_bans", {
   pickTurn: integer("pick_turn"),
 });
 
+export const matchEvents = pgTable("match_events", {
+  matchId: text("match_id")
+    .references(() => matches.matchId, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  type: text("type").notNull(),
+  participantId: integer("participant_id").notNull(),
+  timeStamp: integer("time_stamp").notNull(),
+  levelupType: text("levelup_type"),
+  skillSlot: integer("skill_slot"),
+  itemId: integer("item_id"),
+});
+
 // Perk Stats (Stat Shards)
 export const perkStats = pgTable("perk_stats", {
   id: serial("id").primaryKey(),

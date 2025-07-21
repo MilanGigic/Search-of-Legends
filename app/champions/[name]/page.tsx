@@ -110,7 +110,7 @@ const ChampionPage = () => {
       try {
         setIsLoading(true);
         const res = await fetch(
-          `https://ddragon.leagueoflegends.com/cdn/15.5.1/data/en_US/champion/${completedName}.json`
+          `https://ddragon.leagueoflegends.com/cdn/15.14.1/data/en_US/champion/${completedName}.json`
         );
         if (!res.ok) {
           throw new Error(`Failed to fetch, ${res.status} ${res.statusText}`);
