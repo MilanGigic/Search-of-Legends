@@ -113,6 +113,9 @@ const GameMatchCard = ({
     }
   }, [game.info.gameCreation]);
 
+  // console.log("All the data:", puuid, user, opponent);
+  // console.log("Game data:", game);
+
   const handleButtonClick = (tab: TabOption) => {
     setIsActive({ activeTab: tab });
   };
@@ -229,7 +232,7 @@ const GameMatchCard = ({
               matchEvents={matchEvents!}
             />
           ) : isActive.activeTab === "runes" ? (
-            <Runes />
+            <Runes game={game} />
           ) : null}
         </div>
       ) : (

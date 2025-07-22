@@ -93,6 +93,7 @@ export async function GET(req: NextRequest) {
         existingGameInfo.gameCreation instanceof Date
           ? existingGameInfo.gameCreation
           : new Date(existingGameInfo.gameCreation);
+
       const completeGameInfo: DbGameInfo = {
         info: {
           ...existingGameInfo,

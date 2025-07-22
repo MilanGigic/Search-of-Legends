@@ -3,7 +3,9 @@
 import Image from "next/image";
 import { ComponentState, useEffect, useMemo, useState } from "react";
 import { MdKeyboardArrowRight } from "react-icons/md";
-import SpellCard from "../champions-page/SpellCard";
+import { GiCrossedSwords } from "react-icons/gi";
+import ward from "@/assets/icons/ward-icon.png";
+import helmet from "@/assets/icons/helmet.png";
 
 const Details = ({
   game,
@@ -23,6 +25,12 @@ const Details = ({
   const [selectedParticipantId, setSelectedParticipantId] = useState<number>(1);
   const [champion, setChampion] = useState<ChampionDetail | null>(null);
 
+  const [user, setUser] = useState<DbParticipantData | null>(null);
+  const [opponent, setOpponent] = useState<DbParticipantData | null>(null);
+
+  if (!game.participants || game.participants.length === 0) {
+    return <div>Loading game data...</div>;
+  }
   const getChampionImageUrl = (championName: string) => {
     const championMap: { [key: string]: string } = {
       "Aurelion Sol": "AurelionSol",
@@ -52,6 +60,25 @@ const Details = ({
     return `https://ddragon.leagueoflegends.com/cdn/15.14.1/img/champion/${mappedName}.png`;
   };
 
+  useEffect(() => {
+    const currentUser = game.participants?.find(
+      (p) => p.participantId === selectedParticipantId
+    );
+    setUser(currentUser || null);
+  }, [selectedParticipantId, game]);
+
+  useEffect(() => {
+    if (user) {
+      const opponentParticipant = game.participants?.find(
+        (p) =>
+          p.participantId !== selectedParticipantId &&
+          p.teamPosition === user.teamPosition &&
+          p.teamId !== user.teamId
+      );
+      setOpponent(opponentParticipant || null);
+    }
+  }, [user, selectedParticipantId, game]);
+
   const participantEvents = useMemo(() => {
     if (!matchEvents?.info?.frames) return [];
 
@@ -62,13 +89,73 @@ const Details = ({
     );
   }, [matchEvents, selectedParticipantId]);
 
+  const eventsAt15 = useMemo(() => {
+    if (!matchEvents?.info?.frames) return [];
+
+    return matchEvents.info.frames.flatMap((frame) =>
+      Object.values(frame.participantFrames).filter(
+        (event) => event.participantId === selectedParticipantId
+      )
+    );
+  }, [matchEvents, selectedParticipantId]);
+
+  const userEvents = useMemo(() => {
+    if (!matchEvents?.info?.frames) return [];
+
+    return matchEvents.info.frames.flatMap((frame) =>
+      Object.values(frame.participantFrames).filter(
+        (event) => event.participantId === selectedParticipantId
+      )
+    );
+  }, [matchEvents, selectedParticipantId]);
+  const opponentEvents = useMemo(() => {
+    if (!matchEvents?.info?.frames) return [];
+
+    return matchEvents.info.frames.flatMap((frame) =>
+      Object.values(frame.participantFrames).filter(
+        (event) => event.participantId === opponent?.participantId
+      )
+    );
+  }, [matchEvents, opponent]);
+
+  const userAndOpponentDifference = useMemo(() => {
+    if (!userEvents || !opponentEvents) return null;
+
+    const userAt15 = userEvents[15];
+    const opponentAt15 = opponentEvents[15];
+
+    if (!userAt15 || !opponentAt15) return null;
+
+    // const role = game.participants.find(
+    //   (participant) => participant.teamId === selectedParticipantId
+    // )?.teamPosition;
+
+    return {
+      user: {
+        gold: userAt15.totalGold,
+        level: userAt15.level,
+        minions: userAt15.minionsKilled + userAt15.jungleMinionsKilled,
+        damageDone: userAt15.damageStats.totalDamageDoneToChampions,
+      },
+      opponent: {
+        gold: opponentAt15.totalGold,
+        level: opponentAt15.level,
+        minions: opponentAt15.minionsKilled + opponentAt15.jungleMinionsKilled,
+        damageDone: opponentAt15.damageStats.totalDamageDoneToChampions,
+      },
+    };
+  }, [userEvents, opponentEvents]);
+
   useEffect(() => {
     console.log(
       "Events for participant",
       selectedParticipantId,
-      participantEvents
+      participantEvents,
+      eventsAt15
     );
   }, [participantEvents, selectedParticipantId]);
+
+  console.log("Game data:", game);
 
   const groupedItemEvents = useMemo(() => {
     if (!matchEvents?.info?.frames) {
@@ -199,6 +286,9 @@ const Details = ({
   useEffect(() => {
     console.log("Champion state data:", champion);
   }, [selectedParticipantId]);
+  useEffect(() => {
+    console.log("All data:", user, opponent, matchEvents, game, puuid);
+  }, []);
 
   const SPELLS = ["Q", "W", "E", "R"];
   return (
@@ -225,13 +315,138 @@ const Details = ({
       </header>
       <div className="w-full flex gap-4">
         {/* @15 stats */}
-        <div className="w-1/2 p-2 mt-4 border border-gray-700/70 shadow-sm shadow-[#2A2A40] bg-gradient-to-b from-[#1e2238] to-[#2a2f4a] rounded-md items-center">
-          <h1>Laning Phase</h1>
+        <div className="w-1/3 p-2 mt-4 border border-gray-700/70 shadow-sm shadow-[#2A2A40] bg-gradient-to-b from-[#1e2238] to-[#2a2f4a] rounded-md flex flex-col items-center">
+          <header className="text-base text-slate-300 font-semibold mb-2 ml-2 text-center items-center flex gap-1">
+            {/* <GiCrossedSwords className="text-center items-center flex flex-col w-[20px] h-[20px]" />{" "} */}
+            <Image
+              src={`https://raw.communitydragon.org/latest/game/assets/ux/traiticons/trait_icon_4_duelist.png`}
+              alt={`${(
+                <GiCrossedSwords className="text-center items-center flex flex-col w-[20px] h-[20px]" />
+              )}`}
+              height={20}
+              width={20}
+              className="text-center items-center flex flex-col"
+            />
+            Laning Phase (at 15)
+          </header>
+          <main className="flex gap-2">
+            <p className="flex flex-col tracking-tight text-center">
+              {userAndOpponentDifference?.user.minions! -
+                userAndOpponentDifference?.opponent.minions! >
+              0
+                ? "+"
+                : ""}
+              {userAndOpponentDifference?.user.minions! -
+                userAndOpponentDifference?.opponent.minions!}
+              <span className="text-gray-400 text-xs font-semibold">
+                CS diff
+              </span>
+            </p>
+            <p className="flex flex-col tracking-tight text-center">
+              {userAndOpponentDifference?.user.gold! -
+                userAndOpponentDifference?.opponent.gold! >
+              0
+                ? "+"
+                : ""}
+              {userAndOpponentDifference?.user.gold! -
+                userAndOpponentDifference?.opponent.gold!}
+              <span className="text-gray-400 text-xs font-semibold">
+                Gold Diff
+              </span>
+            </p>
+            <p className="flex flex-col tracking-tight text-center">
+              {userAndOpponentDifference?.user.level! -
+                userAndOpponentDifference?.opponent.level! >
+              0
+                ? "+"
+                : ""}
+              {userAndOpponentDifference?.user.level! -
+                userAndOpponentDifference?.opponent.level!}
+              <span className="text-gray-400 text-xs font-semibold">
+                LvL Diff
+              </span>
+            </p>
+          </main>
         </div>
+        {user && (
+          <div className="w-1/3 p-2 mt-4 border border-gray-700/70 shadow-sm shadow-[#2A2A40] bg-gradient-to-b from-[#1e2238] to-[#2a2f4a] rounded-md items-center flex flex-col">
+            <header className="text-base text-slate-300 font-semibold items-center flex gap-1 mb-2">
+              <Image
+                src={ward}
+                alt="ward"
+                height={20}
+                width={20}
+                className="text-center items-center flex flex-col"
+              />{" "}
+              Wards
+            </header>
+            <main className="flex gap-2">
+              <p className="flex flex-col tracking-tight text-center">
+                {user.wardsPlaced}
+                <span className="text-gray-400 text-xs font-semibold">
+                  Placed
+                </span>
+              </p>
+              <p className="flex flex-col tracking-tight text-center">
+                {user.detectorWardsPlaced}
+                <span className="text-gray-400 text-xs font-semibold">
+                  Control
+                </span>
+              </p>
+              <p className="flex flex-col tracking-tight text-center">
+                {user.wardsKilled}
+                <span className="text-gray-400 text-xs font-semibold">
+                  Destroyed
+                </span>
+              </p>
+              <p className="flex flex-col tracking-tight text-center">
+                {user.visionScore}
+                <span className="text-gray-400 text-xs font-semibold">
+                  Score
+                </span>
+              </p>
+            </main>
+          </div>
+        )}
+
         {/* Global Stats */}
-        <div className="w-1/2 p-2 mt-4 border border-gray-700/70 shadow-sm shadow-[#2A2A40] bg-gradient-to-b from-[#1e2238] to-[#2a2f4a] rounded-md items-center">
-          <h1>Global Stats</h1>
-        </div>
+        {user && (
+          <div className="w-1/3 p-2 mt-4 border border-gray-700/70 shadow-sm shadow-[#2A2A40] bg-gradient-to-b from-[#1e2238] to-[#2a2f4a] rounded-md flex flex-col items-center">
+            <header className="text-base text-slate-300 font-semibold items-center gap-1 flex mb-2">
+              <Image
+                src={helmet}
+                alt="ward"
+                height={20}
+                width={20}
+                className="text-center items-center flex flex-col"
+              />{" "}
+              Global Stats
+            </header>
+            <main className="flex gap-2">
+              <p className="flex flex-col tracking-tight text-center">
+                {(
+                  user!.totalDamageDealtToChampions! /
+                  (user!.timePlayed! / 60)
+                ).toFixed(0)}
+                <span className="text-gray-400 text-xs font-semibold">DPM</span>
+              </p>
+              <p className="flex flex-col tracking-tight text-center">
+                {(user!.totalMinionsKilled! / (user!.timePlayed! / 60)).toFixed(
+                  1
+                )}
+                <span className="text-gray-400 text-xs font-semibold">
+                  CS/m
+                </span>
+              </p>
+              <p className="flex flex-col tracking-tight text-center">
+                {(user.goldEarned! / (user.timePlayed! / 60)).toFixed(0)}
+                <span className="text-gray-400 text-xs font-semibold">
+                  Gold/m
+                </span>
+              </p>
+            </main>
+          </div>
+        )}
       </div>
       {/* ITEMIZATION */}
       <div className="w-full mt-4 border border-gray-700/70 shadow-sm shadow-[#2A2A40] bg-gradient-to-b from-[#1e2238] to-[#2a2f4a] rounded-md items-center">

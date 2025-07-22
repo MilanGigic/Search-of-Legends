@@ -1,4 +1,11 @@
-import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  integer,
+  pgTable,
+  primaryKey,
+  serial,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { accounts } from "./accounts";
 
 export const matches = pgTable("matches", {
@@ -118,10 +125,13 @@ export const matchParticipants = pgTable("match_participants", {
   sightWardsBoughtInGame: integer("sight_wards_bought_in_game"),
   visionScore: integer("vision_score"),
   visionWardsBoughtInGame: integer("vision_wards_bought_in_game"),
+  wardsKilled: integer("wards_killed"),
+  wardsPlaced: integer("wards_placed"),
 
   // Miscellaneous
   timePlayed: integer("time_played"),
   totalMinionsKilled: integer("total_minions_killed"),
+  neutralMinionsKilled: integer("neutral_minions_killed"),
 });
 
 export const matchObjectives = pgTable("match_objectives", {
@@ -150,20 +160,6 @@ export const matchBans = pgTable("match_bans", {
     .notNull(),
   championId: integer("champion_id"),
   pickTurn: integer("pick_turn"),
-});
-
-export const matchEvents = pgTable("match_events", {
-  matchId: text("match_id")
-    .references(() => matches.matchId, {
-      onDelete: "cascade",
-    })
-    .notNull(),
-  type: text("type").notNull(),
-  participantId: integer("participant_id").notNull(),
-  timeStamp: integer("time_stamp").notNull(),
-  levelupType: text("levelup_type"),
-  skillSlot: integer("skill_slot"),
-  itemId: integer("item_id"),
 });
 
 // Perk Stats (Stat Shards)
@@ -198,7 +194,6 @@ export const perkStyles = pgTable("perk_styles", {
 export const perks = pgTable("perks", {
   id: serial("id").primaryKey(),
   matchId: text("match_id").references(() => matches.matchId), // Reference to match
-  puuid: text("puuid").references(() => matchParticipants.puuid), // Reference to player
   statPerksId: integer("stat_perks_id").references(() => perkStats.id),
   primaryStyleId: integer("primary_style_id").references(() => perkStyles.id),
   secondaryStyleId: integer("secondary_style_id").references(

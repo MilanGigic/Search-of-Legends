@@ -270,7 +270,6 @@ interface DbGameInfo {
     style: number;
   }[];
   perks: {
-    puuid: string | null;
     matchId: string | null;
     statPerksId: number | null;
     primaryStyleId: number | null;
@@ -418,6 +417,13 @@ interface ParticipantData {
   // Miscellaneous
   timePlayed: number | null;
   totalMinionsKilled: number | null;
+  neutralMinionsKilled: number | null;
+  sightWardsBoughtInGame: number | null;
+  visionScore: number | null;
+  visionWardsBoughtInGame: number | null;
+  detectorWardsPlaced: number | null;
+  wardsKilled: number | null;
+  wardsPlaced: number | null;
 }
 interface DbParticipantData {
   // Performance metrics
@@ -504,9 +510,17 @@ interface DbParticipantData {
   teamEarlySurrendered: number | null;
   win: number | null;
 
+  detectorWardsPlaced: number | null;
+  sightWardsBoughtInGame: number | null;
+  visionScore: number | null;
+  visionWardsBoughtInGame: number | null;
+  wardsKilled: number | null;
+  wardsPlaced: number | null;
+
   // Miscellaneous
   timePlayed: number | null;
   totalMinionsKilled: number | null;
+  neutralMinionsKilled: number | null;
 }
 
 // Team-related Interfaces

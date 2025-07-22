@@ -171,6 +171,9 @@ export default function ChampionStatsClient({
             </p>
             <p className="text-sm text-center flex flex-col items-center justify-center">
               {Math.round((champ.wins / champ.gamesPlayed) * 100)}%
+              <span className="text-gray-400 text-xs">
+                {champ.wins}W/{champ.gamesPlayed - champ.wins}L
+              </span>
             </p>
             <p className="text-center flex flex-col items-center justify-center">
               {champ.csPerMin.toFixed(1)}

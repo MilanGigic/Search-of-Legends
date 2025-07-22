@@ -138,6 +138,13 @@ export default async function insertMatchData(
         win: p.win ? 1 : 0,
         timePlayed: p.timePlayed,
         totalMinionsKilled: p.totalMinionsKilled,
+        neutralMinionsKilled: p.neutralMinionsKilled,
+        sightWardsBoughtInGame: p.sightWardsBoughtInGame,
+        visionScore: p.visionScore,
+        visionWardsBoughtInGame: p.visionWardsBoughtInGame,
+        wardsKilled: p.wardsKilled,
+        wardsPlaced: p.wardsPlaced,
+        detectorWardsPlaced: p.detectorWardsPlaced,
       })
       .onConflictDoNothing();
   }
@@ -217,7 +224,6 @@ export default async function insertMatchData(
   for (const perk of matchData.info.participants) {
     await db.insert(perks).values({
       matchId,
-      puuid: perk.puuid,
     });
   }
 }
