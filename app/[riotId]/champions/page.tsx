@@ -56,10 +56,6 @@ const ChampionsPage = async ({ params }: AccountPageProps) => {
 
   const champions = await getChampionPerformance(puuid);
 
-  const sortedChampions = champions.sort(
-    (a, b) => Number(b.gamesPlayed) - Number(a.gamesPlayed)
-  );
-
   const fullUrl = headersList.get("x-url") || headersList.get("referer");
   return (
     <div className="relative z-10 min-h-screen p-4 text-slate-300">

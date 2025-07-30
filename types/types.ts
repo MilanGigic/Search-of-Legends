@@ -35,6 +35,27 @@ interface SummonerRankInfo {
   miniSeries?: MiniSeriesDTO; // Optional in case the player isn't in a promo series
 }
 
+interface RuneStyle {
+  id: number;
+  key: string;
+  icon: string;
+  name: string;
+  slots: RuneSlot[];
+}
+
+interface RuneSlot {
+  runes: Rune[];
+}
+
+interface Rune {
+  id: number;
+  key: string;
+  icon: string;
+  name: string;
+  shortDesc?: string;
+  longDesc?: string;
+}
+
 interface MatchTimelineDto {
   metadata: Metadata;
   info: TimelineInfo;
@@ -247,34 +268,6 @@ interface DbGameInfo {
     matchId: string;
     championId: number | null;
     pickTurn: number | null;
-  }[];
-  perkStats: {
-    matchId: string | null;
-    id: number;
-    defense: number;
-    flex: number;
-    offense: number;
-  }[];
-  perkStyleSelections: {
-    matchId: string | null;
-    id: number;
-    perk: number | null;
-    var1: number | null;
-    var2: number | null;
-    var3: number | null;
-  }[];
-  perkStyles: {
-    matchId: string | null;
-    id: number;
-    description: string | null;
-    style: number;
-  }[];
-  perks: {
-    matchId: string | null;
-    statPerksId: number | null;
-    primaryStyleId: number | null;
-    secondaryStyleId: number | null;
-    createdAt: Date | null;
   }[];
 }
 

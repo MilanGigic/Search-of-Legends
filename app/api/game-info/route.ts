@@ -5,10 +5,6 @@ import {
   matchObjectives,
   matchParticipants,
   matchTeams,
-  perks,
-  perkStats,
-  perkStyles,
-  perkStyleSelections,
 } from "@/db/schema";
 import insertMatchData from "@/lib/actions/insertMatchData";
 import { delay } from "@/lib/riot";
@@ -37,10 +33,6 @@ export async function GET(req: NextRequest) {
     existingGameObjectives,
     existingGameTeams,
     existingGameBans,
-    existingPerkStats,
-    existingPerkStyleSelections,
-    existingPerkStyles,
-    existingPerks,
   ] = await Promise.all([
     db.query.matchDetails.findFirst({
       where: eq(matchDetails.matchId, gameId),
@@ -57,18 +49,6 @@ export async function GET(req: NextRequest) {
     db.query.matchBans.findMany({
       where: eq(matchBans.matchId, gameId),
     }),
-    db.query.perkStats.findMany({
-      where: eq(perkStats.matchId, gameId),
-    }),
-    db.query.perkStyleSelections.findMany({
-      where: eq(perkStyleSelections.matchId, gameId),
-    }),
-    db.query.perkStyles.findMany({
-      where: eq(perkStyles.matchId, gameId),
-    }),
-    db.query.perks.findMany({
-      where: eq(perks.matchId, gameId),
-    }),
   ]);
 
   if (
@@ -76,11 +56,7 @@ export async function GET(req: NextRequest) {
     existingGameParticipants.length > 0 &&
     existingGameObjectives.length > 0 &&
     existingGameTeams.length > 0 &&
-    existingGameBans.length > 0 &&
-    existingPerkStats.length > 0 &&
-    existingPerkStyleSelections.length > 0 &&
-    existingPerkStyles.length > 0 &&
-    existingPerks.length > 0
+    existingGameBans.length > 0
   ) {
     console.log("Raw gameCreation from DB:", existingGameInfo.gameCreation);
     console.log("Type of gameCreation:", typeof existingGameInfo.gameCreation);
@@ -103,10 +79,6 @@ export async function GET(req: NextRequest) {
         objectives: existingGameObjectives,
         teams: existingGameTeams,
         bans: existingGameBans,
-        perkStats: existingPerkStats,
-        perkStyleSelections: existingPerkStyleSelections,
-        perkStyles: existingPerkStyles,
-        perks: existingPerks,
       };
 
       console.log("Existing complete game info:", completeGameInfo);
@@ -155,10 +127,6 @@ export async function GET(req: NextRequest) {
       newGameObjectives,
       newGameTeams,
       newGameBans,
-      newPerkStats,
-      newPerkStyleSelections,
-      newPerkStyles,
-      newPerks,
     ] = await Promise.all([
       db.query.matchDetails.findFirst({
         where: eq(matchDetails.matchId, gameId),
@@ -175,18 +143,6 @@ export async function GET(req: NextRequest) {
       db.query.matchBans.findMany({
         where: eq(matchBans.matchId, gameId),
       }),
-      db.query.perkStats.findMany({
-        where: eq(perkStats.matchId, gameId),
-      }),
-      db.query.perkStyleSelections.findMany({
-        where: eq(perkStyleSelections.matchId, gameId),
-      }),
-      db.query.perkStyles.findMany({
-        where: eq(perkStyles.matchId, gameId),
-      }),
-      db.query.perks.findMany({
-        where: eq(perks.matchId, gameId),
-      }),
     ]);
 
     const gameCreationDate =
@@ -202,10 +158,6 @@ export async function GET(req: NextRequest) {
       objectives: newGameObjectives,
       teams: newGameTeams,
       bans: newGameBans,
-      perkStats: newPerkStats,
-      perkStyleSelections: newPerkStyleSelections,
-      perkStyles: newPerkStyles,
-      perks: newPerks,
     };
 
     return NextResponse.json(transformedData, { status: 200 });

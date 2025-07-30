@@ -1,4 +1,4 @@
-const perks = [
+export const perks = [
   {
     id: 8100,
     key: "Domination",

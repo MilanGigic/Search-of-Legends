@@ -118,8 +118,8 @@ const UserCard = ({
   }
 
   return (
-    <div className="container max-w-6xl mx-auto bg-gradient-to-b text-slate-300 from-[#1B1F35] to-[#121624] border-b border-slate-400 shadow-[#2A2A40] px-4 pt-4">
-      <div className="flex w-full justify-between">
+    <div className="container max-w-6xl mx-auto bg-gradient-to-b text-slate-300 from-[#121624] to-[#1B1F35] border-b border-slate-400 shadow-[#2A2A40] px-6 sm:px-4 pt-4">
+      <div className="flex flex-col sm:flex-row w-full justify-between">
         <div>
           <div className="flex items-center">
             <img
@@ -159,13 +159,13 @@ const UserCard = ({
                   </p>
                   {rank && (
                     <p className="text-sm text-gray-300">
-                      {accountData.wins}W {accountData.losses}L (
+                      {accountData.wins}W-{accountData.losses}L (
                       {Math.round(
                         (accountData.wins! /
                           (accountData.wins! + accountData.losses!)) *
                           100
                       )}
-                      % WR)
+                      %)
                     </p>
                   )}
                 </div>
@@ -175,23 +175,8 @@ const UserCard = ({
             )}
           </div>
         </div>
-        <div className="flex flex-col justify-center w-3xl gap-1">
+        <div className="flex flex-col justify-center w-[350px] sm:w-3xl gap-1">
           <VODCarousel />
-          {/* <div className="text-center">
-            <h1 className="text-xl font-bold text-white">Based on your data</h1>
-            <h2 className="text-gray-400">We recommend these VODs</h2>
-          </div>
-          <section className="border h-2/3 w-full">
-            <ul className="flex w-full justify-center gap-2">
-              {"<"}
-              <li className="h-[104px] rounded-md border border-l-0 rounded-l-none w-[85px]"></li>
-              <li className="h-[104px] rounded-md border w-[170px]"></li>
-              <li className="h-[104px] rounded-md border w-[170px]"></li>
-              <li className="h-[104px] rounded-md border w-[170px]"></li>
-              <li className="h-[104px] rounded-md border border-r-0 rounded-r-none w-[85px]"></li>
-              {">"}
-            </ul>
-          </section> */}
         </div>
       </div>
       <ul className="flex justify-center gap-4 w-full">
@@ -230,7 +215,7 @@ const UserCard = ({
         >
           <span className="font-semibold text-base mt-4 flex items-center gap-1 text-center">
             {activeTab === "live" ? (
-              <div className="p-1 rounded-full bg-red-800 animate-pulse animate-duration-5000" />
+              <div className="p-1 rounded-full bg-red-600 animate-pulse animate-duration-5000" />
             ) : (
               <div className="p-1 rounded-full bg-red-900 text-center" />
             )}

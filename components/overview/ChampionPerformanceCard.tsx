@@ -11,9 +11,6 @@ const ChampionPerformanceCard = async ({
   puuid: string;
   riotId: string;
 }) => {
-  const champions = await fetchChampions();
-  console.log("Champions:", champions);
-
   const data = await getChampionPerformance(puuid);
   console.log("Champion performance data:", data);
 

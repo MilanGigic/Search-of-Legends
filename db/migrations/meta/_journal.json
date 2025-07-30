@@ -197,6 +197,13 @@
       "when": 1752231030820,
       "tag": "0027_awesome_beyonder",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1753360832151,
+      "tag": "0028_curious_maelstrom",
+      "breakpoints": true
     }
   ]
 }

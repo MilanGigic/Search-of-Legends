@@ -44,7 +44,7 @@ const UserVsOpponent = ({
   // Item component for reusability
   const ItemSlot = ({
     itemId,
-    size = "w-6 h-6",
+    size = "w-5 h-5",
   }: {
     itemId?: number;
     size?: string;
@@ -64,7 +64,7 @@ const UserVsOpponent = ({
 
   const SummonerSpell = ({
     spellId,
-    size = "w-7 h-7",
+    size = "w-6 h-6",
   }: {
     spellId?: number;
     size?: string;
@@ -124,26 +124,23 @@ const UserVsOpponent = ({
         `}
       >
         <div
-          className={`flex items-center gap-2 text-sm sm:text-base
+          className={`flex items-center gap-1 text-sm
           }`}
         >
           <div
-            className={`flex items-center gap-1 
+            className={`flex items-center gap-0.5 
             `}
           >
-            <span className="font-semibold">{participant.kills}</span>
+            <span className="font-normal">{participant.kills}</span>
             <span className="text-gray-400">/</span>
-            <span className="font-semibold text-red-400">
+            <span className="font-normal text-red-400">
               {participant.deaths}
             </span>
             <span className="text-gray-400">/</span>
-            <span className="font-semibold">{participant.assists}</span>
+            <span className="font-normal">{participant.assists}</span>
           </div>
           <div className="text-xs sm:text-sm text-gray-300">
-            <span className="font-bold text-white text-sm sm:text-base">
-              {kda}
-            </span>{" "}
-            KDA
+            <span className="font-semibold text-white text-sm">{kda}</span> KDA
           </div>
         </div>
 
@@ -161,16 +158,16 @@ const UserVsOpponent = ({
           user?.win
             ? "bg-gradient-to-r from-green-500/40 to-emerald-400/40"
             : "bg-gradient-to-r from-red-500/40 to-rose-400/40"
-        } w-full p-2 sm:px-4 shadow-lg`}
+        } w-full py-1 sm:px-4 shadow-lg`}
       >
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-6">
-          <div className="flex-1">
+          <div className="flex flex-col sm:flex-1">
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0">
                 <img
                   src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/champion/${user?.championName}.png`}
                   alt={user?.championName!}
-                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border-2 border-white/20"
+                  className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg border-2 border-white/20"
                 />
               </div>
 
@@ -184,7 +181,7 @@ const UserVsOpponent = ({
               </div>
             </div>
 
-            <div className="mt-1 sm:mt-3 p-2 bg-slate-800/60 rounded-md">
+            <div className="mt-1 p-1 bg-slate-800/60 rounded-md">
               <div className="flex gap-1 justify-center sm:justify-start">
                 {user && (
                   <>
@@ -215,13 +212,13 @@ const UserVsOpponent = ({
             </div>
           </div>
 
-          <div className="flex-1">
+          <div className="flex flex-col sm:flex-1">
             <div className="flex w-full items-center gap-3 sm:flex-row md:flex-row-reverse">
               <div className="flex-shrink-0">
                 <img
                   src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/champion/${opponent?.championName}.png`}
                   alt={opponent?.championName!}
-                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border-2 border-white/20"
+                  className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg border-2 border-white/20"
                 />
               </div>
 
@@ -239,7 +236,7 @@ const UserVsOpponent = ({
               </div>
             </div>
 
-            <div className="mt-1 sm:mt-3 p-2 bg-slate-800/60 rounded-md">
+            <div className="mt-1 p-1 bg-slate-800/60 rounded-md">
               <div className="flex gap-1 justify-center sm:justify-end">
                 <ItemSlot itemId={opponent?.item0!} />
                 <ItemSlot itemId={opponent?.item1!} />

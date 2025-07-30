@@ -6,6 +6,7 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import { GiCrossedSwords } from "react-icons/gi";
 import ward from "@/assets/icons/ward-icon.png";
 import helmet from "@/assets/icons/helmet.png";
+import VSIcon from "@/assets/icons/VSIcon.png";
 
 const Details = ({
   game,
@@ -283,6 +284,8 @@ const Details = ({
     getChampionSpell();
   }, [selectedParticipantId]);
 
+  // I HAVE DELETED ALL THE PERKS AND RUNE LOGIC, TRY TO FIGURE OUT HOW TO MAKE IT WORK
+
   useEffect(() => {
     console.log("Champion state data:", champion);
   }, [selectedParticipantId]);
@@ -292,44 +295,57 @@ const Details = ({
 
   const SPELLS = ["Q", "W", "E", "R"];
   return (
-    <div className="bg-gradient-to-b from-[#121624] to-[#1B1F35] w-full p-4">
-      <header className="flex justify-between">
-        {game.participants.map((participant) => (
-          <ul key={participant.puuid}>
-            <Image
-              src={getChampionImageUrl(participant.championName!)}
-              width={40}
-              height={40}
-              className={`sm:w-12 sm:h-12 rounded-full hover:opacity-50 cursor-pointer ${
-                selectedParticipantId === participant.participantId
-                  ? "opacity-50"
-                  : ""
-              }`}
-              alt={participant.championName!}
-              onClick={() =>
-                setSelectedParticipantId(participant.participantId!)
-              }
-            />
-          </ul>
+    <div className="bg-gradient-to-b from-[#121624] to-[#1B1F35] w-full p-4 animate-fade-down animate-duration-300 animate-ease-in-out">
+      <header className="grid grid-cols-5 gap-1">
+        {game.participants.map((participant, index) => (
+          <div key={participant.puuid}>
+            <ul className="flex justify-center">
+              <Image
+                src={getChampionImageUrl(participant.championName!)}
+                width={100}
+                height={100}
+                className={`w-14 h-14 sm:w-12 sm:h-12 rounded-full hover:opacity-50 cursor-pointer ${
+                  selectedParticipantId === participant.participantId
+                    ? "opacity-50"
+                    : ""
+                }`}
+                alt={participant.championName!}
+                onClick={() =>
+                  setSelectedParticipantId(participant.participantId!)
+                }
+              />
+            </ul>
+            {index === 2 ? (
+              <h1 className="col-span-5 my-8 w-full flex justify-center">
+                <Image
+                  src={VSIcon}
+                  alt={"VS"}
+                  width={100}
+                  height={100}
+                  className="scale-130 absolute top-14 sm:top-12"
+                />
+              </h1>
+            ) : null}
+          </div>
         ))}
       </header>
       <div className="w-full flex gap-4">
         {/* @15 stats */}
         <div className="w-1/3 p-2 mt-4 border border-gray-700/70 shadow-sm shadow-[#2A2A40] bg-gradient-to-b from-[#1e2238] to-[#2a2f4a] rounded-md flex flex-col items-center">
-          <header className="text-base text-slate-300 font-semibold mb-2 ml-2 text-center items-center flex gap-1">
+          <header className="text-sm sm:text-base text-slate-300 font-semibold mb-2 ml-2 text-center items-center flex flex-col sm:flex-row gap-1">
             {/* <GiCrossedSwords className="text-center items-center flex flex-col w-[20px] h-[20px]" />{" "} */}
             <Image
               src={`https://raw.communitydragon.org/latest/game/assets/ux/traiticons/trait_icon_4_duelist.png`}
               alt={`${(
                 <GiCrossedSwords className="text-center items-center flex flex-col w-[20px] h-[20px]" />
               )}`}
-              height={20}
-              width={20}
-              className="text-center items-center flex flex-col"
+              height={100}
+              width={100}
+              className="text-center w-5 h-5 items-center flex flex-col"
             />
             Laning Phase (at 15)
           </header>
-          <main className="flex gap-2">
+          <main className="flex gap-2 flex-col sm:flex-row">
             <p className="flex flex-col tracking-tight text-center">
               {userAndOpponentDifference?.user.minions! -
                 userAndOpponentDifference?.opponent.minions! >
@@ -370,17 +386,17 @@ const Details = ({
         </div>
         {user && (
           <div className="w-1/3 p-2 mt-4 border border-gray-700/70 shadow-sm shadow-[#2A2A40] bg-gradient-to-b from-[#1e2238] to-[#2a2f4a] rounded-md items-center flex flex-col">
-            <header className="text-base text-slate-300 font-semibold items-center flex gap-1 mb-2">
+            <header className="text-base text-slate-300 font-semibold items-center flex gap-1 mb-2 flex-col sm:flex-row">
               <Image
                 src={ward}
                 alt="ward"
-                height={20}
-                width={20}
-                className="text-center items-center flex flex-col"
+                height={100}
+                width={100}
+                className="text-center w-5 h-5 items-center flex flex-col"
               />{" "}
               Wards
             </header>
-            <main className="flex gap-2">
+            <main className="flex gap-2 flex-col sm:flex-row">
               <p className="flex flex-col tracking-tight text-center">
                 {user.wardsPlaced}
                 <span className="text-gray-400 text-xs font-semibold">
@@ -412,17 +428,17 @@ const Details = ({
         {/* Global Stats */}
         {user && (
           <div className="w-1/3 p-2 mt-4 border border-gray-700/70 shadow-sm shadow-[#2A2A40] bg-gradient-to-b from-[#1e2238] to-[#2a2f4a] rounded-md flex flex-col items-center">
-            <header className="text-base text-slate-300 font-semibold items-center gap-1 flex mb-2">
+            <header className="text-base text-slate-300 font-semibold items-center gap-1 flex mb-2 flex-col sm:flex-row">
               <Image
                 src={helmet}
                 alt="ward"
-                height={20}
-                width={20}
-                className="text-center items-center flex flex-col"
+                height={100}
+                width={100}
+                className="text-center w-5 h-5 items-center flex flex-col"
               />{" "}
               Global Stats
             </header>
-            <main className="flex gap-2">
+            <main className="flex gap-2 flex-col sm:flex-row">
               <p className="flex flex-col tracking-tight text-center">
                 {(
                   user!.totalDamageDealtToChampions! /
@@ -460,8 +476,9 @@ const Details = ({
                       <Image
                         src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/item/${item.itemId}.png`}
                         alt={`Item ${item.itemId}`}
-                        width={25}
-                        height={25}
+                        width={100}
+                        height={100}
+                        className="w-8 h-8"
                       />
                       {item.count > 1 && (
                         <span className="absolute bottom-0 right-0 bg-black text-white text-[10px] rounded">
@@ -508,9 +525,9 @@ const Details = ({
                         alt={`${participant.championName} ${champion?.id}`}
                         width={32}
                         height={32}
-                        className="rounded border border-gray-600"
+                        className="rounded border border-gray-600 hidden sm:block"
                       />
-                      <div className="absolute -right-1 -top-1 w-4 h-4 bg-gray-700 rounded-full border border-gray-500 flex items-center justify-center">
+                      <div className="sm:absolute sm:-right-1 sm:-top-1 w-2 h-2 sm:w-4 sm:h-4 bg-gray-700 rounded-full border border-gray-500 flex items-center justify-center">
                         <span className="text-xs font-bold text-white">
                           {spell}
                         </span>
@@ -544,7 +561,7 @@ const Details = ({
                       return (
                         <div
                           key={level}
-                          className="w-7 h-7 border border-gray-600/30 rounded bg-transparent flex items-center justify-center"
+                          className="w-4 h-4 sm:w-7 sm:h-7 border border-gray-600/30 rounded bg-transparent flex items-center justify-center"
                         >
                           {/* Empty slot */}
                         </div>
@@ -554,7 +571,7 @@ const Details = ({
                     return (
                       <div
                         key={level}
-                        className={`w-7 h-7 bg-[#121624] rounded flex items-center justify-center border border-gray-300`}
+                        className={`w-4 h-4 sm:w-7 sm:h-7 bg-[#121624] rounded flex items-center justify-center border border-gray-300`}
                       >
                         <span className="text-xs font-bold text-slate-300">
                           {levelNumber}

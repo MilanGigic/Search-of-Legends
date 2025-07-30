@@ -7,10 +7,6 @@ import {
   matchObjectives,
   matchParticipants,
   matchTeams,
-  perkStats,
-  perkStyles,
-  perkStyleSelections,
-  perks,
 } from "@/db/schema";
 import { fetchWithRateLimit } from "../riot";
 
@@ -185,45 +181,6 @@ export default async function insertMatchData(
           pickTurn: team.pickTurn,
         })
         .onConflictDoNothing();
-    });
-  }
-
-  for (const perks of matchData.info.participants) {
-    await db.insert(perkStats).values({
-      matchId,
-      defense: perks.perks.statPerks.defense,
-      flex: perks.perks.statPerks.flex,
-      offense: perks.perks.statPerks.offense,
-    });
-  }
-
-  for (const perks of matchData.info.participants) {
-    perks.perks.styles.map(async (styles) => {
-      for (const style of styles.selections) {
-        await db.insert(perkStyleSelections).values({
-          matchId,
-          perk: style.perk,
-          var1: style.var1,
-          var2: style.var2,
-          var3: style.var3,
-        });
-      }
-    });
-  }
-
-  for (const perks of matchData.info.participants) {
-    perks.perks.styles.map(async (styles) => {
-      await db.insert(perkStyles).values({
-        matchId,
-        description: styles.description,
-        style: styles.style,
-      });
-    });
-  }
-
-  for (const perk of matchData.info.participants) {
-    await db.insert(perks).values({
-      matchId,
     });
   }
 }

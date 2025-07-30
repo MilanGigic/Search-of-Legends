@@ -8,6 +8,10 @@ import UserVsOpponent from "./UserVsOpponent";
 import General from "./General";
 import Details from "./Details";
 import Runes from "./Runes";
+import Image from "next/image";
+import { TbListDetails } from "react-icons/tb";
+import { CgChart } from "react-icons/cg";
+import GrayRunesIcon from "@/assets/icons/GrayRuneSymbol.png";
 
 type TabOption = "general" | "details" | "runes";
 
@@ -34,6 +38,9 @@ const GameMatchCard = ({
     activeTab: "general",
   });
   const [matchEvents, setMatchEvents] = useState<MatchTimelineDto | null>(null);
+  const [gameInfoForRunes, setGameInfoForRunes] = useState<RiotMatchDto | null>(
+    null
+  );
 
   useEffect(() => {
     const currentUser = game.participants?.find((p) => p.puuid === puuid);
@@ -83,6 +90,32 @@ const GameMatchCard = ({
     console.log("showGame changed:", showGame);
     fetchMatchEvents();
   }, [showGame]);
+  useEffect(() => {
+    const fetchGameInfoForRunesPage = async () => {
+      console.log(
+        "Fetching game info for runes page for matchId:",
+        game.info.matchId,
+        "region:",
+        region
+      );
+      const runesRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/game-info-for-runes-page?matchId=${game.info.matchId}&region=${region}`
+      );
+
+      if (!runesRes.ok) {
+        console.error(
+          `Fetching game info for runes page failed: ${runesRes.statusText}: status:${runesRes.status}`
+        );
+      }
+
+      const runesData: RiotMatchDto = await runesRes.json();
+      console.log("Fetched game info for runes page:", runesData);
+      setGameInfoForRunes(runesData);
+    };
+
+    console.log("showGame changed:", showGame);
+    fetchGameInfoForRunesPage();
+  }, [showGame]);
 
   useEffect(() => {
     if (!game.info.gameCreation) return;
@@ -128,7 +161,7 @@ const GameMatchCard = ({
           showGame ? "rounded-t-md" : ""
         } from-[#121624] to-[#1B1F35]`}
       >
-        <div className="max-w-[468px] md:max-w-[864px] grid grid-cols-3 items-center py-1.5">
+        <div className="max-w-[468px] md:max-w-[864px] mx-auto grid grid-cols-3 items-center py-0.5">
           <h1 className="text-amber-500 text-sm md:text-base text-center">
             {user?.riotIdGameName}#{user?.riotIdTagline}
           </h1>
@@ -188,29 +221,60 @@ const GameMatchCard = ({
         <div className="">
           <section className="flex justify-center w-full">
             <Button
-              className={`hover:bg-[#1B1F35] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
+              className={`hover:bg-[#1B1F35] text-gray-400 bg-transparent w-1/3 py-5 rounded-none ${
                 isActive.activeTab === "general" &&
                 "bg-[#1B1F35] text-slate-300"
               }`}
               onClick={() => handleButtonClick("general")}
             >
+              <TbListDetails
+                className={`${
+                  isActive.activeTab === "general"
+                    ? "text-[#C8AA6E]"
+                    : "text-gray-400"
+                } transition-colors duration-200`}
+              />
               General
             </Button>
             <Button
-              className={`hover:bg-[#1B1F35] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
+              className={`hover:bg-[#1B1F35] text-gray-400 bg-transparent w-1/3 py-5 rounded-none ${
                 isActive.activeTab === "details" &&
                 "bg-[#1B1F35] text-slate-300"
               }`}
               onClick={() => handleButtonClick("details")}
             >
+              <CgChart
+                className={`${
+                  isActive.activeTab === "details"
+                    ? "text-[#C8AA6E]"
+                    : "text-gray-400"
+                } transition-colors duration-200`}
+              />
               Details
             </Button>
             <Button
-              className={`hover:bg-[#1B1F35] text-slate-300 bg-transparent w-1/3 py-5 rounded-none ${
+              className={`hover:bg-[#1B1F35] text-gray-400 bg-transparent w-1/3 py-5 rounded-none ${
                 isActive.activeTab === "runes" && "bg-[#1B1F35] text-slate-300"
               }`}
               onClick={() => handleButtonClick("runes")}
             >
+              {isActive.activeTab === "runes" ? (
+                <Image
+                  src={
+                    "https://raw.communitydragon.org/latest/game/assets/perks/styles/runesicon.png"
+                  }
+                  alt="Rune"
+                  width={20}
+                  height={20}
+                />
+              ) : (
+                <Image
+                  src={GrayRunesIcon}
+                  alt={"Rune"}
+                  width={20}
+                  height={20}
+                />
+              )}
               Runes
             </Button>
           </section>
@@ -232,7 +296,7 @@ const GameMatchCard = ({
               matchEvents={matchEvents!}
             />
           ) : isActive.activeTab === "runes" ? (
-            <Runes game={game} />
+            <Runes game={game} runesData={gameInfoForRunes} />
           ) : null}
         </div>
       ) : (
