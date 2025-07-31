@@ -151,7 +151,6 @@ async function processLeagueEntries(
               gameName: accountData.gameName,
               tagLine: accountData.tagLine,
               region: "euw1",
-              summonerId: entry.summonerId,
               summonerLevel: summonerInfo.summonerLevel,
               profileIconId: summonerInfo.profileIconId,
               tier,

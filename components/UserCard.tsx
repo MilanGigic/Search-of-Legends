@@ -117,6 +117,8 @@ const UserCard = ({
     return;
   }
 
+  // NEXT THING IS PROBABLY IMPLEMENTING RIOT LOGIN AND ACCOUNT PAGE
+
   return (
     <div className="container max-w-6xl mx-auto bg-gradient-to-b text-slate-300 from-[#121624] to-[#1B1F35] border-b border-slate-400 shadow-[#2A2A40] px-6 sm:px-4 pt-4">
       <div className="flex flex-col sm:flex-row w-full justify-between">

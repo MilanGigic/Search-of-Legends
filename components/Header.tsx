@@ -8,11 +8,14 @@ import SearchForm from "./SearchForm";
 import { MenuIcon, SearchIcon, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSearchStore } from "@/lib/store/useSearchStore";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 const Header = ({ showSearch }: { showSearch?: boolean }) => {
   const [searchOpen, setSearchOpen] = useState<boolean>(false);
 
   const { isOpen, toggle } = useSearchStore();
+
+  const { data: session } = useSession();
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 641px)");
@@ -119,14 +122,22 @@ const Header = ({ showSearch }: { showSearch?: boolean }) => {
           )}
         </ul>
         <div className="hidden md:flex items-center">
-          <Link href="/">
-            <Button
+          {session ? (
+            <>
+              <h1>Welcome, Riot User</h1>
+              <button onClick={() => signOut()}>Sign Out</button>
+            </>
+          ) : (
+            <button onClick={() => signIn("riot")}>Sign In with Riot</button>
+          )}
+          {/* <Link href="/"> */}
+          {/* <Button
               variant="outline"
               className="mr-1 sm:mr-4 p-2 md:p-4 bg-gradient-to-r border-gray-500 from-sky-600 to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-300 hover:to-blue-200 font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"
             >
               Try Premium
-            </Button>
-          </Link>
+            </Button> */}
+          {/* </Link> */}
         </div>
       </div>
     </div>

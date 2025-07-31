@@ -3,6 +3,8 @@ import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Spotlight from "@/components/ui/spotlight";
+import { SessionProvider } from "next-auth/react";
+import { Providers } from "./providers";
 
 const bebasNeue = Bebas_Neue({
   variable: "--font-bebas-neue",
@@ -34,7 +36,7 @@ export default function RootLayout({
           <div className="animated-grid" />
         </div>
         <Spotlight />
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

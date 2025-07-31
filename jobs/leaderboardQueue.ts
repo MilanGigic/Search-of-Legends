@@ -161,7 +161,6 @@ export const leaderboardWorker = new Worker(
                 gameName: accountData.gameName,
                 tagLine: accountData.tagLine,
                 region: "euw1", // Assuming all players are from EUW for simplicity
-                summonerId: entry.summonerId,
                 summonerLevel: summonerInfo.summonerLevel,
                 profileIconId: summonerInfo.profileIconId,
                 tier: entry.tier!,
