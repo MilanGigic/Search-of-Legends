@@ -4,7 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const TopFivePlayers = ({ topFive }: { topFive: DbSummonerInfo[] }) => {
+const TopFivePlayers = ({
+  topFive,
+  version,
+}: {
+  topFive: DbSummonerInfo[];
+  version: string;
+}) => {
   // const [topFive, setTopFive] = useState<DbSummonerInfo[]>([]);
   // console.log(
   //   "Ranks before sorting:",
@@ -39,9 +45,9 @@ const TopFivePlayers = ({ topFive }: { topFive: DbSummonerInfo[] }) => {
 
   return (
     <div className="py-2 px-1 border border-gray-700/70 text-sm text-slate-300 rounded-md flex flex-col bg-gradient-to-b from-[#1B1F35] to-[#121624] ">
-      <ul className="grid grid-cols-5 text-slate-300 font-semibold">
+      <ul className="grid grid-cols-6 text-slate-300 font-semibold">
         <li className="text-center font-semibold">Rank</li>
-        <li className="col-span-2 font-semibold text-center">Player</li>
+        <li className="col-span-3 font-semibold text-center">Player</li>
         <li className="text-center font-semibold">Winrate</li>
         <li className="text-center font-semibold">LP</li>
       </ul>
@@ -52,14 +58,14 @@ const TopFivePlayers = ({ topFive }: { topFive: DbSummonerInfo[] }) => {
               href={`/${encodeURIComponent(
                 account.gameName!
               )}-${encodeURIComponent(account.tagLine!)}`}
-              className="text-center grid grid-cols-5 hover:bg-[#2A2A40] transition-colors py-1 duration-200 rounded-md cursor-pointer"
+              className="text-center grid grid-cols-6 hover:bg-[#2A2A40] transition-colors py-1 duration-200 rounded-md cursor-pointer"
             >
               <h1 className="text-center flex flex-col items-center justify-center">
                 {account.rank}
               </h1>
-              <div className="flex items-center justify-start col-span-2 gap-0.5">
+              <div className="flex items-center justify-start col-span-3 gap-0.5">
                 <Image
-                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${account.profileIconId}.png`}
+                  src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${account.profileIconId}.png`}
                   alt={`Rank 1`}
                   width={30}
                   height={30}

@@ -14,10 +14,12 @@ const MatchHistorySection = ({
   matchHistory,
   puuid,
   region,
+  version,
 }: {
   matchHistory: string[];
   puuid: string;
   region: string;
+  version: string;
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [games, setGames] = useState<GameDataProps[]>([]);
@@ -539,6 +541,7 @@ const MatchHistorySection = ({
             puuid={puuid}
             region={region}
             currentPage={currentPage}
+            version={version}
           />
         ))}
       </Suspense>

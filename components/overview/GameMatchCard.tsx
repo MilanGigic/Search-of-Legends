@@ -24,11 +24,13 @@ const GameMatchCard = ({
   puuid,
   region,
   currentPage,
+  version,
 }: {
   game: DbGameInfo;
   puuid: string;
   region: string;
   currentPage: number;
+  version: string;
 }) => {
   const [user, setUser] = useState<DbParticipantData | null>(null);
   const [opponent, setOpponent] = useState<DbParticipantData | null>(null);
@@ -121,7 +123,6 @@ const GameMatchCard = ({
     if (!game.info.gameCreation) return;
 
     try {
-      // Ensure we have a Date object
       const gameDate =
         game.info.gameCreation instanceof Date
           ? game.info.gameCreation
@@ -145,9 +146,6 @@ const GameMatchCard = ({
       console.error("Error formatting date:", error);
     }
   }, [game.info.gameCreation]);
-
-  // console.log("All the data:", puuid, user, opponent);
-  // console.log("Game data:", game);
 
   const handleButtonClick = (tab: TabOption) => {
     setIsActive({ activeTab: tab });
@@ -215,7 +213,12 @@ const GameMatchCard = ({
           </Link>
         </div>
       </div>
-      <UserVsOpponent user={user} opponent={opponent} showGame={showGame} />
+      <UserVsOpponent
+        user={user}
+        opponent={opponent}
+        showGame={showGame}
+        version={version}
+      />
       {/* ----------------- */}
       {showGame ? (
         <div className="">
@@ -285,6 +288,7 @@ const GameMatchCard = ({
               showGame={showGame}
               region={region}
               isActive={isActive}
+              version={version}
             />
           ) : isActive.activeTab === "details" ? (
             <Details
@@ -294,9 +298,10 @@ const GameMatchCard = ({
               region={region}
               isActive={isActive}
               matchEvents={matchEvents!}
+              version={version}
             />
           ) : isActive.activeTab === "runes" ? (
-            <Runes game={game} runesData={gameInfoForRunes} />
+            <Runes game={game} version={version} runesData={gameInfoForRunes} />
           ) : null}
         </div>
       ) : (

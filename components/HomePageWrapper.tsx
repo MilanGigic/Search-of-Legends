@@ -1,5 +1,7 @@
 import { db } from "@/db";
 import HomePage from "./HomePage";
+import fetchChampions from "@/lib/actions/fetchChampions";
+import { fetchLatestVersion } from "@/lib/riot";
 
 const five = [1, 2, 3, 4, 5];
 const HomePageWrapper = async () => {
@@ -11,6 +13,8 @@ const HomePageWrapper = async () => {
   //   topFive = accounts.filter((account) => Number(account.rank) === rank);
   // }
 
+  fetchChampions();
+
   five.map((rank) => {
     const account = accounts.filter((account) => Number(account.rank) === rank);
 
@@ -19,8 +23,11 @@ const HomePageWrapper = async () => {
     }
   });
 
+  const version = await fetchLatestVersion();
+  console.log("Version:", version);
+
   // Pass the data to the client component
-  return <HomePage topFive={topFive} />;
+  return <HomePage topFive={topFive} version={version!} />;
 };
 
 export default HomePageWrapper;

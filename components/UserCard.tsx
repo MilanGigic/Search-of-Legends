@@ -26,11 +26,13 @@ const UserCard = ({
   region,
   riotId,
   fullUrl,
+  version,
 }: {
   accountData: DbSummonerInfo;
   region: string;
   riotId: string;
   fullUrl: string;
+  version: string;
 }) => {
   const [tierImage, setTierImage] = useState<StaticImageData | undefined>(
     undefined
@@ -125,7 +127,7 @@ const UserCard = ({
         <div>
           <div className="flex items-center">
             <img
-              src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountData.profileIconId}.png`}
+              src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${accountData.profileIconId}.png`}
               width={80}
               className="rounded-full border-2 border-[#5C87F8] animate-pulse animate-duration-5000 mr-4"
             />

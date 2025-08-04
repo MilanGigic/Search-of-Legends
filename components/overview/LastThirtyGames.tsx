@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { champions, matchParticipants, matches } from "@/db/schema";
-import { kda } from "@/lib/riot";
+import { fetchLatestVersion, kda } from "@/lib/riot";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import Image from "next/image";
 import WinrateGauge from "../WinrateGauge";
@@ -88,6 +88,9 @@ const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
 
   console.log("Sorted:", sorted);
 
+  const version = await fetchLatestVersion();
+  console.log("Version:", version);
+
   return (
     <div className="p-5 py-3 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624]  shadow-sm shadow-[#2A2A40]">
       <div>
@@ -122,7 +125,7 @@ const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
           >
             <div className="flex items-center justify-center">
               <Image
-                src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${champ?.image}`}
+                src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${champ?.image}`}
                 alt={`${champ?.name}`}
                 width={40}
                 height={40}

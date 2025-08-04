@@ -29,10 +29,12 @@ const UserVsOpponent = ({
   user,
   opponent,
   showGame,
+  version,
 }: {
   user: DbParticipantData | null;
   opponent: DbParticipantData | null;
   showGame: boolean;
+  version: string;
 }) => {
   const userKda = user
     ? calculateKDA(user.kills!, user.deaths!, user.assists!)
@@ -52,7 +54,7 @@ const UserVsOpponent = ({
     <div className={`${size} flex-shrink-0`}>
       {itemId ? (
         <img
-          src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/item/${itemId}.png`}
+          src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${itemId}.png`}
           alt="Item"
           className="w-full h-full object-cover rounded-sm"
         />
@@ -79,7 +81,7 @@ const UserVsOpponent = ({
       <div className={`${size} flex-shrink-0`}>
         {spellName ? (
           <img
-            src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/spell/${spellName}.png`}
+            src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spellName}.png`}
             alt="Summoner Spell"
             className="w-full h-full object-cover rounded-sm"
             onError={(e) => {
@@ -165,7 +167,7 @@ const UserVsOpponent = ({
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0">
                 <img
-                  src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/champion/${user?.championName}.png`}
+                  src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${user?.championName}.png`}
                   alt={user?.championName!}
                   className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg border-2 border-white/20"
                 />
@@ -216,7 +218,7 @@ const UserVsOpponent = ({
             <div className="flex w-full items-center gap-3 sm:flex-row md:flex-row-reverse">
               <div className="flex-shrink-0">
                 <img
-                  src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/champion/${opponent?.championName}.png`}
+                  src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${opponent?.championName}.png`}
                   alt={opponent?.championName!}
                   className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg border-2 border-white/20"
                 />

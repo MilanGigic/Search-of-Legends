@@ -8,9 +8,11 @@ import RuneTable from "./RuneTable";
 const Runes = ({
   game,
   runesData,
+  version,
 }: {
   game: DbGameInfo;
   runesData: RiotMatchDto | null;
+  version: string;
 }) => {
   const [runesApi, setRunesApi] = useState<RuneStyle[] | null>(null);
   const [runeIcon, setRuneIcon] = useState<string | null>(null);
@@ -41,13 +43,13 @@ const Runes = ({
     };
 
     const mappedName = championMap[championName] || championName;
-    return `https://ddragon.leagueoflegends.com/cdn/15.14.1/img/champion/${mappedName}.png`;
+    return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${mappedName}.png`;
   };
 
   useEffect(() => {
     const fetchRunes = async () => {
       const res = await fetch(
-        `https://ddragon.leagueoflegends.com/cdn/15.14.1/data/en_US/runesReforged.json`
+        `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/runesReforged.json`
       );
 
       if (!res.ok) {

@@ -3,7 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
-export default function SearchForm({ placeholder }: { placeholder: string }) {
+export default function SearchForm({
+  placeholder,
+  version,
+}: {
+  placeholder: string;
+  version: string;
+}) {
   const [gameName, setGameName] = useState("");
   const [tagLine, setTagLine] = useState("");
   const [accountInfo, setAccountInfo] = useState<DbSummonerInfo | null>(null);
@@ -123,7 +129,7 @@ export default function SearchForm({ placeholder }: { placeholder: string }) {
             >
               <div className="flex items-center">
                 <Image
-                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${accountInfo.profileIconId}.png`}
+                  src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${accountInfo.profileIconId}.png`}
                   alt={``}
                   width={60}
                   height={60}

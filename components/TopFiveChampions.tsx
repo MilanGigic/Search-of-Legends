@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-const TopFiveChampions = () => {
+const TopFiveChampions = ({ version }: { version: string }) => {
   return (
     <div className="py-2 px-1 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624] ">
       <div className="shadow-2xl shadow-[#12162499]">
@@ -14,7 +14,7 @@ const TopFiveChampions = () => {
           <li className="text-center grid grid-cols-5 py-1 hover:bg-[#2A2A40] transition-colors duration-200 rounded-md cursor-pointer">
             <div className="flex items-center justify-start col-span-2 gap-2">
               <Image
-                src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/Quinn.png`}
+                src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/Quinn.png`}
                 alt={`Quinn`}
                 width={40}
                 height={40}
@@ -35,7 +35,7 @@ const TopFiveChampions = () => {
           <li className="text-center grid grid-cols-5 py-1 hover:bg-[#2A2A40] transition-colors duration-200 rounded-md cursor-pointer">
             <div className="flex items-center justify-start col-span-2 gap-2">
               <Image
-                src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/Lulu.png`}
+                src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/Lulu.png`}
                 alt={`Lulu`}
                 width={40}
                 height={40}
@@ -56,7 +56,7 @@ const TopFiveChampions = () => {
           <li className="text-center grid grid-cols-5 py-1 hover:bg-[#2A2A40] transition-colors duration-200 rounded-md cursor-pointer">
             <div className="flex items-center justify-start col-span-2 gap-2">
               <Image
-                src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/Nocturne.png`}
+                src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/Nocturne.png`}
                 alt={`Nocturne`}
                 width={40}
                 height={40}
@@ -77,7 +77,7 @@ const TopFiveChampions = () => {
           <li className="text-center grid grid-cols-5 py-1 hover:bg-[#2A2A40] transition-colors duration-200 rounded-md cursor-pointer">
             <div className="flex items-center justify-start col-span-2 gap-2">
               <Image
-                src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/Jinx.png`}
+                src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/Jinx.png`}
                 alt={`Jinx`}
                 width={40}
                 height={40}
@@ -98,7 +98,7 @@ const TopFiveChampions = () => {
           <li className="text-center grid grid-cols-5 py-1 hover:bg-[#2A2A40] transition-colors duration-200 rounded-md cursor-pointer">
             <div className="flex items-center justify-start col-span-2 gap-2">
               <Image
-                src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/Talon.png`}
+                src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/Talon.png`}
                 alt={`Talon`}
                 width={40}
                 height={40}

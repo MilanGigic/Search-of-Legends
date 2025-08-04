@@ -1,5 +1,6 @@
 "use client";
 
+import { fetchLatestVersion } from "@/lib/riot";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
@@ -25,6 +26,7 @@ const LeaderboardPage = () => {
   const [players, setPlayers] = useState<ChallengerPlayer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [latestVersion, setLatestVersion] = useState<string>("");
 
   const [currentPage, setCurrentPage] = useState(1);
   const playersPerPage = 25;
@@ -54,6 +56,16 @@ const LeaderboardPage = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
+
+  useEffect(() => {
+    const fetchVersion = async () => {
+      const version = await fetchLatestVersion();
+
+      setLatestVersion(version!);
+    };
+
+    fetchVersion();
+  }, []);
 
   const topThree = players.slice(0, 3);
   const remainingPlayers = players.slice(3);
@@ -170,7 +182,7 @@ const LeaderboardPage = () => {
           )}-${encodeURIComponent(topThree[1].tagLine!)}`}
           className="relative bg-black/30 ring-1 order-2 sm:order-1 ring-gray-400 rounded-xl shadow-[0_0_30px_rgba(192,192,192,0.5)] sm:hover:scale-105 transition-transform duration-300 backdrop-blur-lg p-4 flex flex-col items-center justify-center sm:min-h-[250px] mt-6"
           style={{
-            backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${topThree[1]?.profileIconId}.png)`,
+            backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/profileicon/${topThree[1]?.profileIconId}.png)`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -200,7 +212,7 @@ const LeaderboardPage = () => {
           )}-${encodeURIComponent(topThree[0].tagLine!)}`}
           className="relative bg-black/60 ring-1 ring-yellow-400 rounded-xl shadow-[0_0_40px_rgba(255,215,0,0.6)] sm:scale-105 sm:hover:scale-110 transition-transform duration-300 p-4 flex order-1 sm:order-2 flex-col items-center justify-center sm:min-h-[280px]"
           style={{
-            backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${topThree[0]?.profileIconId}.png)`,
+            backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/profileicon/${topThree[0]?.profileIconId}.png)`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -230,7 +242,7 @@ const LeaderboardPage = () => {
           )}-${encodeURIComponent(topThree[2].tagLine!)}`}
           className="relative bg-black/30 ring-1 ring-orange-400 rounded-xl shadow-[0_0_30px_rgba(205,127,50,0.5)] sm:hover:scale-105 transition-transform duration-300 backdrop-blur-lg order-3 p-4 flex flex-col items-center justify-center sm:min-h-[250px] mt-6"
           style={{
-            backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/15.6.1/img/profileicon/${topThree[2]?.profileIconId}.png)`,
+            backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/profileicon/${topThree[2]?.profileIconId}.png)`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -282,7 +294,7 @@ const LeaderboardPage = () => {
             <span className="col-span-3 text-start flex items-center">
               <span className="p-0.5 sm:p-2 sm:px-3 rounded-md sm:mr-3 text-xs">
                 <Image
-                  src={`https://ddragon.leagueoflegends.com/cdn/15.13.1/img/profileicon/${player.profileIconId}.png`}
+                  src={`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/profileicon/${player.profileIconId}.png`}
                   alt={player.gameName}
                   width={50}
                   height={50}

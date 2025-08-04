@@ -1,6 +1,7 @@
 "use client";
 
 import SpellCard from "@/components/champions-page/SpellCard";
+import { fetchLatestVersion } from "@/lib/riot";
 import { useSearchStore } from "@/lib/store/useSearchStore";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -107,10 +108,11 @@ const ChampionPage = () => {
     const fetchChampionDetails = async () => {
       if (!championId) return;
 
+      const version = await fetchLatestVersion();
       try {
         setIsLoading(true);
         const res = await fetch(
-          `https://ddragon.leagueoflegends.com/cdn/15.14.1/data/en_US/champion/${completedName}.json`
+          `https://ddragon.leagueoflegends.com/cdn/${version!}/data/en_US/champion/${completedName}.json`
         );
         if (!res.ok) {
           throw new Error(`Failed to fetch, ${res.status} ${res.statusText}`);

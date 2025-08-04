@@ -15,6 +15,7 @@ const Details = ({
   region,
   isActive,
   matchEvents,
+  version,
 }: {
   game: DbGameInfo;
   puuid: string;
@@ -22,6 +23,7 @@ const Details = ({
   region: string;
   isActive: ComponentState;
   matchEvents: MatchTimelineDto;
+  version: string;
 }) => {
   const [selectedParticipantId, setSelectedParticipantId] = useState<number>(1);
   const [champion, setChampion] = useState<ChampionDetail | null>(null);
@@ -58,7 +60,7 @@ const Details = ({
     };
 
     const mappedName = championMap[championName] || championName;
-    return `https://ddragon.leagueoflegends.com/cdn/15.14.1/img/champion/${mappedName}.png`;
+    return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${mappedName}.png`;
   };
 
   useEffect(() => {
@@ -126,10 +128,6 @@ const Details = ({
     const opponentAt15 = opponentEvents[15];
 
     if (!userAt15 || !opponentAt15) return null;
-
-    // const role = game.participants.find(
-    //   (participant) => participant.teamId === selectedParticipantId
-    // )?.teamPosition;
 
     return {
       user: {
@@ -263,7 +261,7 @@ const Details = ({
 
       console.log("Fetching data for champion:", participant.championName);
       const champRes = await fetch(
-        `https://ddragon.leagueoflegends.com/cdn/15.14.1/data/en_US/champion/${participant.championName}.json`
+        `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion/${participant.championName}.json`
       );
 
       if (!champRes.ok) {
@@ -283,8 +281,6 @@ const Details = ({
 
     getChampionSpell();
   }, [selectedParticipantId]);
-
-  // I HAVE DELETED ALL THE PERKS AND RUNE LOGIC, TRY TO FIGURE OUT HOW TO MAKE IT WORK
 
   useEffect(() => {
     console.log("Champion state data:", champion);
@@ -333,7 +329,6 @@ const Details = ({
         {/* @15 stats */}
         <div className="w-1/3 p-2 mt-4 border border-gray-700/70 shadow-sm shadow-[#2A2A40] bg-gradient-to-b from-[#1e2238] to-[#2a2f4a] rounded-md flex flex-col items-center">
           <header className="text-sm sm:text-base text-slate-300 font-semibold mb-2 ml-2 text-center items-center flex flex-col sm:flex-row gap-1">
-            {/* <GiCrossedSwords className="text-center items-center flex flex-col w-[20px] h-[20px]" />{" "} */}
             <Image
               src={`https://raw.communitydragon.org/latest/game/assets/ux/traiticons/trait_icon_4_duelist.png`}
               alt={`${(
@@ -474,7 +469,7 @@ const Details = ({
                   {group.items.map((item) => (
                     <div key={item.itemId} className="relative">
                       <Image
-                        src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/item/${item.itemId}.png`}
+                        src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${item.itemId}.png`}
                         alt={`Item ${item.itemId}`}
                         width={100}
                         height={100}
@@ -521,7 +516,7 @@ const Details = ({
                       className="relative h-7 flex items-center mb-1"
                     >
                       <Image
-                        src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/spell/${champion?.spells[index].image.full}`}
+                        src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${champion?.spells[index].image.full}`}
                         alt={`${participant.championName} ${champion?.id}`}
                         width={32}
                         height={32}

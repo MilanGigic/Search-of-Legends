@@ -23,8 +23,10 @@ type SortKey = "kda" | "gamesPlayed" | "winRate" | "csPerMin" | "dpm";
 
 export default function ChampionStatsClient({
   champions,
+  version,
 }: {
   champions: ChampionStat[];
+  version: string;
 }) {
   const [sortBy, setSortBy] = useState<SortKey>("gamesPlayed");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -146,7 +148,7 @@ export default function ChampionStatsClient({
           >
             <div className="flex items-center justify-start gap-0.5 pl-6">
               <Image
-                src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${champ.championImage}`}
+                src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${champ.championImage}`}
                 alt={champ.championName}
                 width={40}
                 height={40}

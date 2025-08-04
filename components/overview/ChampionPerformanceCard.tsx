@@ -1,8 +1,8 @@
-import fetchChampions from "@/lib/actions/fetchChampions";
 import { getChampionPerformance } from "@/lib/actions/getChampionPerformance";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { fetchLatestVersion } from "@/lib/riot";
 
 const ChampionPerformanceCard = async ({
   puuid,
@@ -19,6 +19,9 @@ const ChampionPerformanceCard = async ({
     .slice(0, 5);
 
   console.log("Top 5", top5);
+
+  const version = await fetchLatestVersion();
+  console.log("Version:", version);
   return (
     <div className="pt-5 border border-gray-700/70 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#121624] to-[#1B1F35]  shadow-sm shadow-[#2A2A40]">
       <div>
@@ -37,7 +40,7 @@ const ChampionPerformanceCard = async ({
             >
               <div className="flex items-center justify-center">
                 <Image
-                  src={`https://ddragon.leagueoflegends.com/cdn/15.6.1/img/champion/${champ.championImage}`}
+                  src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${champ.championImage}`}
                   alt={champ.championName}
                   width={40}
                   height={40}
@@ -56,8 +59,11 @@ const ChampionPerformanceCard = async ({
                 </span>
               </p>
 
-              <p className="flex items-center justify-center text-slate-300">
+              <p className="flex flex-col items-center justify-center text-slate-300">
                 {champ.gamesPlayed}
+                <span className="text-gray-400 text-xs">
+                  {champ.wins}W-{champ.losses}L
+                </span>
               </p>
 
               <p

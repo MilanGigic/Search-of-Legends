@@ -14,12 +14,14 @@ const General = ({
   showGame,
   region,
   isActive,
+  version,
 }: {
   game: DbGameInfo;
   puuid: string;
   showGame: boolean;
   region: string;
   isActive: ComponentState;
+  version: string;
 }) => {
   const blueTeamParticipants =
     game.participants?.filter((p) => p.teamId === 100) || [];
@@ -53,7 +55,7 @@ const General = ({
     };
 
     const mappedName = championMap[championName] || championName;
-    return `https://ddragon.leagueoflegends.com/cdn/15.14.1/img/champion/${mappedName}.png`;
+    return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${mappedName}.png`;
   };
 
   // Function to get summoner spell image URL
@@ -73,7 +75,7 @@ const General = ({
 
     const spellName = spellMap[spellId];
     return spellName
-      ? `https://ddragon.leagueoflegends.com/cdn/15.14.1/img/spell/${spellName}.png`
+      ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spellName}.png`
       : null;
   };
 
@@ -113,7 +115,7 @@ const General = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1 mb-1">
             <Image
-              src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/profileicon/${participant.profileIcon}.png`}
+              src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${participant.profileIcon}.png`}
               width={20}
               height={20}
               className="sm:w-6 sm:h-6 rounded"
@@ -170,7 +172,7 @@ const General = ({
                 return itemId ? (
                   <Image
                     key={itemSlot}
-                    src={`https://ddragon.leagueoflegends.com/cdn/15.14.1/img/item/${itemId}.png`}
+                    src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${itemId}.png`}
                     width={20}
                     height={20}
                     className="w-5 h-5 rounded"

@@ -15,7 +15,13 @@ import rammusOk from "@/assets/icons/rammus-ok.png";
 import zedShocked from "@/assets/icons/zed-shocked.png";
 import TopFivePlayers from "./TopFivePlayers";
 
-const HomePage = ({ topFive }: { topFive: DbSummonerInfo[] }) => {
+const HomePage = ({
+  topFive,
+  version,
+}: {
+  topFive: DbSummonerInfo[];
+  version: string;
+}) => {
   const [isMounted, setIsMounted] = useState(false);
   const controls = useAnimation();
   const h1Ref = useRef(null);
@@ -173,7 +179,10 @@ const HomePage = ({ topFive }: { topFive: DbSummonerInfo[] }) => {
             transition={{ delay: 0.6, duration: 0.5 }}
             className="w-full"
           >
-            <SearchForm placeholder={"Enter Summoner Name (e.g. Faker#KR1)"} />
+            <SearchForm
+              placeholder={"Enter Summoner Name (e.g. Faker#KR1)"}
+              version={version}
+            />
           </motion.div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-16 text-center">
@@ -225,7 +234,7 @@ const HomePage = ({ topFive }: { topFive: DbSummonerInfo[] }) => {
             <h2 className="text-lg font-semibold my-4 text-gray-200 text-center">
               Top Champions This Patch
             </h2>
-            <TopFiveChampions />
+            <TopFiveChampions version={version} />
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -236,7 +245,7 @@ const HomePage = ({ topFive }: { topFive: DbSummonerInfo[] }) => {
             <h2 className="text-lg font-semibold my-4 text-gray-200 text-center">
               Best of the Best
             </h2>
-            <TopFivePlayers topFive={topFive} />
+            <TopFivePlayers topFive={topFive} version={version} />
           </motion.div>
         </section>
 

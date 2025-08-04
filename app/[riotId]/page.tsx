@@ -8,6 +8,7 @@ import getRegionalEndpoint from "@/lib/actions/match-history/getRegionalEndpoint
 import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
+import { fetchLatestVersion } from "@/lib/riot";
 
 export interface AccountPageProps {
   params: { riotId: string };
@@ -63,6 +64,9 @@ const AccountPage = async ({ params }: AccountPageProps) => {
   );
 
   const fullUrl = headersList.get("x-url") || headersList.get("referer");
+
+  const version = await fetchLatestVersion();
+  console.log("Version:", version);
   return (
     <div className="relative z-10 min-h-screen p-4">
       <main className="relative z-10 w-full flex flex-col items-center justify-center">
@@ -72,6 +76,7 @@ const AccountPage = async ({ params }: AccountPageProps) => {
             region={REGION}
             riotId={riotId}
             fullUrl={fullUrl!}
+            version={version!}
           />
         </div>
 
@@ -82,6 +87,7 @@ const AccountPage = async ({ params }: AccountPageProps) => {
             matchHistory={matchHistory}
             puuid={puuid!}
             region={REGION}
+            version={version!}
           />
         </div>
       </main>

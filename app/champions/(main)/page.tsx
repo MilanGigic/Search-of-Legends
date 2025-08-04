@@ -1,6 +1,7 @@
 "use client";
 
 import ChampionCard from "@/components/champions-page/ChampionCard";
+import { fetchLatestVersion } from "@/lib/riot";
 import { ChangeEvent, useEffect, useState } from "react";
 
 const ChampionsPage = () => {
@@ -11,13 +12,24 @@ const ChampionsPage = () => {
   const [filteredChampions, setFilteredChampions] = useState<ChampionDetail[]>(
     []
   );
+  // useEffect(() => {
+  //   const fetchVersion = async () => {
+
+  //     console.log("Version:", version);
+
+  //     setLatestVersion(version!);
+  //   };
+
+  //   fetchVersion();
+  // }, []);
 
   useEffect(() => {
     async function fetchPosts() {
+      const version = await fetchLatestVersion();
       try {
         setIsLoading(true);
         const res = await fetch(
-          "https://ddragon.leagueoflegends.com/cdn/15.5.1/data/en_US/champion.json"
+          `https://ddragon.leagueoflegends.com/cdn/${version!}/data/en_US/champion.json`
         );
         if (!res.ok) {
           throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);

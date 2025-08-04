@@ -9,6 +9,7 @@ import getRegionalEndpoint from "@/lib/actions/match-history/getRegionalEndpoint
 import { getChampionPerformance } from "@/lib/actions/getChampionPerformance";
 import Image from "next/image";
 import ChampionStatsClient from "@/components/champions/ChampionStatsClient";
+import { fetchLatestVersion } from "@/lib/riot";
 
 const ChampionsPage = async ({ params }: AccountPageProps) => {
   const { riotId } = await params;
@@ -47,6 +48,8 @@ const ChampionsPage = async ({ params }: AccountPageProps) => {
 
   const accountData = existingAccount ?? account!;
 
+  const version = await fetchLatestVersion();
+
   if (!accountData?.region) {
     console.error("Missing region for account:", accountData);
     return notFound();
@@ -64,9 +67,10 @@ const ChampionsPage = async ({ params }: AccountPageProps) => {
         region={REGION}
         riotId={riotId}
         fullUrl={fullUrl!}
+        version={version!}
       />
       <div className="pt-5 border border-gray-700/70 sm:mt-3 max-w-5xl mx-auto rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#121624] to-[#1B1F35]  shadow-sm shadow-[#2A2A40]">
-        <ChampionStatsClient champions={champions} />
+        <ChampionStatsClient champions={champions} version={version!} />
       </div>
     </div>
   );
