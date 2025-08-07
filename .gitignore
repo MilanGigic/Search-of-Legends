@@ -43,3 +43,5 @@ next-env.d.ts
 v10
 
 .vscode
+
+joined-match_participants.json
