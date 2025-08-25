@@ -583,12 +583,12 @@ interface ChampionDetail {
     w: number;
     h: number;
   };
-  skins: Array<{
+  skins: {
     id: string;
     num: number;
     name: string;
     chromas: boolean;
-  }>;
+  }[];
   lore: string;
   blurb: string;
   allytips: string[];
@@ -604,7 +604,7 @@ interface ChampionDetail {
   stats: {
     [key: string]: number;
   };
-  spells: Array<{
+  spells: {
     id: string;
     name: string;
     description: string;
@@ -622,7 +622,7 @@ interface ChampionDetail {
       w: number;
       h: number;
     };
-  }>;
+  }[];
   passive: {
     name: string;
     description: string;

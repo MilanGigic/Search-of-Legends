@@ -70,7 +70,7 @@ const AccountPage = async ({ params }: AccountPageProps) => {
   return (
     <div className="relative z-10 min-h-screen p-4">
       <main className="relative z-10 w-full flex flex-col items-center justify-center">
-        <div className="w-full flex flex-col ">
+        <div className="w-full flex flex-col">
           <UserCard
             accountData={accountData}
             region={REGION}

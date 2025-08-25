@@ -1,19 +1,25 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import ChampionHoverPreview from "./ChampionHoverPreview";
 
 const ChampionCard = ({
   name,
   title,
   role,
+  champion,
 }: {
   name: string;
   title: string;
   role: string;
+  champion: ChampionDetail;
 }) => {
   // Switch cases for image url bug for names like: Dr. Mundo, Kai'Sa = Transformed to DrMundo, Kaisa
   const [completedName, setCompletedName] = useState<string>(name);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
+
   useEffect(() => {
     switch (name) {
       case "Aurelion Sol":
@@ -83,17 +89,39 @@ const ChampionCard = ({
   }, [name]);
 
   return (
-    <Link
-      href={`/champions/${completedName}`}
-      className="relative  ring-1 order-2 sm:order-1 ring-gray-400 rounded-xl shadow-[0_0_30px_rgba(192,192,192,0.5)] sm:hover:scale-105 transition-transform duration-300 p-4 flex flex-col items-center justify-end sm:h-[125px] sm:w-[145px]"
-      style={{
-        backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${completedName}_0.jpg)`,
-        backgroundSize: "100% 100%",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-      <h1 className="font-bold text-base text-yellow-400/95">{name}</h1>
-    </Link>
+    <div className="relative">
+      <Link
+        href={`/champions/${completedName}`}
+        className="sm:hover:scale-105 transition-transform duration-300 p-4 flex flex-col items-center justify-end sm:h-[115px] sm:w-[135px]"
+        onMouseEnter={() => setShowPreview(true)}
+        onMouseLeave={() => setShowPreview(false)}
+      >
+        <div className="text-center flex flex-col items-center justify-center">
+          <Image
+            src={`https://ddragon.leagueoflegends.com/cdn/15.16.1/img/champion/${completedName}.png`}
+            alt={completedName}
+            width={100}
+            height={100}
+          />
+          <h1 className="font-bold text-xs text-yellow-400/95">{name}</h1>
+        </div>
+      </Link>
+      <div
+        className={`absolute left-full -top-4 ml-6 z-50 transition-all duration-200  ${
+          showPreview
+            ? "opacity-100 visible translate-x-0"
+            : "opacity-0 invisible -translate-x-4"
+        }`}
+        onMouseEnter={() => setShowPreview(true)}
+        onMouseLeave={() => setShowPreview(false)}
+      >
+        <ChampionHoverPreview
+          championId={name}
+          champion={champion}
+          completedName={completedName}
+        />
+      </div>
+    </div>
   );
 };
 export default ChampionCard;

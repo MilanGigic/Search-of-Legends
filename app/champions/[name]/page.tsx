@@ -108,9 +108,12 @@ const ChampionPage = () => {
     const fetchChampionDetails = async () => {
       if (!championId) return;
 
+      console.log("Fetching details for champion ID:", championId);
+
       const version = await fetchLatestVersion();
       try {
         setIsLoading(true);
+
         const res = await fetch(
           `https://ddragon.leagueoflegends.com/cdn/${version!}/data/en_US/champion/${completedName}.json`
         );
@@ -242,13 +245,21 @@ const ChampionPage = () => {
                   championVideoKeySpell !== null &&
                   spell.id === championVideoKeySpell
               )
-              .map((spell) => (
+              .map((spell, index) => (
                 <div
                   className="flex flex-col items-center border-t-2"
                   key={spell.id}
                 >
                   <h2 className="bg-[#C89B3C] text-[#EAEAEA] p-2 px-3 items-center text-center rounded-full mb-2">
-                    {spell.id.slice(-1)}
+                    {index === 0
+                      ? "Q"
+                      : index === 1
+                      ? "W"
+                      : index === 2
+                      ? "E"
+                      : index === 3
+                      ? "R"
+                      : null}
                   </h2>
                   <div className="text-start text-[#EAEAEA] h-[150px] text-sm tracking-tight">
                     {spell.name} - <strong>{spell.description}</strong>

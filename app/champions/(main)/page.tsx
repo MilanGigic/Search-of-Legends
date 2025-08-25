@@ -1,6 +1,7 @@
 "use client";
 
 import ChampionCard from "@/components/champions-page/ChampionCard";
+import ChampionHoverPreview from "@/components/champions-page/ChampionHoverPreview";
 import { fetchLatestVersion } from "@/lib/riot";
 import { ChangeEvent, useEffect, useState } from "react";
 
@@ -74,8 +75,11 @@ const ChampionsPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen text-gray-100">
-      <div className="container bg-[#2A2A40]/50 pt-16 border-x p-4 shadow-2xl min-h-screen border-gray-500 flex flex-col items-center justify-start">
+    <div className="flex flex-col min-h-screen items-center text-gray-100">
+      <div className="container max-w-6xl z-10 mx-auto bg-gradient-to-b text-slate-300 from-[#121624] to-[#1B1F35] border-b border-slate-400 shadow-[#2A2A40] px-6 sm:px-4 pt-4">
+        Popular champions
+      </div>
+      <div className="bg-gradient-to-b w-full z-10 from-[#121624] via-[#1B1F35] to-[#121624] shadow-sm shadow-[#2A2A40] border rounded-md border-gray-700/70 mt-4 max-w-6xl">
         <input
           placeholder="Search for a champion..."
           type="search"
@@ -83,13 +87,31 @@ const ChampionsPage = () => {
           value={searchQuery}
           onChange={(e) => handleSearch(e)}
         />
-        <div className="flex justify-center items-center">
-          {isLoading && (
+        {isLoading && (
+          <div className="flex justify-center items-center">
             <div className="loader animate-spin ease-linear rounded-full border-y-4 border-cyan-500 h-12 w-12" />
-          )}
-          {error && <p className="text-red-500">Error: {error}</p>}
-        </div>
+            {error && <p className="text-red-500">Error: {error}</p>}
+          </div>
+        )}
         {posts && !isLoading && (
+          <div className="flex flex-col max-w-4xl items-center justify-center mt-4 mx-auto">
+            <div className="grid grid-cols-4 md:grid-cols-7 lg:grid-cols-8 gap-2">
+              {filteredChampions.map((champion) => (
+                <div key={champion.id} className="cursor-pointer">
+                  <ChampionCard
+                    name={champion.name}
+                    title={champion.title}
+                    champion={champion}
+                    role={champion.tags[0]}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* {posts && !isLoading && (
           <div className="container flex flex-col items-center justify-center">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-10 gap-2">
               {filteredChampions.map((champion) => (
@@ -106,8 +128,7 @@ const ChampionsPage = () => {
               ))}
             </div>
           </div>
-        )}
-      </div>
+        )} */}
     </div>
   );
 };
