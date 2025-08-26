@@ -2,9 +2,7 @@
 
 import pLimit from "p-limit";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import SearchForm from "@/components/SearchForm";
 import GameMatchCard from "./GameMatchCard";
-import UserStats from "./UserStats";
 import checkDbGames from "@/lib/actions/checkDbGames";
 import { createRiotRateLimiter } from "@/lib/actions/rateLimiter";
 
@@ -259,6 +257,7 @@ const MatchHistorySection = ({
         };
 
         const failedChecks = Object.entries(validationChecks)
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           .filter(([_, passed]) => !passed)
           .map(([check]) => check);
 

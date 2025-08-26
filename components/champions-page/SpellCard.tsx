@@ -4,8 +4,6 @@ import { useSearchStore } from "@/lib/store/useSearchStore";
 import Image from "next/image";
 
 const SpellCard = ({ champion }: { champion: ChampionDetail | null }) => {
-  if (!champion || champion === null) return null;
-
   const setChampionVideoKey = useSearchStore(
     (state) => state.setChampionVideoKeySpell
   );
@@ -14,6 +12,7 @@ const SpellCard = ({ champion }: { champion: ChampionDetail | null }) => {
     setChampionVideoKey(spellId);
     console.log("Spell ID:", spellId);
   };
+  if (!champion || champion === null) return null;
 
   return (
     <div className="flex gap-5">

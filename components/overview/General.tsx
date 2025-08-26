@@ -7,6 +7,8 @@ type TabOption = "general" | "details" | "runes";
 interface ComponentState {
   activeTab: TabOption;
 }
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 
 const General = ({
   game,

@@ -16,7 +16,7 @@ export async function fetchMatchIdsByPuuid(
 export async function fetchMatchDetails(
   matchId: string,
   region: string
-): Promise<any> {
+): Promise<RiotMatchDto> {
   const response = await fetch(
     `https://${region}.api.riotgames.com/lol/match/v5/matches/${matchId}`,
     {

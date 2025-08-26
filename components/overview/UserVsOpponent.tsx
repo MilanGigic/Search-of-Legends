@@ -1,4 +1,6 @@
 import { calculateCsPerMin } from "@/lib/riot";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 
 const getSummonerSpellImage = (spellId: number) => {
   const spellMap: Record<number, string> = {

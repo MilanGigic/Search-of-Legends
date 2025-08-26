@@ -2,7 +2,7 @@ interface ValidationResult {
   isValid: boolean;
   errors: string[];
 }
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Validates a match data object to ensure it has the required structure and valid data
  * @param match - The match object to validate

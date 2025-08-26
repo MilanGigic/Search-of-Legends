@@ -12,6 +12,7 @@ import Image from "next/image";
 import { TbListDetails } from "react-icons/tb";
 import { CgChart } from "react-icons/cg";
 import GrayRunesIcon from "@/assets/icons/GrayRuneSymbol.png";
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 
 type TabOption = "general" | "details" | "runes";
 

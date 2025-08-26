@@ -34,6 +34,7 @@ const UserCard = ({
   fullUrl: string;
   version: string;
 }) => {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const [tierImage, setTierImage] = useState<StaticImageData | undefined>(
     undefined
   );

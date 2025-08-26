@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import RuneTable from "./RuneTable";
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 const Runes = ({
   game,

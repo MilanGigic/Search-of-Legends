@@ -12,6 +12,7 @@ import {
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const { searchParams } = new URL(req.url);
   const puuid = searchParams.get("puuid");
   const matchIds = searchParams.get("matchIds");
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
       }
     } catch (e) {
       return NextResponse.json(
-        { error: "Invalid matchIds format" },
+        { error: "Invalid matchIds format", e },
         { status: 400 }
       );
     }

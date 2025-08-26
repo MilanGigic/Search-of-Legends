@@ -1,6 +1,6 @@
 // lib/riot-sync-service.ts
 import { db } from "@/db"; // Your Drizzle DB connection
-import { accounts, matches } from "@/db/schema/index"; // Adjust this based on your actual schema
+import { accounts } from "@/db/schema/index"; // Adjust this based on your actual schema
 import {
   fetchMatchIdsByPuuid,
   fetchMatchDetails,

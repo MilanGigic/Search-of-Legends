@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { matchParticipants, champions } from "@/db/schema";
+import { matchParticipants } from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { kda } from "../riot";
 

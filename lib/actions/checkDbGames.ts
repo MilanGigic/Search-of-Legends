@@ -1,4 +1,6 @@
 import validateMatchData from "./validateMatchData";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 
 export default async function checkDbGames(puuid: string, matchIds: string[]) {
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -110,6 +112,7 @@ export default async function checkDbGames(puuid: string, matchIds: string[]) {
     }
 
     // Step 7: Parse and validate response JSON
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let responseData: any;
     try {
       responseData = await res.json();

@@ -8,7 +8,7 @@ const HomePageWrapper = async () => {
   // Fetch data on the server
   const accounts = await db.query.accounts.findMany();
 
-  let topFive: DbSummonerInfo[] = [];
+  const topFive: DbSummonerInfo[] = [];
   // for (const rank of five) {
   //   topFive = accounts.filter((account) => Number(account.rank) === rank);
   // }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, User, BarChart2, Zap, MenuIcon, X } from "lucide-react";
+import { Home, User, BarChart2, Zap, X } from "lucide-react";
 import Link from "next/link";
 import { useSearchStore } from "@/lib/store/useSearchStore";
 import SearchForm from "./SearchForm";
@@ -44,7 +44,7 @@ export default function Sidebar() {
             >
               <Zap size={20} /> AI Coach
             </Link>
-            <SearchForm placeholder={"Search..."} />
+            <SearchForm placeholder={"Search..."} version={"16.6.1"} />
           </div>
           <div className="text-xs text-gray-500 text-center">SoL.gg © 2025</div>
         </div>

@@ -1,9 +1,11 @@
 import { db } from "@/db";
 import { champions, matchParticipants, matches } from "@/db/schema";
 import { fetchLatestVersion, kda } from "@/lib/riot";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import Image from "next/image";
 import WinrateGauge from "../WinrateGauge";
+
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 
 const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
   // Step 1: Get the last 30 match IDs for this player
@@ -111,9 +113,6 @@ const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
         const avgKills = stats.kills / stats.time;
         const avgDeaths = stats.deaths / stats.time;
         const avgAssists = stats.assists / stats.time;
-        const avgCS = stats.cs / stats.time;
-        const winRate = (stats.wins / stats.gamesPlayed) * 100;
-        const avgDmg = stats.damage / stats.time;
         const userKda = kda(avgKills, avgDeaths, avgAssists);
 
         return (

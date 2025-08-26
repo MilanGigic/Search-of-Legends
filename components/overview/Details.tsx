@@ -8,6 +8,9 @@ import ward from "@/assets/icons/ward-icon.png";
 import helmet from "@/assets/icons/helmet.png";
 import VSIcon from "@/assets/icons/VSIcon.png";
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+
 const Details = ({
   game,
   puuid,
@@ -31,9 +34,6 @@ const Details = ({
   const [user, setUser] = useState<DbParticipantData | null>(null);
   const [opponent, setOpponent] = useState<DbParticipantData | null>(null);
 
-  if (!game.participants || game.participants.length === 0) {
-    return <div>Loading game data...</div>;
-  }
   const getChampionImageUrl = (championName: string) => {
     const championMap: { [key: string]: string } = {
       "Aurelion Sol": "AurelionSol",
@@ -288,6 +288,10 @@ const Details = ({
   useEffect(() => {
     console.log("All data:", user, opponent, matchEvents, game, puuid);
   }, []);
+
+  if (!game.participants || game.participants.length === 0) {
+    return <div>Loading game data...</div>;
+  }
 
   const SPELLS = ["Q", "W", "E", "R"];
   return (

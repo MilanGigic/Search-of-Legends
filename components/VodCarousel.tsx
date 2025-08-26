@@ -1,52 +1,12 @@
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 
+type VideoType = {
+  id: string;
+  title: string;
+};
+
 const VideoCarousel = () => {
-  // Sample video data - replace with your actual data
-  // const videos = [
-  //   {
-  //     id: 1,
-  //     title: "Epic Gaming Moments",
-  //     thumbnail: "/api/placeholder/170/104",
-  //     duration: "12:34",
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Pro Strategies Guide",
-  //     thumbnail: "/api/placeholder/170/104",
-  //     duration: "8:45",
-  //   },
-  //   {
-  //     id: 3,
-  //     title: "Best Plays Compilation",
-  //     thumbnail: "/api/placeholder/170/104",
-  //     duration: "15:20",
-  //   },
-  //   {
-  //     id: 4,
-  //     title: "Tutorial Series",
-  //     thumbnail: "/api/placeholder/170/104",
-  //     duration: "6:12",
-  //   },
-  //   {
-  //     id: 5,
-  //     title: "Highlights Reel",
-  //     thumbnail: "/api/placeholder/170/104",
-  //     duration: "9:33",
-  //   },
-  //   {
-  //     id: 6,
-  //     title: "Stream Recap",
-  //     thumbnail: "/api/placeholder/170/104",
-  //     duration: "22:18",
-  //   },
-  //   {
-  //     id: 7,
-  //     title: "Challenge Run",
-  //     thumbnail: "/api/placeholder/170/104",
-  //     duration: "18:45",
-  //   },
-  // ];
   const videos = [
     { id: "2512086416", title: "Twitch VOD 1" },
     { id: "2511803222", title: "Twitch VOD 2" },
@@ -84,14 +44,14 @@ const VideoCarousel = () => {
     setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
     setTimeout(() => setIsTransitioning(false), 300);
   };
-  const smallDeviceGoToNext = () => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentIndex((prev) => Math.min(smallDeviceMaxIndex, prev + 1));
-    setTimeout(() => setIsTransitioning(false), 300);
-  };
+  // const smallDeviceGoToNext = () => {
+  //   if (isTransitioning) return;
+  //   setIsTransitioning(true);
+  //   setCurrentIndex((prev) => Math.min(smallDeviceMaxIndex, prev + 1));
+  //   setTimeout(() => setIsTransitioning(false), 300);
+  // };
 
-  const handleVideoClick = (video: any) => {
+  const handleVideoClick = (video: VideoType) => {
     console.log("Playing video:", video.title);
     // Add your video play logic here
   };
@@ -130,7 +90,7 @@ const VideoCarousel = () => {
 
           {/* Video Items */}
           <div className="gap-2 h-full items-center hidden sm:flex">
-            {visibleVideos.map((video, index) => (
+            {visibleVideos.map((video) => (
               <div
                 key={video.id}
                 onClick={() => handleVideoClick(video)}
@@ -158,7 +118,7 @@ const VideoCarousel = () => {
             ))}
           </div>
           <div className="gap-2 h-full items-center flex sm:hidden">
-            {smallDeviceVisibleVideos.map((video, index) => (
+            {smallDeviceVisibleVideos.map((video) => (
               <div
                 key={video.id}
                 onClick={() => handleVideoClick(video)}

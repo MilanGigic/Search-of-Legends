@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 const ChampionPage = () => {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const params = useParams();
   const championId = params.name as string;
 

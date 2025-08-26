@@ -53,7 +53,7 @@ export default function SearchForm({
         if (!data) throw new Error("Empty data");
 
         setAccountInfo(data);
-      } catch (err: any) {
+      } catch (err) {
         setError(`Sorry, we couldn't find what you're looking for: ${err}`);
         setAccountInfo(null);
       } finally {

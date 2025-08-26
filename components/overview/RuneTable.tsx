@@ -1,5 +1,5 @@
 import Image from "next/image";
-
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 const RuneTable = ({
   participant,
   runesApi,

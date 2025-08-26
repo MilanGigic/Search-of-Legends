@@ -14,9 +14,7 @@ const ChampionHoverPreview = ({
   champion: ChampionDetail;
   completedName: string;
 }) => {
-  // const [champion, setChampion] = useState<ChampionDetail | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
   const [championVideoKey, setChampionVideoKey] = useState<string | null>(null);
   const [championVideoSpell, setChampionVideoSpell] = useState<string | null>(
     "P"

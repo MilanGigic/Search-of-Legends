@@ -1,6 +1,5 @@
 import { db } from "@/db";
 import {
-  accounts,
   matchBans,
   matchDetails,
   matches,

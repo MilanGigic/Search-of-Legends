@@ -9,6 +9,7 @@ const WinrateGauge = ({
   subtitle: string;
   size: number;
 }) => {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   // Calculate the semicircle properties
   const radius = (size - 8) / 2; // Account for stroke width
   const circumference = Math.PI * radius; // Half circle circumference

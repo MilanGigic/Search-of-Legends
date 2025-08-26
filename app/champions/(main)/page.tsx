@@ -1,7 +1,6 @@
 "use client";
 
 import ChampionCard from "@/components/champions-page/ChampionCard";
-import ChampionHoverPreview from "@/components/champions-page/ChampionHoverPreview";
 import { fetchLatestVersion } from "@/lib/riot";
 import { ChangeEvent, useEffect, useState } from "react";
 

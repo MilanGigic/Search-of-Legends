@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
 import Spotlight from "@/components/ui/spotlight";
-import { SessionProvider } from "next-auth/react";
 import { Providers } from "./providers";
 
 const bebasNeue = Bebas_Neue({

@@ -7,7 +7,6 @@ import { and, eq } from "drizzle-orm";
 import { accounts } from "@/db/schema";
 import getRegionalEndpoint from "@/lib/actions/match-history/getRegionalEndpoint";
 import { getChampionPerformance } from "@/lib/actions/getChampionPerformance";
-import Image from "next/image";
 import ChampionStatsClient from "@/components/champions/ChampionStatsClient";
 import { fetchLatestVersion } from "@/lib/riot";
 
