@@ -4,7 +4,7 @@ import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { ExpressAdapter } from "@bull-board/express";
 import { leaderboardQueue } from "../jobs/leaderboardQueue";
-import { leaderboardGamesQueue } from "../jobs/gamesQueue";
+import { gamesQueue } from "../jobs/gamesQueue";
 
 console.log("✅ Starting Bull Board Express server...");
 
@@ -16,7 +16,7 @@ try {
   createBullBoard({
     queues: [
       new BullMQAdapter(leaderboardQueue),
-      new BullMQAdapter(leaderboardGamesQueue),
+      new BullMQAdapter(gamesQueue),
     ],
     serverAdapter,
   });
