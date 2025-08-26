@@ -3,7 +3,7 @@ import { Pool } from "pg";
 import * as schema from "@/db/schema/index"; // ✅ import your schema
 
 const pool = new Pool({
-  connectionString: process.env.SOLDB_URL,
+  connectionString: process.env.DATABASE_URL,
 });
 
 console.log("Loaded DB URL:", process.env.SOLDB_URL);

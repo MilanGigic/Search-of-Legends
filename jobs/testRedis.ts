@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config(); // load .env if you're using it
 
-const redis = new IORedis(process.env.REDIS_URL!);
+const redis = new IORedis(process.env.SOLDB_REDIS_URL!);
 
 redis
   .ping()
