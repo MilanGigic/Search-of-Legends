@@ -6,6 +6,6 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-console.log("Loaded DB URL:", process.env.SOLDB_URL);
+console.log("Loaded DB URL:", process.env.DATABASE_URL);
 
 export const db = drizzle(pool, { schema }); // ✅ include schema

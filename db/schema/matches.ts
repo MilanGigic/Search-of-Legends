@@ -1,11 +1,4 @@
-import {
-  integer,
-  pgTable,
-  primaryKey,
-  serial,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { accounts } from "./accounts";
 
 export const matches = pgTable("matches", {
