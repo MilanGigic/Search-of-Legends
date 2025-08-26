@@ -10,7 +10,7 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { fetchLatestVersion } from "@/lib/riot";
 
-export interface AccountPageProps {
+interface AccountPageProps {
   params: { riotId: string };
 }
 

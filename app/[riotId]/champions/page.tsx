@@ -1,5 +1,4 @@
 import UserCard from "@/components/UserCard";
-import { AccountPageProps } from "../page";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { db } from "@/db";
@@ -9,6 +8,10 @@ import getRegionalEndpoint from "@/lib/actions/match-history/getRegionalEndpoint
 import { getChampionPerformance } from "@/lib/actions/getChampionPerformance";
 import ChampionStatsClient from "@/components/champions/ChampionStatsClient";
 import { fetchLatestVersion } from "@/lib/riot";
+
+interface AccountPageProps {
+  params: { riotId: string };
+}
 
 const ChampionsPage = async ({ params }: AccountPageProps) => {
   const { riotId } = await params;
