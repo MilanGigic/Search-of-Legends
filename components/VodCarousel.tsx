@@ -26,10 +26,10 @@ const VideoCarousel = () => {
 
   // Calculate max index to prevent going beyond available videos
   const maxIndex = Math.max(0, videos.length - videosPerView);
-  const smallDeviceMaxIndex = Math.max(
-    0,
-    videos.length - smallDeviceVideosPerView
-  );
+  // const smallDeviceMaxIndex = Math.max(
+  //   0,
+  //   videos.length - smallDeviceVideosPerView
+  // );
 
   const goToPrevious = () => {
     if (isTransitioning) return;

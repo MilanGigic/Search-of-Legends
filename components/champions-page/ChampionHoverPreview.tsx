@@ -2,8 +2,11 @@
 
 import { useSearchStore } from "@/lib/store/useSearchStore";
 import { useEffect, useMemo, useState } from "react";
-import SpellCard from "./SpellCard";
 import Image from "next/image";
+
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 const ChampionHoverPreview = ({
   championId,
@@ -14,7 +17,6 @@ const ChampionHoverPreview = ({
   champion: ChampionDetail;
   completedName: string;
 }) => {
-  /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
   const [championVideoKey, setChampionVideoKey] = useState<string | null>(null);
   const [championVideoSpell, setChampionVideoSpell] = useState<string | null>(
     "P"

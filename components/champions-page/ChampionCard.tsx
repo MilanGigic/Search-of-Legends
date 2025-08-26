@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import ChampionHoverPreview from "./ChampionHoverPreview";
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const ChampionCard = ({
   name,
   title,
