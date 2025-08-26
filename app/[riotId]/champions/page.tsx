@@ -10,7 +10,7 @@ import ChampionStatsClient from "@/components/champions/ChampionStatsClient";
 import { fetchLatestVersion } from "@/lib/riot";
 
 interface AccountPageProps {
-  params: { riotId: string };
+  params: Promise<{ riotId: string }>; // params is now a Promise
 }
 
 const ChampionsPage = async ({ params }: AccountPageProps) => {
