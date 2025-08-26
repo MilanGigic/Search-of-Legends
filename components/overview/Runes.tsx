@@ -1,6 +1,5 @@
 "use client";
 
-import { perks } from "@/lib/perks";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import RuneTable from "./RuneTable";

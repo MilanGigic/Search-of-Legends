@@ -13,6 +13,31 @@ const ChampionsPage = () => {
   const [filteredChampions, setFilteredChampions] = useState<ChampionDetail[]>(
     []
   );
+  // const [top10Champions, setTop10Champions] = useState<
+  //   Record<string, number>[]
+  // >([]);
+
+  // useEffect(() => {
+  //   const fetchTop10Champions = async () => {
+  //     try {
+  //       const res = await fetch(
+  //         `${process.env.NEXT_PUBLIC_BASE_URL}/api/most-popular-champions`,
+  //         {
+  //           method: "GET",
+  //         }
+  //       );
+  //       if (!res.ok) {
+  //         throw new Error(`Failed to fetch, ${res.status} ${res.statusText}`);
+  //       }
+  //       const data: Record<string, number>[] = await res.json();
+  //       setTop10Champions(data);
+  //       console.log("Top 10 Champions:", data);
+  //     } catch (error) {
+  //       console.error("Error fetching top 10 champions:", error);
+  //     }
+  //   };
+  //   fetchTop10Champions();
+  // }, []);
   // useEffect(() => {
   //   const fetchVersion = async () => {
 
@@ -78,6 +103,9 @@ const ChampionsPage = () => {
     <div className="flex flex-col min-h-screen items-center text-gray-100">
       <div className="container max-w-6xl z-10 mx-auto bg-gradient-to-b text-slate-300 from-[#121624] to-[#1B1F35] border-b border-slate-400 shadow-[#2A2A40] px-6 sm:px-4 pt-4">
         Popular champions
+        {/* {top10Champions.map((champion, index) => (
+          <div>{/* {champion}</div>
+        ))} */}
       </div>
       <div className="bg-gradient-to-b w-full z-10 from-[#121624] via-[#1B1F35] to-[#121624] shadow-sm shadow-[#2A2A40] border rounded-md border-gray-700/70 mt-4 max-w-6xl">
         <input
