@@ -59,7 +59,10 @@ const Header = ({ showSearch }: { showSearch?: boolean }) => {
             <div className="flex items-center w-full gap-2">
               <div className="max-w-xs sm:block sm:max-w-md h-12 mr-8">
                 {!isOpen ? (
-                  <SearchForm placeholder="Search for a Summoner..." />
+                  <SearchForm
+                    placeholder="Search for a Summoner..."
+                    version={"16.6.1"}
+                  />
                 ) : null}
               </div>
               <span className="cursor-pointer relative flex items-center justify-center z-100 w-12 h-12 hover:opacity-70 transition-all duration-100">
@@ -89,7 +92,10 @@ const Header = ({ showSearch }: { showSearch?: boolean }) => {
                 Leaderboard
               </Link>
               <div className="hidden sm:block max-w-md h-12">
-                <SearchForm placeholder="Search for a Summoner..." />
+                <SearchForm
+                  placeholder="Search for a Summoner..."
+                  version={"16.6.1"}
+                />
               </div>
               <Link
                 href="/champions"
