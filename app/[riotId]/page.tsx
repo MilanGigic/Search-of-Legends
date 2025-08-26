@@ -11,7 +11,7 @@ import { headers } from "next/headers";
 import { fetchLatestVersion } from "@/lib/riot";
 
 interface AccountPageProps {
-  params: { riotId: string };
+  params: Promise<{ riotId: string }>; // params is now a Promise
 }
 
 const AccountPage = async ({ params }: AccountPageProps) => {
