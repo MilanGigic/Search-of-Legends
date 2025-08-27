@@ -17,7 +17,7 @@ export default function SearchForm({
   const [error, setError] = useState("");
   const [inputValue, setInputValue] = useState<string>("");
 
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL!;
+  const BASE_URL = process.env.NEXT_PUBLIC_VERCEL_URL!;
 
   useEffect(() => {
     const fetchAccount = async () => {
