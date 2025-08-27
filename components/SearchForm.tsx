@@ -17,7 +17,7 @@ export default function SearchForm({
   const [error, setError] = useState("");
   const [inputValue, setInputValue] = useState<string>("");
 
-  const BASE_URL = process.env.NEXT_PUBLIC_VERCEL_URL!;
+  // const BASE_URL = process.env.NEXT_PUBLIC_VERCEL_URL!;
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -28,7 +28,7 @@ export default function SearchForm({
 
       const fetchData = async (): Promise<DbSummonerInfo | null> => {
         const res = await fetch(
-          `${BASE_URL}/api/account?gameName=${gameName}&tagLine=${tagLine}`
+          `/api/account?gameName=${gameName}&tagLine=${tagLine}`
         );
 
         if (!res.ok) {
@@ -36,7 +36,7 @@ export default function SearchForm({
           if (res.status === 404 || res.status === 500) {
             await new Promise((r) => setTimeout(r, 1000));
             const retryRes = await fetch(
-              `${BASE_URL}/api/account?gameName=${gameName}&tagLine=${tagLine}`
+              `/api/account?gameName=${gameName}&tagLine=${tagLine}`
             );
             if (!retryRes.ok) throw new Error(retryRes.statusText);
             return await retryRes.json();
