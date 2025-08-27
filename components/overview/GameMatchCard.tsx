@@ -76,7 +76,7 @@ const GameMatchCard = ({
         region
       );
       const eventsRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/match-events?matchId=${game.info.matchId}&region=${region}`
+        `/api/match-events?matchId=${game.info.matchId}&region=${region}`
       );
 
       if (!eventsRes.ok) {
@@ -102,7 +102,7 @@ const GameMatchCard = ({
         region
       );
       const runesRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/game-info-for-runes-page?matchId=${game.info.matchId}&region=${region}`
+        `/api/game-info-for-runes-page?matchId=${game.info.matchId}&region=${region}`
       );
 
       if (!runesRes.ok) {
