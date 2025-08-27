@@ -3,8 +3,6 @@ import validateMatchData from "./validateMatchData";
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 
 export default async function checkDbGames(puuid: string, matchIds: string[]) {
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-
   // Step 1: Enhanced input validation
   if (!puuid || typeof puuid !== "string" || puuid.trim().length === 0) {
     console.error("checkDbGames: Invalid puuid provided:", puuid);
@@ -37,23 +35,11 @@ export default async function checkDbGames(puuid: string, matchIds: string[]) {
     );
   }
 
-  // Step 3: Validate BASE_URL
-  if (!BASE_URL || typeof BASE_URL !== "string") {
-    console.error("checkDbGames: Missing or invalid BASE_URL:", BASE_URL);
-    throw new Error("BASE_URL environment variable is not configured");
-  }
-
-  console.log("checkDbGames called with:", {
-    puuid: puuid.substring(0, 8) + "...", // Log partial puuid for privacy
-    matchIdsCount: matchIds.length,
-    BASE_URL: BASE_URL.substring(0, 20) + "...",
-  });
-
   try {
     // Step 4: Construct and validate URL
     let url: string;
     try {
-      url = `${BASE_URL}/api/check-db-games?puuid=${encodeURIComponent(
+      url = `/api/check-db-games?puuid=${encodeURIComponent(
         puuid
       )}&matchIds=${encodeURIComponent(JSON.stringify(matchIds))}`;
     } catch (urlError) {

@@ -37,7 +37,7 @@ const AccountPage = async ({ params }: AccountPageProps) => {
 
   if (!existingAccount) {
     const accountRes = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/account?gameName=${gameName}&tagLine=${tagLine}`,
+      `/api/account?gameName=${gameName}&tagLine=${tagLine}`,
       { headers: { "Content-Type": "application/json" } }
     );
 
