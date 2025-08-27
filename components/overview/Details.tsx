@@ -298,7 +298,7 @@ const Details = ({
     <div className="bg-gradient-to-b from-[#121624] to-[#1B1F35] w-full p-4 animate-fade-down animate-duration-300 animate-ease-in-out">
       <header className="grid grid-cols-5 gap-1">
         {game.participants.map((participant, index) => (
-          <div key={participant.puuid}>
+          <div key={index}>
             <ul className="flex justify-center">
               <Image
                 src={getChampionImageUrl(participant.championName!)}
