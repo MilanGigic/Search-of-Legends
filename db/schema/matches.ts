@@ -15,8 +15,8 @@ export const matchDetails = pgTable("match_details", {
     .references(() => matches.matchId, { onDelete: "cascade" })
     .notNull(),
   gameCreation: timestamp("game_creation", { withTimezone: true }).notNull(),
-  gameMode: text("game_mode").notNull(),
-  gameType: text("game_type").notNull(),
+  gameMode: text("game_mode"),
+  gameType: text("game_type"),
   gameVersion: text("game_version"),
   mapId: integer("map_id"),
   platformId: text("platform_id"),
@@ -33,7 +33,6 @@ export const matchParticipants = pgTable("match_participants", {
   // Performance metrics
   assists: integer("assists"),
   baronKills: integer("baron_kills"),
-  bountyLevel: integer("bounty_level"),
   champExperience: integer("champ_experience"),
   champLevel: integer("champ_level"),
   championId: integer("champion_id"),
@@ -100,7 +99,6 @@ export const matchParticipants = pgTable("match_participants", {
   participantId: integer("participant_id"),
   puuid: text("puuid"),
   summonerLevel: integer("summoner_level"),
-  summonerName: text("summoner_name"),
   profileIcon: integer("profile_icon"),
   riotIdGameName: text("riot_id_game_name"),
   riotIdTagline: text("riot_id_tagline"),

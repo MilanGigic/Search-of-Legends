@@ -1,11 +1,4 @@
-import {
-  bigint,
-  integer,
-  pgTable,
-  text,
-  timestamp,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { bigint, integer, pgTable, varchar } from "drizzle-orm/pg-core";
 
 export const accounts = pgTable("accounts", {
   puuid: varchar("puuid").primaryKey(),

@@ -239,17 +239,17 @@ interface DbSummonerInfo {
 interface DbGameInfo {
   info: {
     matchId: string;
-    gameCreation: Date | null;
-    gameMode: string;
-    gameType: string;
+    gameCreation: Date;
+    gameMode: string | null;
+    gameType: string | null;
     gameVersion: string | null;
     mapId: number | null;
     platformId: string | null;
     queueId: number;
     tournamentCode: string | null;
-    createdAt: Date | null;
+    createdAt: Date;
   };
-  participants: (DbParticipantData & { matchId: string })[];
+  participants: DbParticipantData[];
   objectives: {
     matchId: string;
     baron: string;
@@ -419,10 +419,11 @@ interface ParticipantData {
   wardsPlaced: number | null;
 }
 interface DbParticipantData {
+  matchId: string;
+
   // Performance metrics
   assists: number | null;
   baronKills: number | null;
-  bountyLevel: number | null;
   champExperience: number | null;
   champLevel: number | null;
   championId: number | null;
@@ -489,7 +490,6 @@ interface DbParticipantData {
   participantId: number | null;
   puuid: string | null;
   summonerLevel: number | null;
-  summonerName: string | null;
   profileIcon: number | null;
   riotIdGameName: string | null;
   riotIdTagline: string | null;
