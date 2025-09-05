@@ -530,7 +530,7 @@ const MatchHistorySection = ({
   );
 
   return (
-    <div className="bg-gradient-to-b w-full from-[#121624] via-[#1B1F35] to-[#121624] shadow-sm shadow-[#2A2A40] border rounded-md border-gray-700/70 mt-5 max-w-2xl">
+    <div className="bg-gradient-to-b w-full from-[#121624] via-[#1B1F35] to-[#121624] shadow-sm shadow-[#2A2A40] border rounded-md border-gray-700/70 mt-4 max-w-2xl">
       <PaginationControls position="top" />
       <Suspense>
         {currentGames.map((game, index) => (

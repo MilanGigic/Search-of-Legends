@@ -199,7 +199,7 @@ const ChampionPage = () => {
   return (
     <div className="flex items-center justify-center text-gray-100">
       <div
-        className={`container border-x shadow-2xl ${shadowColor} min-h-screen z-10 border-gray-500 flex flex-col py-7`}
+        className={`container border-x bg-gradient-to-b from-[#121624] to-[#1B1F35] shadow-sm shadow-[#2A2A40] border-gray-700/70 min-h-screen z-10 flex flex-col py-8`}
       >
         {isLoading && (
           <div className="loader animate-spin ease-linear rounded-full border-y-4 border-cyan-500 h-12 w-12" />
@@ -262,12 +262,12 @@ const ChampionPage = () => {
               ))}
           </div>
           <div></div>
-          <div className="mt-10 flex flex-col items-center pr-20">
-            <h1 className="font-bold text-3xl mb-10">Combos</h1>
+          <div className="mt-10 flex flex-col justify-between items-center pr-20">
+            <h1 className="font-bold text-3xl">Builds</h1>
           </div>
         </div>
-        <div className="mt-20 py-10 border-t-2 w-full flex flex-col items-center">
-          <h1 className="font-bold text-4xl flex justify-center">Builds</h1>
+        <div className="mt-20 py-8 border-t-2 flex flex-col justify-between items-center">
+          <h1 className="font-bold text-3xl">PROs</h1>
         </div>
       </div>
     </div>
