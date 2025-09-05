@@ -1,162 +1,231 @@
-"use client";
-
-import ChampionCard from "@/components/champions-page/ChampionCard";
+import ChampionPageClient from "@/components/champions-page/ChampionPageClient";
+import { db } from "@/db";
+import { champions } from "@/db/schema";
+import calculateTier from "@/lib/actions/calculateTier";
+import { getCompletedChampionName } from "@/lib/actions/getCompletedChampionName";
+import { getMostBannedChampions } from "@/lib/actions/getMostBannedChampions";
+import { getTopTenChampions } from "@/lib/actions/getTopTenChampions";
 import { fetchLatestVersion } from "@/lib/riot";
-import { ChangeEvent, useEffect, useState } from "react";
+import { eq } from "drizzle-orm";
+import Image from "next/image";
+import Link from "next/link";
 
-const ChampionsPage = () => {
-  const [posts, setPosts] = useState<ChampionDetailData | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [filteredChampions, setFilteredChampions] = useState<ChampionDetail[]>(
-    []
+const ChampionsPage = async () => {
+  const top10Champions = await getTopTenChampions();
+  const mostBannedData = await getMostBannedChampions();
+  const dbMatches = await db.query.matches.findMany();
+  console.log("Top 10 champions:", top10Champions);
+
+  const top5 = top10Champions
+    .sort((a, b) => Number(b.gamesPlayed) - Number(a.gamesPlayed))
+    .slice(0, 5);
+
+  console.log("Top 5", top5);
+
+  const mostBannedStats = mostBannedData.championStats; // Array of all champion stats
+  const mostBannedChampions = mostBannedData.banStats; // Original ban data
+
+  const tieredMostBannedChampions = calculateTier(
+    mostBannedStats,
+    dbMatches.length
   );
-  // const [top10Champions, setTop10Champions] = useState<
-  //   Record<string, number>[]
-  // >([]);
 
-  // useEffect(() => {
-  //   const fetchTop10Champions = async () => {
-  //     try {
-  //       const res = await fetch(
-  //         `${process.env.NEXT_PUBLIC_BASE_URL}/api/most-popular-champions`,
-  //         {
-  //           method: "GET",
-  //         }
-  //       );
-  //       if (!res.ok) {
-  //         throw new Error(`Failed to fetch, ${res.status} ${res.statusText}`);
-  //       }
-  //       const data: Record<string, number>[] = await res.json();
-  //       setTop10Champions(data);
-  //       console.log("Top 10 Champions:", data);
-  //     } catch (error) {
-  //       console.error("Error fetching top 10 champions:", error);
-  //     }
-  //   };
-  //   fetchTop10Champions();
-  // }, []);
-  // useEffect(() => {
-  //   const fetchVersion = async () => {
+  // Get top 5 most banned champions with their tier info
+  const mostBannedTop5WithTiers = tieredMostBannedChampions
+    .sort((a, b) => b.bans - a.bans) // Sort by ban count
+    .slice(0, 6);
 
-  //     console.log("Version:", version);
+  const highestWinrateTop5 = top10Champions
+    .filter((champ) => champ.gamesPlayed >= 10) // Filter to ensure a minimum number of games played
+    .sort((a, b) => b.wins / b.gamesPlayed - a.wins / a.gamesPlayed) // Sort by winrate
+    .slice(0, 5);
 
-  //     setLatestVersion(version!);
-  //   };
-
-  //   fetchVersion();
-  // }, []);
-
-  useEffect(() => {
-    async function fetchPosts() {
-      const version = await fetchLatestVersion();
-      try {
-        setIsLoading(true);
-        const res = await fetch(
-          `https://ddragon.leagueoflegends.com/cdn/${version!}/data/en_US/champion.json`
-        );
-        if (!res.ok) {
-          throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
-        }
-        const data: ChampionDetailData = await res.json();
-        setPosts(data);
-        setFilteredChampions(Object.values(data.data));
-        setError(null);
-      } catch (error) {
-        console.error("Error fetching champions data:", error);
-        setError(
-          error instanceof Error ? error.message : "An unknown error occurred"
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchPosts();
-  }, []);
-
-  useEffect(() => {
-    if (!posts) return;
-
-    const query = searchQuery.toLowerCase().trim();
-    if (query === "") {
-      setFilteredChampions(Object.values(posts.data));
-      return;
-    }
-
-    const filtered = Object.values(posts.data).filter(
-      (champion) =>
-        champion.name.toLowerCase().includes(query) ||
-        champion.tags.some((tag) => tag.toLowerCase().includes(query))
-    );
-
-    setFilteredChampions(filtered);
-  }, [searchQuery, posts]);
-
-  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
+  const version = await fetchLatestVersion();
 
   return (
-    <div className="flex flex-col min-h-screen items-center text-gray-100">
-      <div className="container max-w-6xl z-10 mx-auto bg-gradient-to-b text-slate-300 from-[#121624] to-[#1B1F35] border-b border-slate-400 shadow-[#2A2A40] px-6 sm:px-4 pt-4">
-        Popular champions
-        {/* {top10Champions.map((champion, index) => (
-          <div>{/* {champion}</div>
-        ))} */}
-      </div>
-      <div className="bg-gradient-to-b w-full z-10 from-[#121624] via-[#1B1F35] to-[#121624] shadow-sm shadow-[#2A2A40] border rounded-md border-gray-700/70 mt-4 max-w-6xl">
-        <input
-          placeholder="Search for a champion..."
-          type="search"
-          className="border-b-2 border-b-white text-white text-center rounded-md p-2 my-4 text-xl w-full outline-none"
-          value={searchQuery}
-          onChange={(e) => handleSearch(e)}
-        />
-        {isLoading && (
-          <div className="flex justify-center items-center">
-            <div className="loader animate-spin ease-linear rounded-full border-y-4 border-cyan-500 h-12 w-12" />
-            {error && <p className="text-red-500">Error: {error}</p>}
-          </div>
-        )}
-        {posts && !isLoading && (
-          <div className="flex flex-col max-w-4xl items-center justify-center mt-4 mx-auto">
-            <div className="grid grid-cols-4 md:grid-cols-7 lg:grid-cols-8 gap-2">
-              {filteredChampions.map((champion) => (
-                <div key={champion.id} className="cursor-pointer">
-                  <ChampionCard
-                    name={champion.name}
-                    title={champion.title}
-                    champion={champion}
-                    role={champion.tags[0]}
-                  />
+    <div className="flex flex-col min-h-screen items-center text-slate-300">
+      <div className="container max-w-6xl z-10 mx-auto bg-gradient-to-b text-slate-300 from-[#121624] to-[#1B1F35] border-b border-slate-400 shadow-[#2A2A40] px-6 sm:px-4 py-4">
+        <div className="flex flex-col items-center">
+          <h1 className="flex flex-col items-center font-semibold">
+            Most Played Champions
+          </h1>
+          <div className="flex gap-4 bg-white/5 p-4 rounded-md border border-gray-700 shadow-md shadow-[#3b3b42]">
+            <ul className="grid grid-rows-5">
+              <li className="row-span-2"></li>
+              <li className="text-center">Pickrate</li>
+              <li className="text-center">Tier</li>
+              <li className="text-center">Winrate</li>
+            </ul>
+            {top5?.map(async (champion, index) => {
+              const completedName = getCompletedChampionName(
+                champion.championName
+              );
+
+              const tier = calculateTier(top5, dbMatches.length);
+              console.log("Top 10 champions Completed name:", completedName);
+
+              const champTier = tier.find(
+                (t) => t.championId === champion.championId
+              );
+
+              console.log("Champion games played:", champion.gamesPlayed);
+              console.log("Games played:", dbMatches.length);
+              return (
+                <div
+                  key={index}
+                  className="flex flex-col items-center text-center px-2"
+                >
+                  <Link href={`/champions/${completedName}`}>
+                    <Image
+                      src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${completedName}.png`}
+                      alt={champion.championName}
+                      width={100}
+                      height={100}
+                      className="rounded-full w-[50px] h-[50px]"
+                    />
+                  </Link>
+                  <h1>
+                    {((champion.gamesPlayed / dbMatches.length) * 10).toFixed(
+                      1
+                    )}
+                    <span className="text-gray-400 text-sm">%</span>
+                  </h1>
+                  <h1>{champTier?.tier}</h1>
+                  <h1>
+                    {((champion.wins / champion.gamesPlayed) * 100).toFixed(1)}
+                  </h1>
                 </div>
-              ))}
+              );
+            })}
+          </div>
+        </div>
+        <div className="flex justify-between">
+          <div className="flex flex-col items-center">
+            <h1 className="flex flex-col items-center font-semibold py-2">
+              Most Banned Champions
+            </h1>
+            <div className="flex gap-4 bg-white/5 p-4 rounded-md border border-gray-700 shadow-md shadow-[#3b3b42]">
+              <ul className="grid grid-rows-5">
+                <li className="row-span-2"></li>
+                <li className="text-center">Banrate</li>
+                <li className="text-center">Tier</li>
+                <li className="text-center">Winrate</li>
+              </ul>
+              {mostBannedTop5WithTiers?.map(async (champion, index) => {
+                const dbChampion = await db.query.champions.findFirst({
+                  where: eq(champions.key, String(champion.championId)),
+                });
+
+                if (!dbChampion) return null;
+                const completedName = getCompletedChampionName(dbChampion.name);
+                console.log("Top 10 champions Completed name:", completedName);
+
+                // const tier = calculateTier(
+                //   champion.champStats!,
+                //   dbMatches.length
+                // );
+                // console.log("Top 10 champions Completed name:", completedName);
+
+                // const champTier = tier.find(
+                //   (t) => t.championId === champion.championId
+                // );
+                return (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center text-center px-2"
+                  >
+                    <Link href={`/champions/${completedName}`}>
+                      <Image
+                        src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${completedName}.png`}
+                        alt={champion.championId!.toString()}
+                        width={100}
+                        height={100}
+                        className="rounded-full w-[50px] h-[50px]"
+                      />
+                    </Link>
+                    <h1>
+                      {((champion.bans / dbMatches.length) * 10).toFixed(1)}
+                      <span className="text-gray-400 text-sm">%</span>
+                    </h1>
+                    <h1>{champion.tier}</h1>
+                    <h1>
+                      {((champion.wins / champion.gamesPlayed) * 100).toFixed(
+                        1
+                      )}
+                      <span className="text-gray-400 text-sm">%</span>
+                    </h1>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        )}
+          <h1 className="flex flex-col justify-center items-center text-center font-bold text-lg">
+            Patch <br />({version})
+          </h1>
+          <div className="flex flex-col items-center">
+            <h1 className="flex flex-col py-2 items-center font-semibold">
+              Highest Winrate Champions
+            </h1>
+            <div className="flex gap-4 bg-white/5 p-4 rounded-md border border-gray-700 shadow-md shadow-[#3b3b42]">
+              <ul className="grid grid-rows-5">
+                <li className="row-span-2"></li>
+                <li className="text-center">Winrate</li>
+                <li className="text-center">Tier</li>
+                <li className="text-center">KDA</li>
+              </ul>
+              {highestWinrateTop5?.map((champion, index) => {
+                const completedName = getCompletedChampionName(
+                  champion.championName
+                );
+                const tier = calculateTier(
+                  highestWinrateTop5,
+                  dbMatches.length
+                );
+                console.log("Top 10 champions Completed name:", completedName);
+
+                const champTier = tier.find(
+                  (t) => t.championId === champion.championId
+                );
+                console.log("Top 10 champions Completed name:", completedName);
+                return (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center text-center px-2"
+                  >
+                    <Link href={`/champions/${completedName}`}>
+                      <Image
+                        src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${completedName}.png`}
+                        alt={champion.championName}
+                        width={100}
+                        height={100}
+                        className="rounded-full w-[50px] h-[50px]"
+                      />
+                    </Link>
+                    <h1>
+                      {((champion.wins / champion.gamesPlayed) * 100).toFixed(
+                        2
+                      )}
+                      <span className="text-gray-400 text-sm">%</span>
+                    </h1>
+                    <h1>{champTier?.tier}</h1>
+                    <h1>{champion.kda}</h1>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* {posts && !isLoading && (
-          <div className="container flex flex-col items-center justify-center">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-10 gap-2">
-              {filteredChampions.map((champion) => (
-                <div
-                  key={champion.id}
-                  className="hover:shadow-2xl transition-all duration-200 cursor-pointer"
-                >
-                  <ChampionCard
-                    name={champion.name}
-                    title={champion.title}
-                    role={champion.tags[0]}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        )} */}
+      <ChampionPageClient version={version!} />
     </div>
   );
 };
 export default ChampionsPage;
+
+// TODO:
+// Implement the action for getting the completed name of the champion
+// Implement the UI for displaying the top 10 champions with their images and counts
+// Style the top 10 champions section to match the overall design of the page
+// Ensure responsiveness and accessibility for the top 10 champions section
+// Test the functionality to ensure it works as expected across different devices and browsers

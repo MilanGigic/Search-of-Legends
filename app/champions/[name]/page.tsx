@@ -197,14 +197,9 @@ const ChampionPage = () => {
   // VIDEO URL SAMPLE https://d28xe8vt774jo5.cloudfront.net/champion-abilities/0084/ability_0084_R1.mp4
 
   return (
-    <div className="flex shiny-dots-bg items-center justify-center text-gray-100">
+    <div className="flex items-center justify-center text-gray-100">
       <div
         className={`container border-x shadow-2xl ${shadowColor} min-h-screen z-10 border-gray-500 flex flex-col py-7`}
-        style={{
-          backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${completedName}_0.jpg)`,
-          backgroundSize: "100% 100%",
-          backgroundRepeat: "no-repeat",
-        }}
       >
         {isLoading && (
           <div className="loader animate-spin ease-linear rounded-full border-y-4 border-cyan-500 h-12 w-12" />
@@ -231,9 +226,6 @@ const ChampionPage = () => {
 
             {championVideoKeySpell === "passive" && (
               <div className="flex flex-col items-center border-t-2">
-                <h2 className="bg-[#C89B3C] text-[#EAEAEA] p-2 px-3 items-center text-center rounded-full mb-2">
-                  P
-                </h2>
                 <p className="text-start text-[#EAEAEA]  h-[150px] text-sm tracking-tight">
                   {champion?.passive.name} -{" "}
                   <strong>{champion?.passive.description}</strong>
@@ -251,17 +243,6 @@ const ChampionPage = () => {
                   className="flex flex-col items-center border-t-2"
                   key={spell.id}
                 >
-                  <h2 className="bg-[#C89B3C] text-[#EAEAEA] p-2 px-3 items-center text-center rounded-full mb-2">
-                    {index === 0
-                      ? "Q"
-                      : index === 1
-                      ? "W"
-                      : index === 2
-                      ? "E"
-                      : index === 3
-                      ? "R"
-                      : null}
-                  </h2>
                   <div className="text-start text-[#EAEAEA] h-[150px] text-sm tracking-tight">
                     {spell.name} - <strong>{spell.description}</strong>
                     <p className="text-start text-gray-300 italic text-sm">
@@ -293,3 +274,8 @@ const ChampionPage = () => {
   );
 };
 export default ChampionPage;
+
+// TODO:
+// Fix the UI so it matches the rest of the app
+// Write the logic for getting the match timeline
+// Find the PROs builds, runes, skill paths

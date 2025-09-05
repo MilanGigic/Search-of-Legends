@@ -19,9 +19,9 @@ const SpellCard = ({ champion }: { champion: ChampionDetail | null }) => {
       <Image
         src={`https://ddragon.leagueoflegends.com/cdn/15.16.1/img/passive/${champion?.passive.image.full}`}
         alt={`${champion.id} passive`}
-        width={80}
-        height={80}
-        className="border rounded-md cursor-pointer hover:shadow-lg hover:shadow-cyan-800 transition-colors duration-200"
+        width={100}
+        height={100}
+        className="border w-[60px] h-[60px] rounded-md cursor-pointer hover:shadow-lg hover:shadow-cyan-800 transition-colors duration-200"
         onClick={() => onClick(champion.passive.image.group)}
       />
       {champion.spells.map((spell) => (
@@ -29,9 +29,9 @@ const SpellCard = ({ champion }: { champion: ChampionDetail | null }) => {
           key={spell.id}
           src={`https://ddragon.leagueoflegends.com/cdn/15.16.1/img/spell/${spell.image.full}`}
           alt={`${champion.id} spells`}
-          width={80}
-          height={80}
-          className="border rounded-md cursor-pointer hover:shadow-lg hover:shadow-cyan-800 transition-colors duration-200"
+          width={100}
+          height={100}
+          className="border w-[60px] h-[60px] rounded-md cursor-pointer hover:shadow-lg hover:shadow-cyan-800 transition-colors duration-200"
           onClick={() => onClick(spell.id)}
         />
       ))}

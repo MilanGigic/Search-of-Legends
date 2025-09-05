@@ -11,15 +11,17 @@ const ChampionCard = ({
   title,
   role,
   champion,
+  version,
 }: {
   name: string;
   title: string;
   role: string;
   champion: ChampionDetail;
+  version: string;
 }) => {
   // Switch cases for image url bug for names like: Dr. Mundo, Kai'Sa = Transformed to DrMundo, Kaisa
   const [completedName, setCompletedName] = useState<string>(name);
-  const [showPreview, setShowPreview] = useState<boolean>(false);
+  // const [showPreview, setShowPreview] = useState<boolean>(false);
 
   useEffect(() => {
     switch (name) {
@@ -94,12 +96,12 @@ const ChampionCard = ({
       <Link
         href={`/champions/${completedName}`}
         className="sm:hover:scale-105 transition-transform duration-300 p-4 flex flex-col items-center justify-end sm:h-[115px] sm:w-[135px]"
-        onMouseEnter={() => setShowPreview(true)}
-        onMouseLeave={() => setShowPreview(false)}
+        // onMouseEnter={() => setShowPreview(true)}
+        // onMouseLeave={() => setShowPreview(false)}
       >
         <div className="text-center flex flex-col items-center justify-center">
           <Image
-            src={`https://ddragon.leagueoflegends.com/cdn/15.16.1/img/champion/${completedName}.png`}
+            src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${completedName}.png`}
             alt={completedName}
             width={100}
             height={100}
@@ -107,7 +109,9 @@ const ChampionCard = ({
           <h1 className="font-bold text-xs text-yellow-400/95">{name}</h1>
         </div>
       </Link>
-      <div
+
+      {/* HOVER PROTOTYPE */}
+      {/* <div
         className={`absolute left-full -top-4 ml-6 z-50 transition-all duration-200  ${
           showPreview
             ? "opacity-100 visible translate-x-0"
@@ -121,7 +125,7 @@ const ChampionCard = ({
           champion={champion}
           completedName={completedName}
         />
-      </div>
+      </div> */}
     </div>
   );
 };
