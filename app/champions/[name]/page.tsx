@@ -27,10 +27,8 @@ const ChampionPage = () => {
     if (championVideoKeySpell !== null) {
       if (championVideoKeySpell === "passive") {
         setChampionVideoSpell("P");
-        console.log("Champion video passive:", championVideoSpell);
       } else {
         setChampionVideoSpell(championVideoKeySpell.slice(-1));
-        console.log("Champion video spell:", championVideoSpell);
       }
     }
   }, [championVideoKeySpell]);
@@ -109,7 +107,6 @@ const ChampionPage = () => {
     const fetchChampionDetails = async () => {
       if (!championId) return;
 
-      console.log("Fetching details for champion ID:", championId);
 
       const version = await fetchLatestVersion();
       try {
@@ -168,23 +165,18 @@ const ChampionPage = () => {
     switch (champion.key.length) {
       case 1:
         setChampionVideoKey(`000${champion?.key}`);
-        console.log("Champion video key:", championVideoKey);
         break;
       case 2:
         setChampionVideoKey(`00${champion?.key}`);
-        console.log("Champion video key:", championVideoKey);
         break;
       case 3:
         setChampionVideoKey(`0${champion?.key}`);
-        console.log("Champion video key:", championVideoKey);
         break;
       case 4:
         setChampionVideoKey(`${champion?.key}`);
-        console.log("Champion video key:", championVideoKey);
         break;
       default:
         setChampionVideoKey(`${champion?.key}`);
-        console.log("Champion video key:", championVideoKey);
         break;
     }
   }, [champion?.key]);

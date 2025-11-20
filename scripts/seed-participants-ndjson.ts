@@ -193,7 +193,7 @@ async function main() {
     saveCheckpoint(ndjsonFile, lineNo);
   }
 
-  console.log("Seeding complete");
+
 }
 
 async function insertBatch(batch: DbParticipantData[], lineNo: number) {

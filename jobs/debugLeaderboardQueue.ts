@@ -8,8 +8,8 @@ const accountQueue = new Queue("account", {
 
 async function debug() {
   const repeatableJobs = await accountQueue.getRepeatableJobs();
-  console.log("📋 Existing repeatable jobs:");
-  console.log(repeatableJobs);
+
+
 }
 
 debug();

@@ -52,7 +52,7 @@ const VideoCarousel = () => {
   // };
 
   const handleVideoClick = (video: VideoType) => {
-    console.log("Playing video:", video.title);
+
     // Add your video play logic here
   };
 

@@ -9,7 +9,7 @@ import pLimit from "p-limit";
 
 dotenv.config();
 
-console.log("Initializing leaderboard games queue...");
+
 
 export const gamesQueue = new Queue("leaderboard-games", {
   connection: redisConnection,
@@ -33,23 +33,13 @@ export const gamesWorker = new Worker(
       const matchIds = await fetchAllMatchIds(job.data.puuid, job.data.region);
 
       if (matchIds.length === 0) {
-        console.log(
-          `No matches found for ${job.data.gameName}#${job.data.tagLine}`
-        );
         return;
       }
 
       console.log(
         `Found ${matchIds.length} matches for ${job.data.gameName}#${job.data.tagLine})`
       );
-      console.log(
-        `🎮 Syncing matches for ${job.data.gameName}#${job.data.tagLine}`
-      );
-      console.log(`🔁 Region: ${job.data.region}`);
       await fetchMatchDetailsInSmallBatch(matchIds, routing, job.data.puuid);
-      console.log(
-        `✅ Finished syncing for ${job.data.gameName}#${job.data.tagLine}`
-      );
     } catch (err) {
       console.error(
         `❌ Failed syncing ${job.data.gameName}#${job.data.tagLine}:`,
@@ -64,7 +54,7 @@ export const gamesWorker = new Worker(
 
 // Schedule individual jobs for each player
 export async function enqueueMatchJobs() {
-  console.log("📅 Enqueuing match jobs...");
+
 
   const players = await db.query.accounts.findMany();
 
@@ -89,11 +79,11 @@ export async function enqueueMatchJobs() {
     );
   }
 
-  console.log("🚀 All player jobs enqueued.");
+
 }
 
 gamesWorker.on("completed", (job) => {
-  console.log(`✅ Completed match sync job: ${job.name}`);
+
 });
 
 gamesWorker.on("failed", (job, err) => {
@@ -101,7 +91,7 @@ gamesWorker.on("failed", (job, err) => {
 });
 
 gamesWorker.on("active", (job) => {
-  console.log(`🚀 Job started: ${job.name}`);
+
 });
 
 if (require.main === module) {

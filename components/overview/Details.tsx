@@ -146,19 +146,13 @@ const Details = ({
   }, [userEvents, opponentEvents]);
 
   useEffect(() => {
-    console.log(
-      "Events for participant",
-      selectedParticipantId,
-      participantEvents,
-      eventsAt15
-    );
   }, [participantEvents, selectedParticipantId]);
 
-  console.log("Game data:", game);
+
 
   const groupedItemEvents = useMemo(() => {
     if (!matchEvents?.info?.frames) {
-      console.log("No frames in matchEvents");
+
       return [];
     }
 
@@ -247,19 +241,15 @@ const Details = ({
 
   useEffect(() => {
     const getChampionSpell = async () => {
-      console.log("Fetching champion spell data...");
+
       const participant = game.participants.find(
         (participant) => participant.participantId === selectedParticipantId
       );
       if (!participant) {
-        console.log(
-          "No participant found for selectedParticipantId:",
-          selectedParticipantId
-        );
         return;
       }
 
-      console.log("Fetching data for champion:", participant.championName);
+
       const champRes = await fetch(
         `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion/${participant.championName}.json`
       );
@@ -270,23 +260,23 @@ const Details = ({
       }
 
       const data: ChampionDetailData = await champRes.json();
-      console.log("Fetched champion data:", data);
+
 
       const champData = data.data;
       const championDetail = champData[participant.championName!];
 
       setChampion(championDetail);
-      console.log("Set champion state");
+
     };
 
     getChampionSpell();
   }, [selectedParticipantId]);
 
   useEffect(() => {
-    console.log("Champion state data:", champion);
+
   }, [selectedParticipantId]);
   useEffect(() => {
-    console.log("All data:", user, opponent, matchEvents, game, puuid);
+
   }, []);
 
   if (!game.participants || game.participants.length === 0) {

@@ -13,7 +13,7 @@ const RuneTable = ({
         const runeTree = runesApi.find((r) => r.id === style.style);
 
         // Debug: Log the result
-        console.log("Rune tree structure:", runeTree);
+
 
         return (
           <div key={styleIndex} className="">
@@ -36,8 +36,8 @@ const RuneTable = ({
               }  mb-2`}
             >
               {style.selections.map((selection, selectionIndex) => {
-                console.log("Selection structure:", selection);
-                console.log("Style structure", style);
+
+
 
                 // Find the specific rune across all slots using flatMap
                 const matchingRune =

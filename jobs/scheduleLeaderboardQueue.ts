@@ -1,7 +1,7 @@
 import { leaderboardQueue } from "./queues/leaderboard";
 
 export async function scheduleLeaderboardSync() {
-  console.log("Scheduling leaderboard sync job...");
+
   await leaderboardQueue.add(
     "sync-leaderboard",
     {},
@@ -11,7 +11,7 @@ export async function scheduleLeaderboardSync() {
       removeOnFail: true,
     }
   );
-  console.log("Leaderboard sync job scheduled.");
+
 }
 
 scheduleLeaderboardSync();

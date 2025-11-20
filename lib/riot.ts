@@ -274,3 +274,12 @@ export async function fetchLatestVersion() {
     console.error("Fetching versions failed:", error);
   }
 }
+
+export async function fetchNumberOfMatches({ puuid }: { puuid: string }) {
+  const res = await fetch(
+    `http://localhost:3000/api/number-of-matches/${puuid}`
+  );
+
+  // return await res.json();
+  return "";
+}

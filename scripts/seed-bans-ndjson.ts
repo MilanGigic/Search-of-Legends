@@ -29,28 +29,18 @@ function safeString(value: any): string | null {
 
 // Debug function to inspect raw data
 function debugRawData(raw: any, lineNo: number) {
-  console.log(`\n=== DEBUG LINE ${lineNo} ===`);
-  console.log("Raw object keys:", Object.keys(raw));
-  console.log("Sample values:");
-  console.log("  matchId:", raw.match_id, "type:", typeof raw.match_id);
-  console.log(
-    "  championId:",
-    raw.champion_id,
-    "type:",
-    typeof raw.champion_id
-  );
-  console.log("  pickTurn:", raw.pick_turn, "type:", typeof raw.pick_turn);
 
+  console.log("Raw object keys:", Object.keys(raw));
   // Check if the object has the expected structure
   const expectedFields = ["match_id", "champion_id", "pick_turn"];
   const missingFields = expectedFields.filter((field) => !(field in raw));
   if (missingFields.length > 0) {
-    console.log("Missing expected fields:", missingFields);
+
   }
 
   // Show first few entries of the raw object
   const entries = Object.entries(raw).slice(0, 10);
-  console.log("First 10 raw entries:", entries);
+
 }
 
 // map raw row -> DB shape
@@ -68,10 +58,10 @@ function mapRow(raw: any, lineNo: number) {
 
   // Debug the mapping for first few rows
   if (lineNo <= 3) {
-    console.log("Mapped values:");
-    console.log("  matchId:", mapped.matchId);
-    console.log("  championId:", mapped.championId);
-    console.log("  pickTurn:", mapped.pickTurn);
+
+
+
+
 
     // Count how many fields are null
     const nullFields = Object.entries(mapped).filter(
@@ -168,18 +158,14 @@ async function main() {
     saveCheckpoint(ndjsonFile, lineNo);
   }
 
-  console.log("Debug seeding complete");
+
 }
 
 async function insertBatch(batch: any[], lineNo: number) {
   try {
-    console.log(
-      `\n=== ATTEMPTING TO INSERT BATCH OF ${batch.length} RECORDS ===`
-    );
-
     // Debug the first record in the batch
     if (batch.length > 0) {
-      console.log("First record in batch:");
+
       const firstRecord = batch[0];
       Object.entries(firstRecord).forEach(([key, value]) => {
         if (value === null || value === undefined || Number.isNaN(value)) {

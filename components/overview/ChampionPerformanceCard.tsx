@@ -12,16 +12,16 @@ const ChampionPerformanceCard = async ({
   riotId: string;
 }) => {
   const data = await getChampionPerformance(puuid);
-  console.log("Champion performance data:", data);
+
 
   const top5 = data
     .sort((a, b) => Number(b.gamesPlayed) - Number(a.gamesPlayed))
     .slice(0, 5);
 
-  console.log("Top 5", top5);
+
 
   const version = await fetchLatestVersion();
-  console.log("Version:", version);
+
   return (
     <div className="pt-5 border border-gray-700/70 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#121624] to-[#1B1F35]  shadow-sm shadow-[#2A2A40]">
       <div>

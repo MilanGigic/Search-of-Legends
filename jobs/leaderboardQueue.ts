@@ -8,7 +8,7 @@ import pLimit from "p-limit";
 
 dotenv.config();
 
-console.log("Initializing leaderboard queue...");
+
 
 export const leaderboardQueue = new Queue("leaderboard", {
   connection: redisConnection,
@@ -36,7 +36,7 @@ interface AccountData {
 export const leaderboardWorker = new Worker(
   "leaderboard",
   async (job: Job) => {
-    console.log("Worker started: Fetching leaderboard...");
+
     console.log("🔥 Job STARTED at", new Date().toISOString());
 
     // 1. Fetch Challenger and Grandmaster
@@ -48,7 +48,7 @@ export const leaderboardWorker = new Worker(
     let allEntries: LeagueEntry[] = [];
 
     for (const tier of tiers) {
-      console.log(`Fetching ${tier.tier} data from Riot API...`);
+
       const res = await fetch(
         `https://euw1.api.riotgames.com/lol/league/v4/${tier.url}/by-queue/RANKED_SOLO_5x5?api_key=${process.env.RIOT_API_KEY}`
       );
@@ -65,35 +65,30 @@ export const leaderboardWorker = new Worker(
         tier: tier.tier,
       }));
 
-      console.log(`Fetched ${entries.length} ${tier.tier} entries.`);
+
       allEntries = [...allEntries, ...entries];
-      console.log(`Waiting 2 minutes before next tier fetch...`);
+
       await delay(1000 * 60 * 2); // Wait between API calls to avoid burst
     }
 
     // 2. Sort by LP
-    console.log("Sorting all entries by league points...");
+
     const sortedEntries = allEntries.sort(
       (a, b) => b.leaguePoints - a.leaguePoints
     );
 
     // 3. Fetch account info with rate limiting
-    console.log("Preparing to fetch account info for each entry...");
+
     const BATCH_SIZE = 90;
     const BATCH_DELAY = 130000; // 2 minutes 10 seconds
 
-    console.log(`🔍 DEBUG: Starting batch loop`);
-    console.log(`🔍 Total entries: ${sortedEntries.length}`);
-    console.log(`🔍 Batch size: ${BATCH_SIZE}`);
+
+
+
     console.log(
       `🔍 Expected batches: ${Math.ceil(sortedEntries.length / BATCH_SIZE)}`
     );
     for (let i = 0; i < sortedEntries.length; i += BATCH_SIZE) {
-      console.log(
-        `🔍 DEBUG: Loop iteration, i=${i}, condition=${
-          i < sortedEntries.length
-        }`
-      );
       const batchEntries = sortedEntries.slice(i, i + BATCH_SIZE);
       const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
       const totalBatches = Math.ceil(sortedEntries.length / BATCH_SIZE);
@@ -117,9 +112,6 @@ export const leaderboardWorker = new Worker(
           await delay(100 * j);
 
           try {
-            console.log(
-              `🌐 Fetching account info for puuid: ${entry.puuid}...`
-            );
             const accountRes = await fetch(
               `https://europe.api.riotgames.com/riot/account/v1/accounts/by-puuid/${entry.puuid}?api_key=${process.env.RIOT_API_KEY}`
             );
@@ -132,10 +124,6 @@ export const leaderboardWorker = new Worker(
             }
 
             const accountData: AccountData = await accountRes.json();
-
-            console.log(
-              `🌐 Fetching summoner info for puuid: ${accountData.puuid}...`
-            );
             const summonerRes = await fetch(
               `https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${accountData.puuid}?api_key=${process.env.RIOT_API_KEY}`
             );
@@ -207,10 +195,6 @@ export const leaderboardWorker = new Worker(
           }
         })
       );
-
-      console.log(
-        `⏳ Waiting for all jobs in batch ${i / BATCH_SIZE + 1} to complete...`
-      );
       try {
         const results = await Promise.all(batchJobs);
 
@@ -218,11 +202,6 @@ export const leaderboardWorker = new Worker(
         const successful = results.filter((r) => r?.success).length;
         const failed = results.filter((r) => r && !r.success).length;
         const total = results.length;
-
-        console.log(
-          `📊 Batch ${batchNumber} completed: ${successful}/${total} successful, ${failed} failed`
-        );
-
         if (failed > 0) {
           console.log(
             `⚠️ Failed entries in batch ${batchNumber}:`,
@@ -245,13 +224,10 @@ export const leaderboardWorker = new Worker(
         );
         await delay(BATCH_DELAY);
       } else {
-        console.log(
-          `🎉 All batches completed! Processed ${sortedEntries.length} entries total.`
-        );
       }
     }
 
-    console.log("✅ Leaderboard sync complete.");
+
     console.log("✅ Job COMPLETED at", new Date().toISOString());
   },
   {
@@ -261,15 +237,15 @@ export const leaderboardWorker = new Worker(
 
 // Add event handlers to debug worker activity
 leaderboardWorker.on("ready", () => {
-  console.log("🟢 Worker is ready and waiting for jobs");
+
 });
 
 leaderboardWorker.on("active", (job) => {
-  console.log(`🔄 Worker picked up job: ${job.id}`);
+
 });
 
 leaderboardWorker.on("completed", (job) => {
-  console.log(`✅ Job completed: ${job.id}`);
+
 });
 
 leaderboardWorker.on("failed", (job, err) => {
@@ -282,18 +258,18 @@ leaderboardWorker.on("error", (err) => {
 
 // Add a manual trigger function for testing
 export async function triggerLeaderboardSync() {
-  console.log("🚀 Manually triggering leaderboard sync...");
+
   const job = await leaderboardQueue.add("sync-leaderboard", {});
-  console.log(`📋 Job added with ID: ${job.id}`);
+
   return job;
 }
 
 // If this file is run directly, trigger a manual sync
 if (require.main === module) {
-  console.log("🏃 Running leaderboard sync manually...");
+
   triggerLeaderboardSync()
     .then(() => {
-      console.log("✅ Manual trigger completed");
+
     })
     .catch((err) => {
       console.error("❌ Manual trigger failed:", err);

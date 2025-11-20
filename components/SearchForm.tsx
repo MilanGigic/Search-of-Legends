@@ -70,7 +70,7 @@ export default function SearchForm({
   const handleRiotNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
-    console.log("Input value changed:", value);
+
     setInputValue(value);
 
     const hashIndex = value.indexOf("#");

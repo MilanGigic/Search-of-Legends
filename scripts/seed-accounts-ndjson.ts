@@ -31,23 +31,23 @@ function safeString(value: any): string | null {
 
 // Debug function to inspect raw data
 function debugRawData(raw: any, lineNo: number) {
-  console.log(`\n=== DEBUG LINE ${lineNo} ===`);
+
   console.log("Raw object keys:", Object.keys(raw));
-  console.log("Sample values:");
-  console.log("  gameName:", raw.game_name, "type:", typeof raw.game_name);
-  console.log("  tagLine:", raw.tag_line, "type:", typeof raw.tag_line);
-  console.log("  puuid:", raw.puuid, "type:", typeof raw.puuid);
+
+
+
+
 
   // Check if the object has the expected structure
   const expectedFields = ["game_name", "tag_line", "puuid"];
   const missingFields = expectedFields.filter((field) => !(field in raw));
   if (missingFields.length > 0) {
-    console.log("Missing expected fields:", missingFields);
+
   }
 
   // Show first few entries of the raw object
   const entries = Object.entries(raw).slice(0, 10);
-  console.log("First 10 raw entries:", entries);
+
 }
 
 // map raw row -> DB shape
@@ -75,10 +75,10 @@ function mapRow(raw: any, lineNo: number) {
 
   // Debug the mapping for first few rows
   if (lineNo <= 3) {
-    console.log("Mapped values:");
-    console.log("  gameName:", mapped.gameName);
-    console.log("  tagLine:", mapped.tagLine);
-    console.log("  assists:", mapped.puuid);
+
+
+
+
 
     // Count how many fields are null
     const nullFields = Object.entries(mapped).filter(
@@ -175,18 +175,14 @@ async function main() {
     saveCheckpoint(ndjsonFile, lineNo);
   }
 
-  console.log("Debug seeding complete");
+
 }
 
 async function insertBatch(batch: any[], lineNo: number) {
   try {
-    console.log(
-      `\n=== ATTEMPTING TO INSERT BATCH OF ${batch.length} RECORDS ===`
-    );
-
     // Debug the first record in the batch
     if (batch.length > 0) {
-      console.log("First record in batch:");
+
       const firstRecord = batch[0];
       Object.entries(firstRecord).forEach(([key, value]) => {
         if (value === null || value === undefined || Number.isNaN(value)) {

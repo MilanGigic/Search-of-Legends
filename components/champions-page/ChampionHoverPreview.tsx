@@ -35,11 +35,11 @@ const ChampionHoverPreview = ({
 
   const onClick = (spellId: string) => {
     setChampionVideoKeySpell(spellId);
-    console.log("Spell ID:", spellId);
+
   };
 
-  console.log("Completed name:", completedName);
-  console.log("Champion details:", championDetails);
+
+
 
   useEffect(() => {
     if (!completedName || !championId) return;
@@ -57,7 +57,7 @@ const ChampionHoverPreview = ({
         }
 
         const data: ChampionDetailData = await res.json();
-        console.log("Champion details fetched:", data);
+
 
         setChampionDetails(data.data[completedName]);
       } catch (error) {}
@@ -70,10 +70,10 @@ const ChampionHoverPreview = ({
     if (championVideoKeySpell !== null) {
       if (championVideoKeySpell === "passive") {
         setChampionVideoSpell("P");
-        console.log("Champion video passive:", championVideoSpell);
+
       } else {
         setChampionVideoSpell(championVideoKeySpell.slice(-1));
-        console.log("Champion video spell:", championVideoSpell);
+
       }
     }
   }, [championVideoKeySpell]);
@@ -212,23 +212,23 @@ const ChampionHoverPreview = ({
     switch (champion.key.length) {
       case 1:
         setChampionVideoKey(`000${champion?.key}`);
-        console.log("Champion video key:", championVideoKey);
+
         break;
       case 2:
         setChampionVideoKey(`00${champion?.key}`);
-        console.log("Champion video key:", championVideoKey);
+
         break;
       case 3:
         setChampionVideoKey(`0${champion?.key}`);
-        console.log("Champion video key:", championVideoKey);
+
         break;
       case 4:
         setChampionVideoKey(`${champion?.key}`);
-        console.log("Champion video key:", championVideoKey);
+
         break;
       default:
         setChampionVideoKey(`${champion?.key}`);
-        console.log("Champion video key:", championVideoKey);
+
         break;
     }
   }, [champion?.key]);
@@ -237,12 +237,6 @@ const ChampionHoverPreview = ({
     if (!championVideoKey || !championVideoSpell) return null;
     return `https://d28xe8vt774jo5.cloudfront.net/champion-abilities/${championVideoKey}/ability_${championVideoKey}_${championVideoSpell}1.mp4`;
   }, [championVideoKey, championVideoSpell]);
-
-  console.log(
-    `Passive image: https://ddragon.leagueoflegends.com/cdn/15.16.1/img/passive/${championDetails
-      ?.passive.image.full!}`
-  );
-
   // VIDEO URL SAMPLE https://d28xe8vt774jo5.cloudfront.net/champion-abilities/0084/ability_0084_R1.mp4
   return (
     <div className="h-[420px] w-[300px] bg-gradient-to-b text-slate-300 from-[#121624] to-[#1B1F35] border border-slate-400 shadow-[#2A2A40]">

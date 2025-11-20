@@ -24,7 +24,7 @@ pipeline(
       out.write(JSON.stringify(value) + "\n");
     }
     out.end();
-    console.log(`Wrote NDJSON to ${output}`);
+
   },
   (err) => {
     if (err) {

@@ -21,7 +21,7 @@ export default async function getGameInfo(
   const region = getRegionalEndpoint(account.region);
   const url = `${BASE_URL}/api/riot/game-info?currRegion=${region}&gameId=${matchId}&puuid=${puuid}`;
   try {
-    console.log(`Fetching game info for: ${matchId} in region: ${region}`);
+
     const response = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
@@ -57,7 +57,7 @@ export default async function getGameInfo(
       return null;
     }
 
-    console.log(`Successfully fetched game info for: ${matchId}`);
+
     return data;
   } catch (error) {
     console.error(`Failed to fetch game info for gameId: ${matchId}`, error);

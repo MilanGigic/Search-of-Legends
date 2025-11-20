@@ -11,7 +11,7 @@ async function clearRepeats() {
 
   for (const job of repeatable) {
     await leaderboardQueue.removeRepeatableByKey(job.key);
-    console.log(`🧹 Removed repeatable job: ${job.key}`);
+
   }
 }
 

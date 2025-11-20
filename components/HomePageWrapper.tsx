@@ -24,7 +24,7 @@ const HomePageWrapper = async () => {
   });
 
   const version = await fetchLatestVersion();
-  console.log("Version:", version);
+
 
   // Pass the data to the client component
   return <HomePage topFive={topFive} version={version!} />;

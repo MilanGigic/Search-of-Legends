@@ -58,12 +58,6 @@ export async function GET(req: NextRequest) {
     existingGameTeams.length > 0 &&
     existingGameBans.length > 0
   ) {
-    console.log("Raw gameCreation from DB:", existingGameInfo.gameCreation);
-    console.log("Type of gameCreation:", typeof existingGameInfo.gameCreation);
-    console.log(
-      "Instance of Date:",
-      existingGameInfo.gameCreation instanceof Date
-    );
     try {
       const gameCreationDate =
         existingGameInfo.gameCreation instanceof Date
@@ -81,7 +75,7 @@ export async function GET(req: NextRequest) {
         bans: existingGameBans,
       };
 
-      console.log("Existing complete game info:", completeGameInfo);
+
       return NextResponse.json(completeGameInfo, { status: 200 });
     } catch (error) {
       console.error(
@@ -113,7 +107,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (res.status === 429) {
-      console.log("Rate limit");
+
       await delay(1000 * 60 * 2);
     }
 

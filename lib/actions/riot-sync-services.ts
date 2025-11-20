@@ -32,7 +32,7 @@ export async function syncAllPlayersMatches() {
 
         await insertMatchData(matchData, puuid);
 
-        console.log(`Stored match ${matchId}`);
+
       }
     }
   }

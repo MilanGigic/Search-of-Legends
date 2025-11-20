@@ -79,7 +79,7 @@ const UserCard = ({
         default:
           setTierImage(undefined);
       }
-      console.log("Set tier image for:", tier);
+
     }
   }, [tier]);
 
@@ -97,10 +97,10 @@ const UserCard = ({
       }
 
       const data = await response.json();
-      console.log("Revalidation response:", data);
+
 
       if (data.revalidated) {
-        console.log("Summoner data updated successfully");
+
       } else {
         console.error("Failed to update summoner data");
       }

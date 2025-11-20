@@ -24,7 +24,7 @@ export async function getRolePerformance(puuid: string) {
       )
     )
     .groupBy(matchParticipants.individualPosition);
-  console.log("stats", stats);
+
 
   const enriched = await Promise.all(
     stats.map(async (stat) => {

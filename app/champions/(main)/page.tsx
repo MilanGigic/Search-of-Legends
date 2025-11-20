@@ -14,13 +14,13 @@ const ChampionsPage = async () => {
   const top10Champions = await getTopTenChampions();
   const mostBannedData = await getMostBannedChampions();
   const dbMatches = await db.query.matches.findMany();
-  console.log("Top 10 champions:", top10Champions);
+
 
   const top5 = top10Champions
     .sort((a, b) => Number(b.gamesPlayed) - Number(a.gamesPlayed))
     .slice(0, 5);
 
-  console.log("Top 5", top5);
+
 
   const mostBannedStats = mostBannedData.championStats; // Array of all champion stats
   const mostBannedChampions = mostBannedData.banStats; // Original ban data
@@ -62,14 +62,14 @@ const ChampionsPage = async () => {
               );
 
               const tier = calculateTier(top5, dbMatches.length);
-              console.log("Top 10 champions Completed name:", completedName);
+
 
               const champTier = tier.find(
                 (t) => t.championId === champion.championId
               );
 
-              console.log("Champion games played:", champion.gamesPlayed);
-              console.log("Games played:", dbMatches.length);
+
+
               return (
                 <div
                   key={index}
@@ -118,7 +118,7 @@ const ChampionsPage = async () => {
 
                 if (!dbChampion) return null;
                 const completedName = getCompletedChampionName(dbChampion.name);
-                console.log("Top 10 champions Completed name:", completedName);
+
 
                 // const tier = calculateTier(
                 //   champion.champStats!,
@@ -181,12 +181,12 @@ const ChampionsPage = async () => {
                   highestWinrateTop5,
                   dbMatches.length
                 );
-                console.log("Top 10 champions Completed name:", completedName);
+
 
                 const champTier = tier.find(
                   (t) => t.championId === champion.championId
                 );
-                console.log("Top 10 champions Completed name:", completedName);
+
                 return (
                   <div
                     key={index}

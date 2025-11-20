@@ -34,40 +34,8 @@ function sanitizeTimestamp(value: any): Date | null {
 }
 // Debug function to inspect raw data
 function debugRawData(raw: any, lineNo: number) {
-  console.log(`\n=== DEBUG LINE ${lineNo} ===`);
-  console.log("Raw object keys:", Object.keys(raw));
-  console.log("Sample values:");
-  console.log("  matchId:", raw.match_id, "type:", typeof raw.match_id);
-  console.log(
-    "  gameCreation:",
-    raw.game_creation,
-    "type:",
-    typeof raw.game_creation
-  );
-  console.log("  gameMode:", raw.game_mode, "type:", typeof raw.game_mode);
-  console.log("  gameType:", raw.game_type, "type:", typeof raw.game_type);
-  console.log(
-    "  gameVersion:",
-    raw.game_version,
-    "type:",
-    typeof raw.game_version
-  );
-  console.log("  mapId:", raw.map_id, "type:", typeof raw.map_id);
-  console.log(
-    "  platformId:",
-    raw.platform_id,
-    "type:",
-    typeof raw.platform_id
-  );
-  console.log("  queueId:", raw.queue_id, "type:", typeof raw.queue_id);
-  console.log(
-    "  tournamentCode:",
-    raw.tournament_code,
-    "type:",
-    typeof raw.tournament_code
-  );
-  console.log("  createdAt:", raw.created_at, "type:", typeof raw.created_at);
 
+  console.log("Raw object keys:", Object.keys(raw));
   // Check if the object has the expected structure
   const expectedFields = [
     "match_id",
@@ -83,12 +51,12 @@ function debugRawData(raw: any, lineNo: number) {
   ];
   const missingFields = expectedFields.filter((field) => !(field in raw));
   if (missingFields.length > 0) {
-    console.log("Missing expected fields:", missingFields);
+
   }
 
   // Show first few entries of the raw object
   const entries = Object.entries(raw).slice(0, 10);
-  console.log("First 10 raw entries:", entries);
+
 }
 
 // map raw row -> DB shape
@@ -113,17 +81,17 @@ function mapRow(raw: any, lineNo: number) {
 
   // Debug the mapping for first few rows
   if (lineNo <= 3) {
-    console.log("Mapped values:");
-    console.log("  matchId:", mapped.matchId);
-    console.log("  gameCreation:", mapped.gameCreation);
-    console.log("  gameMode:", mapped.gameMode);
-    console.log("  gameType:", mapped.gameType);
-    console.log("  gameVersion:", mapped.gameVersion);
-    console.log("  mapId:", mapped.mapId);
-    console.log("  platformId:", mapped.platformId);
-    console.log("  queueId:", mapped.queueId);
-    console.log("  tournamentCode:", mapped.tournamentCode);
-    console.log("  createdAt:", mapped.createdAt);
+
+
+
+
+
+
+
+
+
+
+
 
     // Count how many fields are null
     const nullFields = Object.entries(mapped).filter(
@@ -220,18 +188,14 @@ async function main() {
     saveCheckpoint(ndjsonFile, lineNo);
   }
 
-  console.log("Debug seeding complete");
+
 }
 
 async function insertBatch(batch: any[], lineNo: number) {
   try {
-    console.log(
-      `\n=== ATTEMPTING TO INSERT BATCH OF ${batch.length} RECORDS ===`
-    );
-
     // Debug the first record in the batch
     if (batch.length > 0) {
-      console.log("First record in batch:");
+
       const firstRecord = batch[0];
       Object.entries(firstRecord).forEach(([key, value]) => {
         if (value === null || value === undefined || Number.isNaN(value)) {

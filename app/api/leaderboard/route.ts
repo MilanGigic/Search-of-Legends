@@ -18,7 +18,7 @@ export async function GET() {
       )
       .limit(502); // Get top 500 players
 
-    console.log("Top 500 players ranked by ascending:", players);
+
 
     return NextResponse.json(players);
   } catch (error) {

@@ -70,14 +70,14 @@ export const fetchMatchDetailsInSmallBatch = async (
 ) => {
   if (matchIds.length === 0) return [];
 
-  console.log(`📦 Fetching ${matchIds.length} matches in region ${REGION}`);
+
 
   const allMatchData: RiotMatchDto[] = [];
   const MAX_CONCURRENT = 5;
 
   for (let i = 0; i < matchIds.length; i += MAX_CONCURRENT) {
     const batch = matchIds.slice(i, i + MAX_CONCURRENT);
-    console.log(`🔄 Batch ${i / MAX_CONCURRENT + 1}: ${batch.length} matches`);
+
 
     const batchResults = await Promise.allSettled(
       batch.map(async (matchId, index) => {
@@ -102,13 +102,9 @@ export const fetchMatchDetailsInSmallBatch = async (
     });
 
     if (i + MAX_CONCURRENT < matchIds.length) {
-      console.log(`⏳ Waiting 1.2 seconds before next batch...`);
+
       await delay(1200);
     }
   }
-
-  console.log(
-    `✅ Finished: ${allMatchData.length}/${matchIds.length} matches processed successfully.`
-  );
   return allMatchData;
 };

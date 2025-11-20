@@ -13,11 +13,13 @@ const MatchHistorySection = ({
   puuid,
   region,
   version,
+  numberOfMatches,
 }: {
   matchHistory: string[];
   puuid: string;
   region: string;
   version: string;
+  numberOfMatches: any;
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [games, setGames] = useState<GameDataProps[]>([]);
@@ -25,6 +27,8 @@ const MatchHistorySection = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [dbChecked, setDbChecked] = useState<boolean>(false);
   const gamesPerPage = 9;
+
+  // console.log(">>> numberOfMatches", numberOfMatches);
 
   const checkDatabaseForMatches = useCallback(async () => {
     try {
@@ -36,7 +40,7 @@ const MatchHistorySection = ({
         return matchHistory || [];
       }
 
-      console.log(`Checking database for ${matchHistory.length} matches`);
+
       const dbGames = await checkDbGames(puuid, matchHistory); // Process found matches
 
       if (!dbGames || typeof dbGames !== "object") {
@@ -114,9 +118,6 @@ const MatchHistorySection = ({
         setGames((prev) => {
           const exists = prev.some((g) => g.id === matchData.info.matchId);
           if (exists) {
-            console.log(
-              `Match ${matchData.info.matchId} already exists in state`
-            );
             return prev;
           }
 
@@ -130,11 +131,6 @@ const MatchHistorySection = ({
           ];
         });
       });
-
-      console.log(
-        `Successfully processed ${validMatchesProcessed} valid matches from database`
-      );
-
       // Step 7: Validate missingMatchIds
       if (!Array.isArray(missingMatchIds)) {
         console.error("missingMatchIds is not an array:", missingMatchIds);
@@ -155,10 +151,6 @@ const MatchHistorySection = ({
       }
 
       setDbChecked(true);
-      console.log(
-        `Database check complete: ${foundMatches.length} found, ${validMissingIds.length} missing`
-      );
-
       return validMissingIds;
     } catch (error) {
       console.error("Error checking database:", error);
@@ -217,7 +209,7 @@ const MatchHistorySection = ({
         clearTimeout(timeoutId);
 
         if (res.status === 429) {
-          console.log("Waiting for riot rate limiter");
+
           setFailedMatches((prev) => [...prev, matchId]);
           await delay(1000 * 60 * 2);
         }
@@ -290,11 +282,11 @@ const MatchHistorySection = ({
         setGames((prev) => {
           const exists = prev.some((game) => game.id === matchId);
           if (exists) {
-            console.log(`Match ${matchId} already exists in games state`);
+
             return prev;
           }
 
-          console.log(`Successfully added match ${matchId} to games state`);
+
           return [...prev, { id: matchId, data: data }];
         });
       } catch (error) {
@@ -411,11 +403,6 @@ const MatchHistorySection = ({
           return 0; // Keep original order if sorting fails
         }
       });
-
-    console.log(
-      `Filtered to ${valid.length} valid games from ${games.length} total games`
-    );
-
     return {
       validGames: valid,
       totalPages: Math.ceil(valid.length / gamesPerPage),

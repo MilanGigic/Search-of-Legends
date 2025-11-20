@@ -69,12 +69,12 @@ const GameMatchCard = ({
 
   useEffect(() => {
     const fetchMatchEvents = async () => {
-      console.log(
-        "Fetching match events for matchId:",
-        game.info.matchId,
-        "region:",
-        region
-      );
+      // console.log(
+      //   "Fetching match events for matchId:",
+      //   game.info.matchId,
+      //   "region:",
+      //   region
+      // );
       const eventsRes = await fetch(
         `/api/match-events?matchId=${game.info.matchId}&region=${region}`
       );
@@ -86,21 +86,15 @@ const GameMatchCard = ({
       }
 
       const matchEvents: MatchTimelineDto = await eventsRes.json();
-      console.log("Fetched match events:", matchEvents);
+      // console.log("Fetched match events:", matchEvents);
       setMatchEvents(matchEvents);
     };
 
-    console.log("showGame changed:", showGame);
+    // console.log("showGame changed:", showGame);
     fetchMatchEvents();
   }, [showGame]);
   useEffect(() => {
     const fetchGameInfoForRunesPage = async () => {
-      console.log(
-        "Fetching game info for runes page for matchId:",
-        game.info.matchId,
-        "region:",
-        region
-      );
       const runesRes = await fetch(
         `/api/game-info-for-runes-page?matchId=${game.info.matchId}&region=${region}`
       );
@@ -112,11 +106,11 @@ const GameMatchCard = ({
       }
 
       const runesData: RiotMatchDto = await runesRes.json();
-      console.log("Fetched game info for runes page:", runesData);
+      // console.log("Fetched game info for runes page:", runesData);
       setGameInfoForRunes(runesData);
     };
 
-    console.log("showGame changed:", showGame);
+    // console.log("showGame changed:", showGame);
     fetchGameInfoForRunesPage();
   }, [showGame]);
 

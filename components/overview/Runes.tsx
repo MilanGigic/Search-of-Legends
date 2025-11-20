@@ -58,7 +58,7 @@ const Runes = ({
       }
 
       const data: RuneStyle[] = await res.json();
-      console.log("Fetches runes data:", data);
+
 
       setRunesApi(data);
     };
@@ -71,7 +71,7 @@ const Runes = ({
       const primaryStyleId = participant.perks.styles[0]?.style;
       const matched = runesApi.find((r) => r.id === primaryStyleId);
 
-      console.log("Matched rune:", matched);
+
       if (matched) {
         const iconPath = matched.icon;
         const url = `https://ddragon.leagueoflegends.com/cdn/img/${iconPath}`;

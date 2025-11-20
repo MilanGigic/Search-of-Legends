@@ -10,7 +10,7 @@ const SpellCard = ({ champion }: { champion: ChampionDetail | null }) => {
 
   const onClick = (spellId: string) => {
     setChampionVideoKey(spellId);
-    console.log("Spell ID:", spellId);
+
   };
   if (!champion || champion === null) return null;
 

@@ -5,7 +5,7 @@ interface RegionData {
 }
 
 export default async function fetchSummonerFromAnyRegion(puuid: string) {
-  console.log("Trying to fetch summoner from multiple regions...");
+
 
   const API_KEY = process.env.RIOT_API_KEY;
 
@@ -21,7 +21,7 @@ export default async function fetchSummonerFromAnyRegion(puuid: string) {
     }
 
     const regionData: RegionData = await response.json();
-    console.log(`✅ Found region for PUUID ${puuid}: ${regionData.region}`);
+
 
     const summonerUrl = `https://${regionData.region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${API_KEY}`;
 
@@ -36,11 +36,6 @@ export default async function fetchSummonerFromAnyRegion(puuid: string) {
         }
 
         const summonerData: SummonerInfo = await summonerResponse.json();
-
-        console.log(
-          `✅ Found summoner data for PUUID ${puuid} in region ${regionData.region}`
-        );
-
         return {
           region: regionData.region,
           data: summonerData,

@@ -9,7 +9,7 @@ import { fetchWithRateLimit } from "@/lib/riot";
 
 dotenv.config();
 
-console.log("Initializing account queue...");
+
 
 export const accountQueue = new Queue("account", {
   connection: redisConnection,
@@ -39,7 +39,7 @@ const MAX_ACCOUNT_AGE = 1000 * 60 * 60; // 1 hour
 export const accountsWorker = new Worker(
   "account",
   async (job: Job) => {
-    console.log("Worker started: Fetching accounts...");
+
     console.log("🔥 Job STARTED at", new Date().toISOString());
 
     const tiers = [
@@ -61,7 +61,7 @@ export const accountsWorker = new Worker(
 
         while (hasMorePages) {
           const url = `https://euw1.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/${tier}/${division}?page=${page}&api_key=${process.env.RIOT_API_KEY}`;
-          console.log(`🔎 Fetching ${tier} ${division} page ${page}`);
+
           const res = await fetchWithRateLimit(url);
 
           if (!res.ok) {
@@ -73,9 +73,6 @@ export const accountsWorker = new Worker(
 
           const data: LeagueEntry[] = await res.json();
           if (!Array.isArray(data) || data.length === 0) {
-            console.log(
-              `✅ No more entries for ${tier} ${division} at page ${page}.`
-            );
             break;
           }
 
@@ -83,13 +80,13 @@ export const accountsWorker = new Worker(
 
           page++;
           hasMorePages = true;
-          console.log(`⏳ Waiting 2 minutes before next page...`);
+
           await delay(1000 * 60 * 2);
         }
       }
     }
 
-    console.log("✅ All accounts sync completed.");
+
   },
   {
     connection: redisConnection,
@@ -106,11 +103,6 @@ async function processLeagueEntries(
   const BATCH_DELAY = 130000;
 
   const sorted = entries.sort((a, b) => b.leaguePoints - a.leaguePoints);
-
-  console.log(
-    `🔄 Processing ${sorted.length} entries for ${tier} ${division} page ${page}`
-  );
-
   for (let i = 0; i < sorted.length; i += BATCH_SIZE) {
     const batch = sorted.slice(i, i + BATCH_SIZE);
 
@@ -176,10 +168,6 @@ async function processLeagueEntries(
                 lastUpdated: Date.now(),
               },
             });
-
-          console.log(
-            `✅ Synced ${accountData.gameName}#${accountData.tagLine}`
-          );
         } catch (err) {
           console.warn(
             `⚠️ Failed entry in ${tier} ${division} page ${page}:`,
@@ -192,19 +180,19 @@ async function processLeagueEntries(
     await Promise.all(jobs);
 
     if (i + BATCH_SIZE < sorted.length) {
-      console.log(`⏳ Waiting ${BATCH_DELAY / 1000}s before next batch...`);
+
       await delay(BATCH_DELAY);
     }
   }
 
-  console.log(`✅ Finished processing page ${page} of ${tier} ${division}`);
+
 }
 
 // Worker lifecycle events
 accountsWorker.on("ready", () => console.log("🟢 Worker is ready"));
 accountsWorker.on("active", (job) => console.log(`🔄 Job started: ${job.id}`));
 accountsWorker.on("completed", (job) =>
-  console.log(`✅ Job completed: ${job.id}`)
+
 );
 accountsWorker.on("failed", (job, err) =>
   console.error(`❌ Job failed: ${job?.id}`, err)
@@ -212,18 +200,18 @@ accountsWorker.on("failed", (job, err) =>
 
 // Add a manual trigger function for testing
 export async function triggerAccountsSync() {
-  console.log("🚀 Manually triggering accounts sync...");
+
   const job = await accountQueue.add("sync-accounts", {});
-  console.log(`📋 Job added with ID: ${job.id}`);
+
   return job;
 }
 
 // If this file is run directly, trigger a manual sync
 if (require.main === module) {
-  console.log("🏃 Running accounts sync manually...");
+
   triggerAccountsSync()
     .then(() => {
-      console.log("✅ Manual trigger completed");
+
     })
     .catch((err) => {
       console.error("❌ Manual trigger failed:", err);

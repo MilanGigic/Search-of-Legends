@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log(`Checking ${matchIdArray.length} matches for puuid ${puuid}`);
+
 
     // Fetch all related match data in a single query
     const matchData = await db.transaction(async (tx) => {
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       });
 
       if (!matchRecords || matchRecords.length === 0) {
-        console.log(`No matches found in database for puuid: ${puuid}`);
+
         return {
           foundMatches: [],
           missingMatchIds: matchIdArray,
@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
         };
       }
 
-      console.log(`Found ${foundMatchIds.length} base matches in database`);
+
 
       try {
         const [details, participants, objectives, teams, bans] =
@@ -103,14 +103,6 @@ export async function GET(req: NextRequest) {
           ]);
 
         // Step 7: Validate related data was fetched
-        console.log(
-          `Related data fetched - Details: ${
-            details?.length || 0
-          }, Participants: ${participants?.length || 0}, Teams: ${
-            teams?.length || 0
-          }`
-        );
-
         // Step 8: Structure and validate the complete match data
         const completeMatches = foundMatchIds.map((matchId) => {
           const matchDetail = details?.find((d) => d?.matchId === matchId);
@@ -172,11 +164,6 @@ export async function GET(req: NextRequest) {
         const missingMatchIds = matchIdArray.filter(
           (id) => !validMatchIds.includes(id)
         );
-
-        console.log(
-          `Returning ${validCompleteMatches.length} complete matches, ${missingMatchIds.length} missing/incomplete`
-        );
-
         return {
           foundMatches: validCompleteMatches.map(
             ({ isComplete, ...match }) => match
@@ -211,10 +198,6 @@ export async function GET(req: NextRequest) {
       matchData;
 
     // Step 12: Log final results for debugging
-    console.log(
-      `Final results: Found ${foundCount}/${totalRequested} matches, ${missingMatchIds.length} missing`
-    );
-
     // Step 13: Validate response structure before sending
     if (!Array.isArray(foundMatches) || !Array.isArray(missingMatchIds)) {
       console.error("Invalid response structure from database transaction");

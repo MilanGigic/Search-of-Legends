@@ -76,7 +76,7 @@ export default async function checkDbGames(puuid: string, matchIds: string[]) {
     }
 
     clearTimeout(timeoutId);
-    console.log("Fetch response status:", res.status);
+
 
     // Step 6: Validate response status
     if (!res.ok) {
@@ -206,14 +206,6 @@ export default async function checkDbGames(puuid: string, matchIds: string[]) {
         `checkDbGames: Total processed (${totalProcessed}) doesn't match input (${matchIds.length})`
       );
     }
-
-    console.log("checkDbGames: Validation complete", {
-      foundMatches: totalFound,
-      missingMatchIds: totalMissing,
-      invalidMatches: invalidMatches.length,
-      totalRequested: matchIds.length,
-    });
-
     // Step 15: Return validated data
     return {
       foundMatches: validFoundMatches,

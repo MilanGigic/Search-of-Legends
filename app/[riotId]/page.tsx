@@ -8,20 +8,21 @@ import getRegionalEndpoint from "@/lib/actions/match-history/getRegionalEndpoint
 import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
-import { fetchLatestVersion } from "@/lib/riot";
+import { fetchLatestVersion, fetchNumberOfMatches } from "@/lib/riot";
 
 interface AccountPageProps {
-  params: Promise<{ riotId: string }>; // params is now a Promise
+  params: Promise<{ riotId: string; page: string }>; // params is now a Promise
+  searchParams: Promise<{ page: string }>;
 }
 
-const AccountPage = async ({ params }: AccountPageProps) => {
+const AccountPage = async ({ params, searchParams }: AccountPageProps) => {
   const { riotId } = await params;
+  const { page } = await searchParams;
   const decodedRiotId = decodeURIComponent(riotId);
   const separator = decodedRiotId.lastIndexOf("-");
   if (separator === -1) return notFound();
   const gameName = decodedRiotId.slice(0, separator);
   const tagLine = decodedRiotId.slice(separator + 1);
-  console.log("Parsed gameName and tagLine:", { gameName, tagLine });
   const headersList = await headers();
 
   if (!gameName || !tagLine) {
@@ -60,13 +61,14 @@ const AccountPage = async ({ params }: AccountPageProps) => {
 
   const matchHistory: string[] = await fetchAllMatchIds(
     puuid,
-    accountData.region
+    accountData.region,
+    page
   );
 
   const fullUrl = headersList.get("x-url") || headersList.get("referer");
 
   const version = await fetchLatestVersion();
-  console.log("Version:", version);
+  const numberOfMatches = await fetchNumberOfMatches({ puuid });
   return (
     <div className="relative z-10 min-h-screen p-4">
       <main className="relative z-10 w-full flex flex-col items-center justify-center">
@@ -88,6 +90,7 @@ const AccountPage = async ({ params }: AccountPageProps) => {
             puuid={puuid!}
             region={REGION}
             version={version!}
+            numberOfMatches={numberOfMatches}
           />
         </div>
       </main>
