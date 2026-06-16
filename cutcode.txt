@@ -1,0 +1,201 @@
+  const checkDatabaseForMatches = useCallback(async () => {
+    try {
+      if (!puuid || !matchHistory || matchHistory.length === 0) {
+        console.warn("Invalid inputs for database check:", {
+          puuid: !!puuid,
+          matchHistoryLength: matchHistory?.length,
+        });
+        return matchHistory || [];
+      }
+
+      const dbGames = await checkDbGames(puuid, matchHistory); // Process found matches
+
+      if (!dbGames || typeof dbGames !== "object") {
+        console.error("Invalid response from checkDbGames:", dbGames);
+        return matchHistory; // Fallback to fetching all
+      }
+      const { foundMatches, missingMatchIds } = dbGames;
+
+      if (!Array.isArray(foundMatches)) {
+        console.error("foundMatches is not an array:", foundMatches);
+        return matchHistory;
+      }
+
+      let validMatchesProcessed = 0;
+      foundMatches.forEach((matchData: DbGameInfo, index: number) => {
+        // Validate match data structure
+        if (!matchData || typeof matchData !== "object") {
+          console.warn(`Invalid match data at index ${index}:`, matchData);
+          return;
+        }
+
+        // Validate essential match info exists
+        if (!matchData.info || !matchData.info.matchId) {
+          console.warn(`Missing essential info for match at index ${index}:`, {
+            hasInfo: !!matchData.info,
+            hasMatchId: !!matchData.info?.matchId,
+          });
+          return;
+        }
+
+        // Validate participants and teams (essential for game display)
+        if (
+          !matchData.participants ||
+          !Array.isArray(matchData.participants) ||
+          matchData.participants.length === 0
+        ) {
+          console.warn(
+            `Invalid participants for match ${matchData.info.matchId}:`,
+            {
+              hasParticipants: !!matchData.participants,
+              isArray: Array.isArray(matchData.participants),
+              length: matchData.participants?.length,
+            },
+          );
+          return;
+        }
+
+        if (
+          !matchData.teams ||
+          !Array.isArray(matchData.teams) ||
+          matchData.teams.length === 0
+        ) {
+          console.warn(`Invalid teams for match ${matchData.info.matchId}:`, {
+            hasTeams: !!matchData.teams,
+            isArray: Array.isArray(matchData.teams),
+            length: matchData.teams?.length,
+          });
+          return;
+        }
+
+        // Step 5: Additional validation for game data integrity
+        const hasValidGameCreation =
+          matchData.info.gameCreation &&
+          (typeof matchData.info.gameCreation === "number" ||
+            typeof matchData.info.gameCreation === "string");
+
+        if (!hasValidGameCreation) {
+          console.warn(
+            `Invalid gameCreation for match ${matchData.info.matchId}:`,
+            matchData.info.gameCreation,
+          );
+        }
+
+        // Step 6: Process valid match data
+        setGames((prev) => {
+          const exists = prev.some((g) => g.id === matchData.info.matchId);
+          if (exists) {
+            return prev;
+          }
+
+          validMatchesProcessed++;
+          return [
+            ...prev,
+            {
+              id: matchData.info.matchId,
+              data: matchData,
+            },
+          ];
+        });
+      });
+      // Step 7: Validate missingMatchIds
+      if (!Array.isArray(missingMatchIds)) {
+        console.error("missingMatchIds is not an array:", missingMatchIds);
+        return matchHistory;
+      }
+
+      // Step 8: Validate missing IDs are actually strings
+      const validMissingIds = missingMatchIds.filter(
+        (id) => typeof id === "string" && id.trim().length > 0,
+      );
+
+      if (validMissingIds.length !== missingMatchIds.length) {
+        console.warn(
+          `Filtered out ${
+            missingMatchIds.length - validMissingIds.length
+          } invalid missing match IDs`,
+        );
+      }
+
+      setDbChecked(true);
+      return validMissingIds;
+    } catch (error) {
+      console.error("Error checking database:", error);
+
+      // Step 9: Enhanced error handling
+      if (error instanceof TypeError) {
+        console.error(
+          "Type error in database check - possible data structure issue",
+        );
+      } else if (error instanceof Error && error.message.includes("fetch")) {
+        console.error("Network error during database check");
+      }
+
+      setDbChecked(true); // Prevent infinite loops
+      return matchHistory; // Fallback to fetching all
+    }
+  }, [puuid, matchHistory]);
+
+    useEffect(() => {
+    const limit = pLimit(9);
+    let isCancelled = false;
+    setIsLoading(true);
+
+    const startFetching = async () => {
+      try {
+        // First check database for existing matches
+        const missingMatchIds = await checkDatabaseForMatches();
+
+        // Only fetch matches that weren't in the database
+        const batchSize = 10;
+        for (let i = 0; i < missingMatchIds!.length; i += batchSize) {
+          if (isCancelled) break;
+          const batch = missingMatchIds!.slice(i, i + batchSize);
+          const tasks = batch.map((matchId: string, batchIndex: number) =>
+            limit(() => fetchGameInfo(matchId, i + batchIndex)),
+          );
+
+          await Promise.all(tasks);
+
+          if (i + batchSize < missingMatchIds!.length) {
+            await delay(500); // Rate limiting between batches
+          }
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    startFetching();
+
+    return () => {
+      isCancelled = true;
+      setIsLoading(false);
+    };
+  }, [matchHistory, fetchGameInfo, checkDatabaseForMatches]);
+  
+    const [
+      newGameInfo,
+      newGameParticipants,
+      newGameObjectives,
+      newGameTeams,
+      newGameBans,
+    ] = await Promise.all([
+      db.query.matchDetails.findFirst({
+        where: eq(matchDetails.matchId, gameId),
+      }),
+      db.query.matchParticipants.findMany({
+        where: eq(matchParticipants.matchId, gameId),
+      }),
+      db.query.matchObjectives.findMany({
+        where: eq(matchObjectives.matchId, gameId),
+      }),
+      db.query.matchTeams.findMany({
+        where: eq(matchTeams.matchId, gameId),
+      }),
+      db.query.matchBans.findMany({
+        where: eq(matchBans.matchId, gameId),
+      }),
+    ]);

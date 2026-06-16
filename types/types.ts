@@ -18,6 +18,24 @@ interface SummonerInfo {
   summonerLevel: number;
 }
 
+interface TopFivePerRegion {
+  puuid: string;
+  gameName: string;
+  tagLine: string;
+  region: string;
+
+  summonerLevel: number;
+  profileIconId: number;
+
+  rank: string;
+  leaguePoints: number;
+
+  wins: number;
+  losses: number;
+
+  updatedAt: Date;
+}
+
 interface SummonerRankInfo {
   leagueId: string;
   summonerId: string;
@@ -188,6 +206,12 @@ interface LeagueData {
   entries: LeagueEntry[];
 }
 
+interface LeaderboardLeagueData {
+  tier: string;
+  queue: string;
+  entries: LeagueEntry[];
+}
+
 interface CompleteSummonerInfo extends SummonerInfo {
   summoner: SummonerRankInfo;
 }
@@ -247,7 +271,7 @@ interface DbGameInfo {
     platformId: string | null;
     queueId: number;
     tournamentCode: string | null;
-    createdAt: Date;
+    createdAt: Date | null;
   };
   participants: DbParticipantData[];
   objectives: {

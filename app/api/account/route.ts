@@ -1,34 +1,28 @@
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
-import fetchSummonerFromAnyRegion from "@/lib/actions/region";
+import fetchSummonerFromAnyRegion from "@/actions/region";
 import { delay } from "@/lib/riot";
 import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-
-
   const { searchParams } = new URL(req.url);
   const gameName = searchParams.get("gameName");
   const tagLine = searchParams.get("tagLine");
 
-
-
   if (!gameName || !tagLine) {
-
     return NextResponse.json(
       { error: "Both gameName and tagLine are required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   const API_KEY = process.env.RIOT_API_KEY!;
 
   if (!API_KEY) {
-
     return NextResponse.json(
       { error: "Riot API key is not configured" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -37,7 +31,7 @@ export async function GET(req: NextRequest) {
     const existingAccount = await db.query.accounts.findFirst({
       where: and(
         eq(accounts.gameName, gameName),
-        eq(accounts.tagLine, tagLine)
+        eq(accounts.tagLine, tagLine),
       ),
     });
 
@@ -49,7 +43,6 @@ export async function GET(req: NextRequest) {
       existingAccount?.lastUpdated &&
       now - existingAccount?.lastUpdated < ONE_HOUR
     ) {
-
       return NextResponse.json({
         puuid: existingAccount?.puuid,
         gameName: existingAccount?.gameName,
@@ -69,13 +62,9 @@ export async function GET(req: NextRequest) {
 
     const accountUrl = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}?api_key=${API_KEY}`;
 
-
-
     const accountResponse = await fetch(accountUrl);
 
-
     if (accountResponse.status === 429) {
-
       await delay(60 * 1000 * 2);
     }
 
@@ -84,47 +73,39 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json(
         { error: errorData.status.message || "Failed to fetch account" },
-        { status: accountResponse.status }
+        { status: accountResponse.status },
       );
     }
 
     const accountData: Account = await accountResponse.json();
 
-
     let completeData: DbSummonerInfo | null = null;
 
     try {
       const summonerResult = await fetchSummonerFromAnyRegion(
-        accountData.puuid
+        accountData.puuid,
       );
 
       if (!summonerResult) {
-
         return NextResponse.json(
           { error: "No summoner found for the given PUUID in any region." },
-          { status: 404 }
+          { status: 404 },
         );
       }
       const summonerData: SummonerInfo = summonerResult.data;
       const entriesRes = await fetch(
-        `https://${summonerResult.region}.api.riotgames.com/lol/league/v4/entries/by-puuid/${accountData.puuid}?api_key=${API_KEY}`
+        `https://${summonerResult.region}.api.riotgames.com/lol/league/v4/entries/by-puuid/${accountData.puuid}?api_key=${API_KEY}`,
       );
-
-
 
       if (!entriesRes.ok) {
       }
 
       const entries: SummonerRankInfo[] = await entriesRes.json();
 
-
-
       // Find the ranked solo queue entry
       const soloQueueEntry = entries.find(
-        (entry) => entry.queueType === "RANKED_SOLO_5x5"
+        (entry) => entry.queueType === "RANKED_SOLO_5x5",
       );
-
-
 
       if (summonerResult && soloQueueEntry) {
         completeData = {
@@ -180,16 +161,13 @@ export async function GET(req: NextRequest) {
             });
         }
       }
-    } catch (error) {
-
-    }
+    } catch (error) {}
 
     return NextResponse.json(completeData, { status: 200 });
   } catch (error) {
-
     return NextResponse.json(
       { error: "Something went wrong." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,9 +1,8 @@
-import { getRolePerformance } from "@/lib/actions/getRolePerformance";
+import { getRolePerformance } from "@/actions/performance/getRolePerformance";
 import Image from "next/image";
 
 const RolesPerformanceCard = async ({ puuid }: { puuid: string }) => {
   const data = await getRolePerformance(puuid);
-
 
   return (
     <div className="p-5 py-3 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624]  shadow-sm shadow-[#2A2A40]">

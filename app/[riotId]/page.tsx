@@ -3,12 +3,13 @@ import UserCard from "@/components/UserCard";
 import UserStats from "@/components/overview/UserStats";
 import { db } from "@/db";
 import { accounts } from "@/db/schema";
-import fetchAllMatchIds from "@/lib/actions/match-history/fetchMatchIds";
-import getRegionalEndpoint from "@/lib/actions/match-history/getRegionalEndpoint";
+import fetchAllMatchIds from "@/actions/match-history/fetchMatchIds";
+import getRegionalEndpoint from "@/actions/match-history/getRegionalEndpoint";
 import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
-import { fetchLatestVersion, fetchNumberOfMatches } from "@/lib/riot";
+import { fetchLatestVersion } from "@/lib/riot";
+import { fetchNumberOfMatches } from "@/actions/fetchNumberOfMatches";
 
 interface AccountPageProps {
   params: Promise<{ riotId: string; page: string }>; // params is now a Promise
@@ -39,7 +40,7 @@ const AccountPage = async ({ params, searchParams }: AccountPageProps) => {
   if (!existingAccount) {
     const accountRes = await fetch(
       `/api/account?gameName=${gameName}&tagLine=${tagLine}`,
-      { headers: { "Content-Type": "application/json" } }
+      { headers: { "Content-Type": "application/json" } },
     );
 
     if (!accountRes.ok) {
@@ -62,7 +63,7 @@ const AccountPage = async ({ params, searchParams }: AccountPageProps) => {
   const matchHistory: string[] = await fetchAllMatchIds(
     puuid,
     accountData.region,
-    page
+    page,
   );
 
   const fullUrl = headersList.get("x-url") || headersList.get("referer");

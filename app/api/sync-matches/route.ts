@@ -1,6 +1,6 @@
 // app/api/sync-matches/route.ts
 import { NextResponse } from "next/server";
-import { syncAllPlayersMatches } from "@/lib/actions/riot-sync-services";
+import { syncAllPlayersMatches } from "@/actions/riot-sync-services";
 
 export async function POST() {
   try {

@@ -6,7 +6,7 @@ import {
   matchParticipants,
   matchTeams,
 } from "@/db/schema";
-import insertMatchData from "@/lib/actions/insertMatchData";
+import insertMatchData from "@/actions/insertMatchData";
 import { delay } from "@/lib/riot";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
@@ -75,16 +75,15 @@ export async function GET(req: NextRequest) {
         bans: existingGameBans,
       };
 
-
       return NextResponse.json(completeGameInfo, { status: 200 });
     } catch (error) {
       console.error(
         `Failed to fetch game info from database for gameId: ${gameId}`,
-        error
+        error,
       );
       return NextResponse.json(
         { message: "Internal server error" },
-        { status: 500 }
+        { status: 500 },
       );
     }
   }
@@ -101,13 +100,12 @@ export async function GET(req: NextRequest) {
     if (!res.ok) {
       const errorText = await res.text();
       console.error(
-        `Failed to fetch game info for gameId: ${gameId}. Status: ${res.status}, Error: ${errorText}`
+        `Failed to fetch game info for gameId: ${gameId}. Status: ${res.status}, Error: ${errorText}`,
       );
       return new Response(errorText, { status: res.status });
     }
 
     if (res.status === 429) {
-
       await delay(1000 * 60 * 2);
     }
 
@@ -139,13 +137,15 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
+    if (!newGameInfo) return;
+
     const gameCreationDate =
       newGameInfo?.gameCreation instanceof Date
         ? newGameInfo.gameCreation
-        : new Date(newGameInfo!.gameCreation);
+        : new Date(newGameInfo.gameCreation);
     const transformedData: DbGameInfo = {
       info: {
-        ...newGameInfo!,
+        ...newGameInfo,
         gameCreation: gameCreationDate,
       },
       participants: newGameParticipants,
@@ -159,7 +159,7 @@ export async function GET(req: NextRequest) {
     console.error(`Failed to fetch game info for gameId: ${gameId}`, error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

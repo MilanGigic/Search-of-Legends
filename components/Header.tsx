@@ -127,7 +127,8 @@ const Header = ({ showSearch }: { showSearch?: boolean }) => {
             )
           )}
         </ul>
-        <div className="hidden md:flex items-center">
+        <div></div>
+        {/* <div className="hidden md:flex items-center">
           {session ? (
             <>
               <h1>Welcome, Riot User</h1>
@@ -136,15 +137,8 @@ const Header = ({ showSearch }: { showSearch?: boolean }) => {
           ) : (
             <button onClick={() => signIn("riot")}>Sign In with Riot</button>
           )}
-          {/* <Link href="/"> */}
-          {/* <Button
-              variant="outline"
-              className="mr-1 sm:mr-4 p-2 md:p-4 bg-gradient-to-r border-gray-500 from-sky-600 to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-300 hover:to-blue-200 font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"
-            >
-              Try Premium
-            </Button> */}
-          {/* </Link> */}
-        </div>
+
+        </div> */}
       </div>
     </div>
   );

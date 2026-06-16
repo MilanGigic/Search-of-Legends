@@ -1,1 +1,0 @@
-ALTER TABLE "match_details" ADD COLUMN "queue_type" text NOT NULL;

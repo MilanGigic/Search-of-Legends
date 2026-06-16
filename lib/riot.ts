@@ -256,14 +256,14 @@ export async function fetchWithRateLimit(url: string, opts?: RequestInit) {
 export async function fetchLatestVersion() {
   try {
     const versionRes = await fetch(
-      "https://ddragon.leagueoflegends.com/api/versions.json"
+      "https://ddragon.leagueoflegends.com/api/versions.json",
     );
 
     if (!versionRes.ok) {
       console.error(
         "Error fetching versions:",
         versionRes.status,
-        versionRes.statusText
+        versionRes.statusText,
       );
     }
 
@@ -273,13 +273,4 @@ export async function fetchLatestVersion() {
   } catch (error) {
     console.error("Fetching versions failed:", error);
   }
-}
-
-export async function fetchNumberOfMatches({ puuid }: { puuid: string }) {
-  const res = await fetch(
-    `http://localhost:3000/api/number-of-matches/${puuid}`
-  );
-
-  // return await res.json();
-  return "";
 }

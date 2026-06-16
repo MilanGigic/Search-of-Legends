@@ -1,1 +1,0 @@
-CREATE UNIQUE INDEX unique_match_champion_non_quickmatch ON match_participants (match_id, champion_id) WHERE queue_id <> 48 OR queue_id <> 43;

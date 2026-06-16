@@ -1,10 +1,10 @@
 import ChampionPageClient from "@/components/champions-page/ChampionPageClient";
 import { db } from "@/db";
 import { champions } from "@/db/schema";
-import calculateTier from "@/lib/actions/calculateTier";
-import { getCompletedChampionName } from "@/lib/actions/getCompletedChampionName";
-import { getMostBannedChampions } from "@/lib/actions/getMostBannedChampions";
-import { getTopTenChampions } from "@/lib/actions/getTopTenChampions";
+import calculateTier from "@/actions/performance/calculateTier";
+import { getCompletedChampionName } from "@/actions/champions/getCompletedChampionName";
+import { getMostBannedChampions } from "@/actions/champions/getMostBannedChampions";
+import { getTopTenChampions } from "@/actions/performance/getTopTenChampions";
 import { fetchLatestVersion } from "@/lib/riot";
 import { eq } from "drizzle-orm";
 import Image from "next/image";
@@ -15,19 +15,16 @@ const ChampionsPage = async () => {
   const mostBannedData = await getMostBannedChampions();
   const dbMatches = await db.query.matches.findMany();
 
-
   const top5 = top10Champions
     .sort((a, b) => Number(b.gamesPlayed) - Number(a.gamesPlayed))
     .slice(0, 5);
-
-
 
   const mostBannedStats = mostBannedData.championStats; // Array of all champion stats
   const mostBannedChampions = mostBannedData.banStats; // Original ban data
 
   const tieredMostBannedChampions = calculateTier(
     mostBannedStats,
-    dbMatches.length
+    dbMatches.length,
   );
 
   // Get top 5 most banned champions with their tier info
@@ -58,17 +55,14 @@ const ChampionsPage = async () => {
             </ul>
             {top5?.map(async (champion, index) => {
               const completedName = getCompletedChampionName(
-                champion.championName
+                champion.championName,
               );
 
               const tier = calculateTier(top5, dbMatches.length);
 
-
               const champTier = tier.find(
-                (t) => t.championId === champion.championId
+                (t) => t.championId === champion.championId,
               );
-
-
 
               return (
                 <div
@@ -86,7 +80,7 @@ const ChampionsPage = async () => {
                   </Link>
                   <h1>
                     {((champion.gamesPlayed / dbMatches.length) * 10).toFixed(
-                      1
+                      1,
                     )}
                     <span className="text-gray-400 text-sm">%</span>
                   </h1>
@@ -119,7 +113,6 @@ const ChampionsPage = async () => {
                 if (!dbChampion) return null;
                 const completedName = getCompletedChampionName(dbChampion.name);
 
-
                 // const tier = calculateTier(
                 //   champion.champStats!,
                 //   dbMatches.length
@@ -150,7 +143,7 @@ const ChampionsPage = async () => {
                     <h1>{champion.tier}</h1>
                     <h1>
                       {((champion.wins / champion.gamesPlayed) * 100).toFixed(
-                        1
+                        1,
                       )}
                       <span className="text-gray-400 text-sm">%</span>
                     </h1>
@@ -175,16 +168,15 @@ const ChampionsPage = async () => {
               </ul>
               {highestWinrateTop5?.map((champion, index) => {
                 const completedName = getCompletedChampionName(
-                  champion.championName
+                  champion.championName,
                 );
                 const tier = calculateTier(
                   highestWinrateTop5,
-                  dbMatches.length
+                  dbMatches.length,
                 );
 
-
                 const champTier = tier.find(
-                  (t) => t.championId === champion.championId
+                  (t) => t.championId === champion.championId,
                 );
 
                 return (
@@ -203,7 +195,7 @@ const ChampionsPage = async () => {
                     </Link>
                     <h1>
                       {((champion.wins / champion.gamesPlayed) * 100).toFixed(
-                        2
+                        2,
                       )}
                       <span className="text-gray-400 text-sm">%</span>
                     </h1>

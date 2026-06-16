@@ -3,8 +3,8 @@
 import pLimit from "p-limit";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import GameMatchCard from "./GameMatchCard";
-import checkDbGames from "@/lib/actions/checkDbGames";
-import { createRiotRateLimiter } from "@/lib/actions/rateLimiter";
+import checkDbGames from "@/actions/checkDbGames";
+import { createRiotRateLimiter } from "@/actions/rateLimiter";
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
@@ -28,146 +28,7 @@ const MatchHistorySection = ({
   const [dbChecked, setDbChecked] = useState<boolean>(false);
   const gamesPerPage = 9;
 
-  // console.log(">>> numberOfMatches", numberOfMatches);
-
-  const checkDatabaseForMatches = useCallback(async () => {
-    try {
-      if (!puuid || !matchHistory || matchHistory.length === 0) {
-        console.warn("Invalid inputs for database check:", {
-          puuid: !!puuid,
-          matchHistoryLength: matchHistory?.length,
-        });
-        return matchHistory || [];
-      }
-
-
-      const dbGames = await checkDbGames(puuid, matchHistory); // Process found matches
-
-      if (!dbGames || typeof dbGames !== "object") {
-        console.error("Invalid response from checkDbGames:", dbGames);
-        return matchHistory; // Fallback to fetching all
-      }
-      const { foundMatches, missingMatchIds } = dbGames;
-
-      if (!Array.isArray(foundMatches)) {
-        console.error("foundMatches is not an array:", foundMatches);
-        return matchHistory;
-      }
-
-      let validMatchesProcessed = 0;
-      foundMatches.forEach((matchData: DbGameInfo, index: number) => {
-        // Validate match data structure
-        if (!matchData || typeof matchData !== "object") {
-          console.warn(`Invalid match data at index ${index}:`, matchData);
-          return;
-        }
-
-        // Validate essential match info exists
-        if (!matchData.info || !matchData.info.matchId) {
-          console.warn(`Missing essential info for match at index ${index}:`, {
-            hasInfo: !!matchData.info,
-            hasMatchId: !!matchData.info?.matchId,
-          });
-          return;
-        }
-
-        // Validate participants and teams (essential for game display)
-        if (
-          !matchData.participants ||
-          !Array.isArray(matchData.participants) ||
-          matchData.participants.length === 0
-        ) {
-          console.warn(
-            `Invalid participants for match ${matchData.info.matchId}:`,
-            {
-              hasParticipants: !!matchData.participants,
-              isArray: Array.isArray(matchData.participants),
-              length: matchData.participants?.length,
-            }
-          );
-          return;
-        }
-
-        if (
-          !matchData.teams ||
-          !Array.isArray(matchData.teams) ||
-          matchData.teams.length === 0
-        ) {
-          console.warn(`Invalid teams for match ${matchData.info.matchId}:`, {
-            hasTeams: !!matchData.teams,
-            isArray: Array.isArray(matchData.teams),
-            length: matchData.teams?.length,
-          });
-          return;
-        }
-
-        // Step 5: Additional validation for game data integrity
-        const hasValidGameCreation =
-          matchData.info.gameCreation &&
-          (typeof matchData.info.gameCreation === "number" ||
-            typeof matchData.info.gameCreation === "string");
-
-        if (!hasValidGameCreation) {
-          console.warn(
-            `Invalid gameCreation for match ${matchData.info.matchId}:`,
-            matchData.info.gameCreation
-          );
-        }
-
-        // Step 6: Process valid match data
-        setGames((prev) => {
-          const exists = prev.some((g) => g.id === matchData.info.matchId);
-          if (exists) {
-            return prev;
-          }
-
-          validMatchesProcessed++;
-          return [
-            ...prev,
-            {
-              id: matchData.info.matchId,
-              data: matchData,
-            },
-          ];
-        });
-      });
-      // Step 7: Validate missingMatchIds
-      if (!Array.isArray(missingMatchIds)) {
-        console.error("missingMatchIds is not an array:", missingMatchIds);
-        return matchHistory;
-      }
-
-      // Step 8: Validate missing IDs are actually strings
-      const validMissingIds = missingMatchIds.filter(
-        (id) => typeof id === "string" && id.trim().length > 0
-      );
-
-      if (validMissingIds.length !== missingMatchIds.length) {
-        console.warn(
-          `Filtered out ${
-            missingMatchIds.length - validMissingIds.length
-          } invalid missing match IDs`
-        );
-      }
-
-      setDbChecked(true);
-      return validMissingIds;
-    } catch (error) {
-      console.error("Error checking database:", error);
-
-      // Step 9: Enhanced error handling
-      if (error instanceof TypeError) {
-        console.error(
-          "Type error in database check - possible data structure issue"
-        );
-      } else if (error instanceof Error && error.message.includes("fetch")) {
-        console.error("Network error during database check");
-      }
-
-      setDbChecked(true); // Prevent infinite loops
-      return matchHistory; // Fallback to fetching all
-    }
-  }, [puuid, matchHistory]);
+  console.log(">>> numberOfMatches", numberOfMatches);
 
   const riotRateLimiter = createRiotRateLimiter();
 
@@ -186,7 +47,7 @@ const MatchHistorySection = ({
 
       if (!region || !puuid) {
         console.error(
-          `Missing required parameters: region=${region}, puuid=${!!puuid}`
+          `Missing required parameters: region=${region}, puuid=${!!puuid}`,
         );
         setFailedMatches((prev) => [...prev, matchId]);
         return;
@@ -203,19 +64,18 @@ const MatchHistorySection = ({
 
         const res = await fetch(
           `/api/game-info?gameId=${matchId}&region=${region}&puuid=${puuid}`,
-          { signal: controller.signal }
+          { signal: controller.signal },
         );
 
         clearTimeout(timeoutId);
 
         if (res.status === 429) {
-
           setFailedMatches((prev) => [...prev, matchId]);
           await delay(1000 * 60 * 2);
         }
         if (!res.ok) {
           console.error(
-            `HTTP error fetching game info for ${matchId}: ${res.status} ${res.statusText}`
+            `HTTP error fetching game info for ${matchId}: ${res.status} ${res.statusText}`,
           );
           setFailedMatches((prev) => [...prev, matchId]);
           return;
@@ -269,12 +129,12 @@ const MatchHistorySection = ({
 
         // Step 6: Additional participant validation
         const validParticipants = data.participants.filter(
-          (p) => p && typeof p === "object" && p.puuid
+          (p) => p && typeof p === "object" && p.puuid,
         );
 
         if (validParticipants.length !== data.participants.length) {
           console.warn(
-            `Some participants invalid for match ${matchId}: ${validParticipants.length}/${data.participants.length} valid`
+            `Some participants invalid for match ${matchId}: ${validParticipants.length}/${data.participants.length} valid`,
           );
         }
 
@@ -282,10 +142,8 @@ const MatchHistorySection = ({
         setGames((prev) => {
           const exists = prev.some((game) => game.id === matchId);
           if (exists) {
-
             return prev;
           }
-
 
           return [...prev, { id: matchId, data: data }];
         });
@@ -299,66 +157,27 @@ const MatchHistorySection = ({
         ) {
           console.error(
             `Network error fetching match ${matchId}:`,
-            error.message
+            error.message,
           );
         } else {
           console.error(
             `Unexpected error fetching game info for ${matchId}:`,
-            error
+            error,
           );
         }
         setFailedMatches((prev) => [...prev, matchId]);
       }
     },
-    [puuid, region, dbChecked]
+    [puuid, region, dbChecked],
   );
-
-  useEffect(() => {
-    const limit = pLimit(9);
-    let isCancelled = false;
-    setIsLoading(true);
-
-    const startFetching = async () => {
-      try {
-        // First check database for existing matches
-        const missingMatchIds = await checkDatabaseForMatches();
-
-        // Only fetch matches that weren't in the database
-        const batchSize = 10;
-        for (let i = 0; i < missingMatchIds!.length; i += batchSize) {
-          if (isCancelled) break;
-          const batch = missingMatchIds!.slice(i, i + batchSize);
-          const tasks = batch.map((matchId: string, batchIndex: number) =>
-            limit(() => fetchGameInfo(matchId, i + batchIndex))
-          );
-
-          await Promise.all(tasks);
-
-          if (i + batchSize < missingMatchIds!.length) {
-            await delay(500); // Rate limiting between batches
-          }
-        }
-      } finally {
-        if (!isCancelled) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    startFetching();
-
-    return () => {
-      isCancelled = true;
-      setIsLoading(false);
-    };
-  }, [matchHistory, fetchGameInfo, checkDatabaseForMatches]);
 
   const { validGames, totalPages } = useMemo(() => {
     // Step 1: Apply comprehensive validation to each game
     const valid = games
-      .filter((game) => {
+      .filter((game, idx) => {
         // Basic structure validation
         if (!game || !game.data || !game.id) {
+          console.log(`[Filter #${idx}] Skipping invalid game object:`, game);
           return false;
         }
 
@@ -376,6 +195,7 @@ const MatchHistorySection = ({
 
         if (!hasEssentialData) {
           console.debug(`Game ${game.id} failed essential data validation`);
+          console.log(`[Filter #${idx}] Failed essential data check:`, game);
           return false;
         }
 
@@ -386,7 +206,11 @@ const MatchHistorySection = ({
 
         if (!hasValidDate) {
           console.debug(
-            `Game ${game.id} has invalid gameCreation date: ${data.info.gameCreation}`
+            `Game ${game.id} has invalid gameCreation date: ${data.info.gameCreation}`,
+          );
+          console.log(
+            `[Filter #${idx}] Game ${game.id} invalid 'gameCreation':`,
+            data.info.gameCreation,
           );
           return false;
         }
@@ -397,12 +221,22 @@ const MatchHistorySection = ({
         try {
           const dateA = new Date(a.data!.info.gameCreation!).getTime();
           const dateB = new Date(b.data!.info.gameCreation!).getTime();
+          // Log sort values
+          console.log(
+            `Sorting game ${a.id} (${dateA}) vs ${b.id} (${dateB}): result ${
+              dateB - dateA
+            }`,
+          );
           return dateB - dateA; // Newest first
         } catch (error) {
           console.error("Error sorting games by date:", error);
           return 0; // Keep original order if sorting fails
         }
       });
+    console.log(
+      "useMemo: valid games computed:",
+      valid.map((g) => g.id),
+    );
     return {
       validGames: valid,
       totalPages: Math.ceil(valid.length / gamesPerPage),
@@ -411,14 +245,22 @@ const MatchHistorySection = ({
 
   const currentGames = useMemo(() => {
     const startIndex = (currentPage - 1) * gamesPerPage;
-    return validGames.slice(startIndex, startIndex + gamesPerPage);
+    const pageGames = validGames.slice(startIndex, startIndex + gamesPerPage);
+    console.log(
+      `Current page: ${currentPage}, Showing games:`,
+      pageGames.map((g) => g.id),
+    );
+    return pageGames;
   }, [currentPage, validGames]);
 
   const pageNumbers = useMemo(() => {
     const pages = [];
     const maxVisiblePages = 4;
 
-    if (totalPages <= 1) return [1];
+    if (totalPages <= 1) {
+      console.log("Only one page, returning [1]");
+      return [1];
+    }
 
     pages.push(1);
 
@@ -441,6 +283,7 @@ const MatchHistorySection = ({
       pages.push(totalPages);
     }
 
+    console.log("Pagination pages generated:", pages);
     return pages;
   }, [currentPage, totalPages]);
 
@@ -503,7 +346,7 @@ const MatchHistorySection = ({
             >
               {page}
             </button>
-          )
+          ),
         )}
       </span>
       <button

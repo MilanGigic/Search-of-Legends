@@ -1,18 +1,92 @@
-import { bigint, integer, pgTable, varchar } from "drizzle-orm/pg-core";
+import {
+  bigint,
+  index,
+  integer,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 export const accounts = pgTable("accounts", {
-  puuid: varchar("puuid").primaryKey(),
-  gameName: varchar("game_name").notNull(),
-  tagLine: varchar("tag_line").notNull(),
-  region: varchar("region").notNull(),
+  puuid: text("puuid").primaryKey(),
+  gameName: text("game_name").notNull(),
+  tagLine: text("tag_line").notNull(),
+  region: text("region").notNull(),
   // Summoner info
   summonerLevel: integer("summoner_level").notNull(),
   profileIconId: integer("profile_icon_id").notNull(),
-  tier: varchar("tier").notNull(),
-  rank: varchar("rank").notNull(),
+
+  revisionDate: bigint("revision_date", { mode: "number" }).notNull(),
+});
+
+export const topFivePerRegion = pgTable("top_five_per_region", {
+  puuid: text("puuid").primaryKey(),
+  gameName: text("game_name").notNull(),
+  tagLine: text("tag_line").notNull(),
+  region: text("region").notNull(),
+
+  summonerLevel: integer("summoner_level").notNull(),
+  profileIconId: integer("profile_icon_id").notNull(),
+
+  rank: text("rank").notNull(),
   leaguePoints: integer("league_points").notNull(),
+
   wins: integer("wins").notNull(),
   losses: integer("losses").notNull(),
-  revisionDate: bigint("revision_date", { mode: "number" }).notNull(),
-  lastUpdated: bigint("last_updated", { mode: "number" }).notNull(),
+
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+export const rankedStats = pgTable(
+  "ranked_stats",
+  {
+    puuid: text("puuid")
+      .references(() => accounts.puuid)
+      .notNull(),
+
+    queueType: text("queue_type").notNull(),
+
+    tier: text("tier").notNull(),
+    rank: text("rank").notNull(),
+    leaguePoints: integer("league_points").notNull(),
+
+    wins: integer("wins").notNull(),
+    losses: integer("losses").notNull(),
+
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.puuid, t.queueType] }),
+  }),
+);
+
+export const rankedHistory = pgTable(
+  "ranked_history",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    puuid: text("puuid")
+      .references(() => accounts.puuid)
+      .notNull(),
+    queueType: text("queue_type").notNull(),
+
+    tier: text("tier").notNull(),
+    rank: text("rank").notNull(),
+    leaguePoints: integer("league_points").notNull(),
+
+    wins: integer("wins").notNull(),
+    losses: integer("losses").notNull(),
+
+    capturedAt: timestamp("captured_at").notNull().defaultNow(),
+  },
+  (t) => {
+    return {
+      rankedHistoryPuuidQueueIndex: index("ranked_history_puuid_queue_idx").on(
+        t.puuid,
+        t.queueType,
+        t.capturedAt,
+      ),
+    };
+  },
+);

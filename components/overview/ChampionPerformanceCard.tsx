@@ -1,4 +1,4 @@
-import { getChampionPerformance } from "@/lib/actions/getChampionPerformance";
+import { getChampionPerformance } from "@/actions/performance/getChampionPerformance";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -13,12 +13,9 @@ const ChampionPerformanceCard = async ({
 }) => {
   const data = await getChampionPerformance(puuid);
 
-
   const top5 = data
     .sort((a, b) => Number(b.gamesPlayed) - Number(a.gamesPlayed))
     .slice(0, 5);
-
-
 
   const version = await fetchLatestVersion();
 

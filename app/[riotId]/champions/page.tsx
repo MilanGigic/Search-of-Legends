@@ -4,8 +4,8 @@ import { headers } from "next/headers";
 import { db } from "@/db";
 import { and, eq } from "drizzle-orm";
 import { accounts } from "@/db/schema";
-import getRegionalEndpoint from "@/lib/actions/match-history/getRegionalEndpoint";
-import { getChampionPerformance } from "@/lib/actions/getChampionPerformance";
+import getRegionalEndpoint from "@/actions/match-history/getRegionalEndpoint";
+import { getChampionPerformance } from "@/actions/performance/getChampionPerformance";
 import ChampionStatsClient from "@/components/champions/ChampionStatsClient";
 import { fetchLatestVersion } from "@/lib/riot";
 
@@ -37,7 +37,7 @@ const ChampionsPage = async ({ params }: AccountPageProps) => {
   if (!existingAccount) {
     const accountRes = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/account?gameName=${gameName}&tagLine=${tagLine}`,
-      { headers: { "Content-Type": "application/json" } }
+      { headers: { "Content-Type": "application/json" } },
     );
 
     if (!accountRes.ok) {

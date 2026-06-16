@@ -18,7 +18,6 @@ const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
 
   const matchIds = last30MatchIds.map((m) => m.matchId);
 
-
   if (matchIds.length === 0) {
     return <div>No recent matches found</div>;
   }
@@ -30,19 +29,15 @@ const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
     .where(
       and(
         eq(matchParticipants.puuid, puuid),
-        inArray(matchParticipants.matchId, matchIds)
-      )
+        inArray(matchParticipants.matchId, matchIds),
+      ),
     );
-
-
 
   let wins = 0;
   let losses = 0;
   last30ParticipantRows.map((row) => {
     row.win === 1 ? wins++ : losses++;
   });
-
-
 
   // Step 3: Group manually in JS
   const statsByChampion = new Map<
@@ -88,10 +83,7 @@ const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
     .sort((a, b) => b[1].gamesPlayed - a[1].gamesPlayed)
     .slice(0, 3);
 
-
-
   const version = await fetchLatestVersion();
-
 
   return (
     <div className="p-5 py-3 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624]  shadow-sm shadow-[#2A2A40]">
