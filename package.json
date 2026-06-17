@@ -10,7 +10,10 @@
     "start:pm2": "pm2 start ecosystem.config.js",
     "stop:pm2": "pm2 stop all",
     "restart:pm2": "pm2 restart all",
-    "delete:pm2": "pm2 delete all"
+    "delete:pm2": "pm2 delete all",
+    "worker:leaderboard": "dotenv -e .env.local -- npx tsx --watch workers/leaderboardWorker.ts",
+    "schedule:leaderboard": "dotenv -e .env.local -- npx tsx scripts/scheduleLeaderboard.ts",
+    "trigger:leaderboard": "dotenv -e .env.local -- npx tsx scripts/triggerNow.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
@@ -19,13 +22,13 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@upstash/redis": "^1.35.1",
+    "bullmq": "^5.78.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "dotenv": "^16.5.0",
+    "dotenv": "^17.4.2",
     "drizzle-orm": "^0.44.1",
     "express": "^5.1.0",
     "framer-motion": "^12.18.1",
-    "ioredis": "^5.6.1",
     "lucide-react": "^0.511.0",
     "next": "16.2.9",
     "next-auth": "^4.24.11",
@@ -55,12 +58,13 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@types/stream-json": "^1.7.8",
+    "dotenv-cli": "^11.0.0",
     "drizzle-kit": "^0.31.1",
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.4",
+    "tsx": "^4.22.4",
     "tw-animate-css": "^1.3.3",
     "typescript": "^6.0.3"
   }
