@@ -1,7 +1,8 @@
 import { db } from "@/db";
 import { topFivePerRegion } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { fetchAccount } from "./fetchAccount";
+import { fetchAccount } from "../fetchAccount";
+import { REGIONS } from "@/lib/riot";
 
 interface ExtractedAccountInfo {
   puuid: string;
@@ -13,27 +14,15 @@ interface ExtractedAccountInfo {
   revisionDate?: number;
 }
 
-const REGIONS = [
-  "euw1",
-  "na1",
-  "kr",
-  "eun1",
-  "br1",
-  "la1",
-  "la2",
-  "oc1",
-  "tr1",
-  "ru",
-  "jp1",
-];
-
-export async function refreshLeaderboardForRegion(region: string) {
+export async function refreshTopFiveForRegion(region: string) {
   const res = await fetch(
     `https://${region}.api.riotgames.com/lol/league/v4/challengerleagues/by-queue/RANKED_SOLO_5x5?api_key=${process.env.RIOT_API_KEY}`,
   );
 
   if (!res.ok) {
-    throw new Error(`Failed to fetch leaderboard for ${region}: ${res.status}`);
+    throw new Error(
+      `[topFive] Failed to fetch leaderboard for ${region}: ${res.status}`,
+    );
   }
 
   const leaderboardData = await res.json();
@@ -72,17 +61,17 @@ export async function refreshLeaderboardForRegion(region: string) {
   await db.insert(topFivePerRegion).values(topFiveAccounts);
 
   console.log(
-    `[leaderboard] Refreshed ${region}: ${topFiveAccounts.length} entries`,
+    `[topFive] Refreshed ${region}: ${topFiveAccounts.length} entries`,
   );
 }
 
 export async function refreshAllRegions() {
   for (const region of REGIONS) {
     try {
-      await refreshLeaderboardForRegion(region);
+      await refreshTopFiveForRegion(region);
     } catch (err) {
       // Don't let one region failure abort the rest
-      console.error(`[leaderboard] Failed to refresh ${region}:`, err);
+      console.error(`[topFive] Failed to refresh ${region}:`, err);
     }
   }
 }

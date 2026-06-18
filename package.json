@@ -11,9 +11,13 @@
     "stop:pm2": "pm2 stop all",
     "restart:pm2": "pm2 restart all",
     "delete:pm2": "pm2 delete all",
+    "worker:topFive": "dotenv -e .env.local -- npx tsx --watch workers/topFiveWorker.ts",
+    "schedule:topFive": "dotenv -e .env.local -- npx tsx scripts/scheduleTopFive.ts",
+    "trigger:topFive": "dotenv -e .env.local -- npx tsx scripts/triggerNow.ts",
     "worker:leaderboard": "dotenv -e .env.local -- npx tsx --watch workers/leaderboardWorker.ts",
     "schedule:leaderboard": "dotenv -e .env.local -- npx tsx scripts/scheduleLeaderboard.ts",
-    "trigger:leaderboard": "dotenv -e .env.local -- npx tsx scripts/triggerNow.ts"
+    "trigger:leaderboard": "dotenv -e .env.local -- npx tsx scripts/triggerLeaderboard.ts",
+    "worker:accountSync": "dotenv -e .env.local -- npx tsx --watch workers/accountSyncWorker.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",

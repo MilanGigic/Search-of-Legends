@@ -1,0 +1,1 @@
+ALTER TABLE "ranked_stats" ADD COLUMN "region" text NOT NULL;

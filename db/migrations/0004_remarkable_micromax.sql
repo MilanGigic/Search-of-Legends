@@ -1,0 +1,1 @@
+CREATE INDEX "top_five_per_region_region_idx" ON "top_five_per_region" USING btree ("region");

@@ -16,7 +16,7 @@ export default function TopFiveSection() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: 0.7 }}
-        className="w-full"
+        className="w-full space-y-4"
       >
         <h2 className="text-lg font-semibold my-4 text-gray-200 text-center">
           Top Champions This Patch

@@ -186,7 +186,6 @@ interface Position {
 }
 
 interface LeagueEntry {
-  summonerId: string;
   puuid: string;
   leaguePoints: number;
   rank: string;

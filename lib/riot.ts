@@ -3,6 +3,30 @@ import pLimit from "p-limit";
 const limit = pLimit(18); // ~90% of the 20/sec limit
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
+export const REGIONS = [
+  "euw1",
+  "na1",
+  "kr",
+  "eun1",
+  "br1",
+  "la1",
+  "la2",
+  "oc1",
+  "tr1",
+  "ru",
+  "jp1",
+];
+
+export const calculateWinRate = (wins: number, losses: number) => {
+  const total = wins + losses;
+  if (total === 0) return 0;
+  return Math.round((wins / total) * 100);
+};
+
+export const formatLP = (lp: number) => {
+  return `${lp.toLocaleString()}`;
+};
+
 export const calculateAccurateGameDuration = (maxTimePlayer: number) => {
   const totalMinutes = Math.floor((maxTimePlayer * 1000) / 60000);
   const totalSeconds = Math.floor(((maxTimePlayer * 1000) % 60000) / 1000);

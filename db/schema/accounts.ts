@@ -21,32 +21,37 @@ export const accounts = pgTable("accounts", {
   revisionDate: bigint("revision_date", { mode: "number" }).notNull(),
 });
 
-export const topFivePerRegion = pgTable("top_five_per_region", {
-  puuid: text("puuid").primaryKey(),
-  gameName: text("game_name").notNull(),
-  tagLine: text("tag_line").notNull(),
-  region: text("region").notNull(),
+export const topFivePerRegion = pgTable(
+  "top_five_per_region",
+  {
+    puuid: text("puuid").primaryKey(),
+    gameName: text("game_name").notNull(),
+    tagLine: text("tag_line").notNull(),
+    region: text("region").notNull(),
 
-  summonerLevel: integer("summoner_level").notNull(),
-  profileIconId: integer("profile_icon_id").notNull(),
+    summonerLevel: integer("summoner_level").notNull(),
+    profileIconId: integer("profile_icon_id").notNull(),
 
-  rank: text("rank").notNull(),
-  leaguePoints: integer("league_points").notNull(),
+    rank: text("rank").notNull(),
+    leaguePoints: integer("league_points").notNull(),
 
-  wins: integer("wins").notNull(),
-  losses: integer("losses").notNull(),
+    wins: integer("wins").notNull(),
+    losses: integer("losses").notNull(),
 
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    regionIdx: index("top_five_per_region_region_idx").on(table.region),
+  }),
+);
 
 export const rankedStats = pgTable(
   "ranked_stats",
   {
-    puuid: text("puuid")
-      .references(() => accounts.puuid)
-      .notNull(),
+    puuid: text("puuid").notNull(),
 
     queueType: text("queue_type").notNull(),
+    region: text("region").notNull(),
 
     tier: text("tier").notNull(),
     rank: text("rank").notNull(),
@@ -54,6 +59,8 @@ export const rankedStats = pgTable(
 
     wins: integer("wins").notNull(),
     losses: integer("losses").notNull(),
+
+    leaderboardPosition: integer("leaderboard_position"),
 
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },

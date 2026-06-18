@@ -1,0 +1,1 @@
+ALTER TABLE "ranked_stats" DROP CONSTRAINT "ranked_stats_puuid_queue_type_pk";

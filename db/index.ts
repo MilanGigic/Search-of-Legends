@@ -5,6 +5,7 @@ import * as schema from "@/db/schema/index"; // ✅ import your schema
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  log: undefined,
 });
 
-export const db = drizzle(pool, { schema }); // ✅ include schema
+export const db = drizzle(pool, { schema, logger: false });
