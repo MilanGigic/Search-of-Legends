@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { accounts } from "@/db/schema";
+import { accounts, rankedStats } from "@/db/schema";
 import fetchSummonerFromAnyRegion from "@/actions/region";
 import { delay } from "@/lib/riot";
 import { and, eq } from "drizzle-orm";
@@ -40,9 +40,16 @@ export async function GET(req: NextRequest) {
 
     if (
       existingAccount?.puuid &&
-      existingAccount?.lastUpdated &&
-      now - existingAccount?.lastUpdated < ONE_HOUR
+      existingAccount?.revisionDate &&
+      now - existingAccount?.revisionDate < ONE_HOUR
     ) {
+      const existingRankedStats = await db.query.rankedStats.findFirst({
+        where: eq(rankedStats.puuid, existingAccount.puuid),
+      });
+
+      if (!existingRankedStats) {
+        throw new Error("Missing ranked stats");
+      }
       return NextResponse.json({
         puuid: existingAccount?.puuid,
         gameName: existingAccount?.gameName,
@@ -51,12 +58,12 @@ export async function GET(req: NextRequest) {
         profileIconId: existingAccount.profileIconId,
         revisionDate: existingAccount.revisionDate,
         summonerLevel: existingAccount.summonerLevel,
-        tier: existingAccount.tier,
-        rank: existingAccount.rank,
-        leaguePoints: existingAccount.leaguePoints,
-        wins: existingAccount.wins,
-        losses: existingAccount.losses,
-        lastUpdated: existingAccount.lastUpdated,
+        tier: existingRankedStats.tier,
+        rank: existingRankedStats.rank,
+        leaguePoints: existingRankedStats.leaguePoints,
+        wins: existingRankedStats.wins,
+        losses: existingRankedStats.losses,
+        lastUpdated: existingRankedStats.updatedAt,
       });
     }
 
@@ -98,6 +105,9 @@ export async function GET(req: NextRequest) {
       );
 
       if (!entriesRes.ok) {
+        throw new Error(
+          `Something went wrong while fetching entries: ${entriesRes.statusText}`,
+        );
       }
 
       const entries: SummonerRankInfo[] = await entriesRes.json();
@@ -133,14 +143,8 @@ export async function GET(req: NextRequest) {
               tagLine: accountData.tagLine,
               region: summonerResult.region,
               profileIconId: summonerData.profileIconId,
-              tier: soloQueueEntry.tier,
-              rank: soloQueueEntry.rank,
-              leaguePoints: soloQueueEntry.leaguePoints,
-              wins: soloQueueEntry.wins,
-              losses: soloQueueEntry.losses,
               revisionDate: summonerData.revisionDate,
               summonerLevel: summonerData.summonerLevel,
-              lastUpdated: Date.now(),
             })
             .onConflictDoUpdate({
               target: [accounts.puuid],
@@ -149,14 +153,8 @@ export async function GET(req: NextRequest) {
                 tagLine: accountData.tagLine,
                 region: summonerResult.region,
                 profileIconId: summonerData.profileIconId,
-                tier: soloQueueEntry.tier,
-                rank: soloQueueEntry.rank,
-                leaguePoints: soloQueueEntry.leaguePoints,
-                wins: soloQueueEntry.wins,
-                losses: soloQueueEntry.losses,
                 revisionDate: summonerData.revisionDate,
                 summonerLevel: summonerData.summonerLevel,
-                lastUpdated: Date.now(),
               },
             });
         }

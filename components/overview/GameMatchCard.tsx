@@ -42,8 +42,11 @@ const GameMatchCard = ({
   });
   const [matchEvents, setMatchEvents] = useState<MatchTimelineDto | null>(null);
   const [gameInfoForRunes, setGameInfoForRunes] = useState<RiotMatchDto | null>(
-    null
+    null,
   );
+
+  console.log("Region:", region);
+  console.log("Game info matchId:", game.info.matchId);
 
   useEffect(() => {
     const currentUser = game.participants?.find((p) => p.puuid === puuid);
@@ -61,7 +64,7 @@ const GameMatchCard = ({
         (p) =>
           p.puuid !== puuid &&
           p.teamPosition === user.teamPosition &&
-          p.teamId !== user.teamId
+          p.teamId !== user.teamId,
       );
       setOpponent(opponentParticipant || null);
     }
@@ -69,48 +72,39 @@ const GameMatchCard = ({
 
   useEffect(() => {
     const fetchMatchEvents = async () => {
-      // console.log(
-      //   "Fetching match events for matchId:",
-      //   game.info.matchId,
-      //   "region:",
-      //   region
-      // );
       const eventsRes = await fetch(
-        `/api/match-events?matchId=${game.info.matchId}&region=${region}`
+        `/api/match-events?matchId=${game.info.matchId}&region=${region}`,
       );
 
       if (!eventsRes.ok) {
         console.error(
-          `Fetching match events failed: ${eventsRes.statusText}: status:${eventsRes.status}`
+          `Fetching match events failed: ${eventsRes.statusText}: status:${eventsRes.status}`,
         );
       }
 
       const matchEvents: MatchTimelineDto = await eventsRes.json();
-      // console.log("Fetched match events:", matchEvents);
       setMatchEvents(matchEvents);
     };
 
-    // console.log("showGame changed:", showGame);
     fetchMatchEvents();
   }, [showGame]);
+
   useEffect(() => {
     const fetchGameInfoForRunesPage = async () => {
       const runesRes = await fetch(
-        `/api/game-info-for-runes-page?matchId=${game.info.matchId}&region=${region}`
+        `/api/game-info-for-runes-page?matchId=${game.info.matchId}&region=${region}`,
       );
 
       if (!runesRes.ok) {
         console.error(
-          `Fetching game info for runes page failed: ${runesRes.statusText}: status:${runesRes.status}`
+          `Fetching game info for runes page failed: ${runesRes.statusText}: status:${runesRes.status}`,
         );
       }
 
       const runesData: RiotMatchDto = await runesRes.json();
-      // console.log("Fetched game info for runes page:", runesData);
       setGameInfoForRunes(runesData);
     };
 
-    // console.log("showGame changed:", showGame);
     fetchGameInfoForRunesPage();
   }, [showGame]);
 
@@ -165,30 +159,30 @@ const GameMatchCard = ({
                 {game.info.queueId === 420
                   ? "Solo/Duo"
                   : game.info.queueId === 400
-                  ? "Normal Draft"
-                  : game.info.queueId === 490
-                  ? "Quickplay"
-                  : game.info.queueId === 440
-                  ? "Flex"
-                  : game.info.queueId === 450
-                  ? "ARAM"
-                  : game.info.queueId === 880
-                  ? "Co-op vs Beginner"
-                  : game.info.queueId === 890
-                  ? "Co-op vs Intermediate"
-                  : game.info.queueId === 900
-                  ? "ARURF"
-                  : game.info.queueId === 1020
-                  ? "One for All"
-                  : game.info.queueId === 1400
-                  ? "Ultimate Spellbook"
-                  : game.info.queueId === 1300
-                  ? "Nexus Blitz"
-                  : game.info.queueId === 1700
-                  ? "Arena"
-                  : game.info.queueId === 1710
-                  ? "Arena"
-                  : ""}
+                    ? "Normal Draft"
+                    : game.info.queueId === 490
+                      ? "Quickplay"
+                      : game.info.queueId === 440
+                        ? "Flex"
+                        : game.info.queueId === 450
+                          ? "ARAM"
+                          : game.info.queueId === 880
+                            ? "Co-op vs Beginner"
+                            : game.info.queueId === 890
+                              ? "Co-op vs Intermediate"
+                              : game.info.queueId === 900
+                                ? "ARURF"
+                                : game.info.queueId === 1020
+                                  ? "One for All"
+                                  : game.info.queueId === 1400
+                                    ? "Ultimate Spellbook"
+                                    : game.info.queueId === 1300
+                                      ? "Nexus Blitz"
+                                      : game.info.queueId === 1700
+                                        ? "Arena"
+                                        : game.info.queueId === 1710
+                                          ? "Arena"
+                                          : ""}
               </p>
               <p className="flex text-xs md:text-base items-center w-full">
                 <strong className="mr-0.5 md:mr-1 text-xs md:text-base font-semibold md:font-bold text-gray-300">

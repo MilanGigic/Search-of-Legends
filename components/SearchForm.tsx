@@ -1,4 +1,5 @@
 "use client";
+import getFrontendRegion from "@/actions/match-history/getFrontendRegion";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -16,47 +17,87 @@ export default function SearchForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [inputValue, setInputValue] = useState<string>("");
+  const [region, setRegion] = useState<string>("");
 
   // const BASE_URL = process.env.NEXT_PUBLIC_VERCEL_URL!;
 
   useEffect(() => {
     const fetchAccount = async () => {
-      if (gameName.trim() === "" || tagLine.trim() === "") return;
+      console.log("[fetchAccount] Called with", { gameName, tagLine });
+
+      if (gameName.trim() === "" || tagLine.trim() === "") {
+        console.log("[fetchAccount] Missing gameName or tagLine, aborting");
+        return;
+      }
 
       setLoading(true);
       setError("");
 
       const fetchData = async (): Promise<DbSummonerInfo | null> => {
-        const res = await fetch(
-          `/api/account?gameName=${gameName}&tagLine=${tagLine}`
+        console.log(
+          "[fetchData] Fetching account info for:",
+          gameName,
+          tagLine,
         );
+
+        const res = await fetch(
+          `/api/account?gameName=${gameName}&tagLine=${tagLine}`,
+        );
+        console.log("[fetchData] First fetch result:", res);
 
         if (!res.ok) {
           // Retry once after a delay if first request fails
           if (res.status === 404 || res.status === 500) {
+            console.log(
+              "[fetchData] First fetch failed with status",
+              res.status,
+              "retrying in 1s...",
+            );
             await new Promise((r) => setTimeout(r, 1000));
             const retryRes = await fetch(
-              `/api/account?gameName=${gameName}&tagLine=${tagLine}`
+              `/api/account?gameName=${gameName}&tagLine=${tagLine}`,
             );
+            console.log("[fetchData] Retry fetch result:", retryRes);
             if (!retryRes.ok) throw new Error(retryRes.statusText);
-            return await retryRes.json();
+            const retryJson = await retryRes.json();
+            console.log("[fetchData] Retry fetch JSON:", retryJson);
+            return retryJson;
           }
 
+          console.error(
+            "[fetchData] Fetch failed with status:",
+            res.status,
+            res.statusText,
+          );
           throw new Error(res.statusText);
         }
 
-        return await res.json();
+        const jsonData = await res.json();
+        console.log("[fetchData] Fetch successful, JSON:", jsonData);
+        setLoading(false);
+        return jsonData;
       };
 
       try {
         const data = await fetchData();
-        if (!data) throw new Error("Empty data");
+        if (!data) {
+          console.error("[fetchAccount] fetchData returned empty object");
+          throw new Error("Empty data");
+        }
 
+        console.log("[fetchAccount] Received data:", data);
         setAccountInfo(data);
+        const displayRegion = getFrontendRegion(data.region);
+        console.log("[fetchAccount] Setting region to", displayRegion);
+        setLoading(false);
+
+        setRegion(displayRegion);
       } catch (err) {
+        console.error("[fetchAccount] Error:", err);
         setError(`Sorry, we couldn't find what you're looking for: ${err}`);
         setAccountInfo(null);
       } finally {
+        console.log("[fetchAccount] Fetch finished, setting loading to false");
         setLoading(false);
       }
     };
@@ -69,7 +110,6 @@ export default function SearchForm({
 
   const handleRiotNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-
 
     setInputValue(value);
 
@@ -123,7 +163,7 @@ export default function SearchForm({
           <div className="px-4 bg-gradient-to-b from-[#121624] to-[#1B1F35] rounded-b-lg shadow border-x border-b border-slate-400/50 w-[200px] md:w-md">
             <Link
               href={`/${encodeURIComponent(
-                accountInfo.gameName
+                accountInfo.gameName,
               )}-${encodeURIComponent(accountInfo.tagLine)}`}
               className="flex items-center justify-between p-2 text-center gap-2 hover:opacity-85 cursor-pointer"
             >
@@ -143,35 +183,7 @@ export default function SearchForm({
                 </h1>
               </div>
               <h4 className="bg-[#1E2A78] text-[#EAEAEA] p-2 px-3 uppercase rounded-md font-normal md:font-semibold">
-                {accountInfo.region === "euw1"
-                  ? "EUW"
-                  : accountInfo.region === "eun1"
-                  ? "EUNE"
-                  : accountInfo.region === "na1"
-                  ? "NA"
-                  : accountInfo.region === "kr"
-                  ? "KR"
-                  : accountInfo.region === "la1"
-                  ? "LAN"
-                  : accountInfo.region === "la2"
-                  ? "LAS"
-                  : accountInfo.region === "tr1"
-                  ? "TR"
-                  : accountInfo.region === "ru"
-                  ? "RU"
-                  : accountInfo.region === "oc1"
-                  ? "OCE"
-                  : accountInfo.region === "ph2"
-                  ? "PH"
-                  : accountInfo.region === "sg2"
-                  ? "SG"
-                  : accountInfo.region === "th2"
-                  ? "TH"
-                  : accountInfo.region === "tw2"
-                  ? "TW"
-                  : accountInfo.region === "vn2"
-                  ? "VN"
-                  : accountInfo.region}
+                {region}
               </h4>
             </Link>
           </div>

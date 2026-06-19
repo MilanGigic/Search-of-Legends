@@ -1,18 +1,14 @@
 import MatchHistorySection from "@/components/overview/MatchHistorySection";
 import UserCard from "@/components/UserCard";
 import UserStats from "@/components/overview/UserStats";
-import { db } from "@/db";
-import { accounts } from "@/db/schema";
 import fetchAllMatchIds from "@/actions/match-history/fetchMatchIds";
 import getRegionalEndpoint from "@/actions/match-history/getRegionalEndpoint";
-import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { fetchLatestVersion } from "@/lib/riot";
-import { fetchNumberOfMatches } from "@/actions/fetchNumberOfMatches";
 
 interface AccountPageProps {
-  params: Promise<{ riotId: string; page: string }>; // params is now a Promise
+  params: Promise<{ riotId: string; page: string }>;
   searchParams: Promise<{ page: string }>;
 }
 
@@ -31,27 +27,23 @@ const AccountPage = async ({ params, searchParams }: AccountPageProps) => {
     return notFound();
   }
 
-  const existingAccount = await db.query.accounts.findFirst({
-    where: and(eq(accounts.gameName, gameName), eq(accounts.tagLine, tagLine)),
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+  const url = `${BASE_URL}/api/account?gameName=${gameName}&tagLine=${tagLine}`;
+
+  const accountRes = await fetch(url, {
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
-  let account: DbSummonerInfo | null = null;
-
-  if (!existingAccount) {
-    const accountRes = await fetch(
-      `/api/account?gameName=${gameName}&tagLine=${tagLine}`,
-      { headers: { "Content-Type": "application/json" } },
+  if (!accountRes.ok) {
+    throw new Error(
+      `Fetching ${gameName}#${tagLine} account went wrong: ${accountRes.status} ${accountRes.statusText}`,
     );
-
-    if (!accountRes.ok) {
-      console.error("Failed to fetch account data:", accountRes.statusText);
-      return notFound();
-    }
-
-    account = await accountRes.json();
   }
 
-  const accountData = existingAccount ?? account!;
+  const accountData = await accountRes.json();
 
   if (!accountData?.region) {
     console.error("Missing region for account:", accountData);
@@ -69,7 +61,6 @@ const AccountPage = async ({ params, searchParams }: AccountPageProps) => {
   const fullUrl = headersList.get("x-url") || headersList.get("referer");
 
   const version = await fetchLatestVersion();
-  const numberOfMatches = await fetchNumberOfMatches({ puuid });
   return (
     <div className="relative z-10 min-h-screen p-4">
       <main className="relative z-10 w-full flex flex-col items-center justify-center">
@@ -91,7 +82,6 @@ const AccountPage = async ({ params, searchParams }: AccountPageProps) => {
             puuid={puuid!}
             region={REGION}
             version={version!}
-            numberOfMatches={numberOfMatches}
           />
         </div>
       </main>

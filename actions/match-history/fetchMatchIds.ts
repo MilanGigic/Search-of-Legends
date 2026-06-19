@@ -21,6 +21,7 @@ export default async function fetchAllMatchIds(
       eq(matchParticipants.matchId, matches.matchId),
     )
     .where(eq(matchParticipants.puuid, puuid));
+
   const existingMatchIds = new Set(
     existingMatches.map((match) => match.matchId),
   );
@@ -38,12 +39,9 @@ export default async function fetchAllMatchIds(
   const startIndex = (pageNum - 1) * count;
   const url = `https://${REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${startIndex}&count=${count}`;
 
-  // while (true) {
-  // console.log(`Fetching matches from API: start=${start}, count=${count}`);
   const res = await fetch(url, { headers: { "X-Riot-Token": RIOT_API_KEY } });
 
   if (!res.ok) {
-    // console.error("Failed to fetch match IDs:", await res.text());
     throw new Error("Failed to fetch match IDs");
   }
 
@@ -56,13 +54,6 @@ export default async function fetchAllMatchIds(
     }
     allMatchIds.add(matchId);
   }
-
-  // Stop if we've reached the end or if we're not getting new matches
-  // if (batch.length < count || !hasNewMatches) {
-  //   console.log("Stopping fetch - no more matches or no new matches");
-  //   break;
-  // }
-  // }
 
   return Array.from(allMatchIds);
 }

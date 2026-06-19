@@ -5,7 +5,7 @@ import getRegionalEndpoint from "./match-history/getRegionalEndpoint";
 
 export default async function getGameInfo(
   matchId: string,
-  puuid: string
+  puuid: string,
 ): Promise<RiotMatchDto | null> {
   const account = await db.query.accounts.findFirst({
     where: eq(accounts.puuid, puuid),
@@ -19,9 +19,8 @@ export default async function getGameInfo(
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   const region = getRegionalEndpoint(account.region);
-  const url = `${BASE_URL}/api/riot/game-info?currRegion=${region}&gameId=${matchId}&puuid=${puuid}`;
+  const url = `${BASE_URL}/api/game-info?currRegion=${region}&gameId=${matchId}&puuid=${puuid}`;
   try {
-
     const response = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
@@ -31,7 +30,7 @@ export default async function getGameInfo(
     if (!response.ok) {
       const errorText = await response.text();
       console.error(
-        `Failed to fetch game info for gameId: ${matchId}. Status: ${response.status}, Error: ${errorText}`
+        `Failed to fetch game info for gameId: ${matchId}. Status: ${response.status}, Error: ${errorText}`,
       );
 
       // Log different error types
@@ -52,11 +51,10 @@ export default async function getGameInfo(
     if (!data || !data.info || !data.metadata) {
       console.error(
         `Invalid data structure received for gameId: ${matchId}`,
-        data
+        data,
       );
       return null;
     }
-
 
     return data;
   } catch (error) {

@@ -1,22 +1,35 @@
-import { NextRequest } from "next/server";
+import "dotenv";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { puuid: string } },
-) {
+export async function GET({ params }: { params: { puuid: string } }) {
   const { puuid } = params;
+  console.log("[Number of Matches API] Received request for puuid:", puuid);
+
   const API_KEY = process.env.RIOT_API_KEY;
 
   if (!API_KEY) {
+    console.error("[Number of Matches API] No API KEY provided");
     throw new Error("No API KEY provided");
   }
 
-  // https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/omgN_Flcq4tyNFd_yb49UjoKS8MF1feqpaZAmgwp0RJjBzwPooBZ3x6rTKBmisA4jwVqbIzcQV-ewg/ids?start=0&count=100&api_key=RGAPI-d226fbb2-17d0-4e6a-992d-52f2086dcfb6
-  const res = await fetch(
-    `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=0&count=100&api_key=${API_KEY}`,
-  );
+  const apiUrl = `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=0&count=100&api_key=${API_KEY}`;
+  console.log("[Number of Matches API] Fetching from Riot API at URL:", apiUrl);
 
-  const data = res.json();
+  const res = await fetch(apiUrl);
+
+  if (!res.ok) {
+    console.error(
+      "[Number of Matches API] Failed to fetch matches. Status:",
+      res.status,
+      "StatusText:",
+      res.statusText,
+    );
+  }
+
+  const data = await res.json();
+  console.log(
+    "[Number of Matches API] Successfully fetched match data. Number of matches:",
+    Array.isArray(data) ? data.length : "unknown",
+  );
 
   return new Response(JSON.stringify(data), { status: 200 });
 }

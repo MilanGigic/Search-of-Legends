@@ -1,5 +1,10 @@
 import { db } from "@/db";
-import { champions, matchParticipants, matches } from "@/db/schema";
+import {
+  champions,
+  matchDetails,
+  matchParticipants,
+  matches,
+} from "@/db/schema";
 import { fetchLatestVersion, kda } from "@/lib/riot";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import Image from "next/image";
@@ -10,10 +15,14 @@ import WinrateGauge from "../WinrateGauge";
 const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
   // Step 1: Get the last 30 match IDs for this player
   const last30MatchIds = await db
-    .select({ matchId: matches.matchId })
-    .from(matches)
-    .where(eq(matches.puuid, puuid))
-    .orderBy(desc(matches.matchId)) // Ideally use gameCreation desc
+    .select({ matchId: matchParticipants.matchId })
+    .from(matchParticipants)
+    .where(eq(matchParticipants.puuid, puuid))
+    .orderBy(desc(matchDetails.gameCreation)) // Ideally use gameCreation desc
+    .innerJoin(
+      matchDetails,
+      eq(matchParticipants.matchId, matchDetails.matchId),
+    )
     .limit(30);
 
   const matchIds = last30MatchIds.map((m) => m.matchId);
