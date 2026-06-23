@@ -185,6 +185,61 @@ interface Position {
   y: number;
 }
 
+interface Entries {
+  queueType: string;
+  tier: string;
+  rank: string;
+  puuid: string;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
+  veteran: boolean;
+  inactive: boolean;
+  freshBlood: boolean;
+  hotStreak: boolean;
+}
+
+interface RolePerformance {
+  role: string | null;
+  gamesPlayed: number;
+  wins: number;
+  losses: number;
+  avgKills: number;
+  avgDeaths: number;
+  avgAssists: number;
+  kda: number;
+  csPerMin: string;
+}
+
+interface ChampionPerformance {
+  championId: number | null;
+  gamesPlayed: number;
+  wins: number;
+  losses: number;
+  avgKills: number;
+  avgDeaths: number;
+  avgAssists: number;
+  kda: number;
+  csPerMin: number;
+  championName: string;
+  championImage: string;
+  avgDamageDealt: number;
+  avgTime: number;
+}
+
+interface LastThirtyMatches {
+  kills: number | null;
+  deaths: number | null;
+  assists: number | null;
+  cs: number | null;
+  time: number | null;
+  win: number | null;
+  damage: number | null;
+  championImage: string;
+  championName: string;
+  championId: string;
+}
+
 interface LeagueEntry {
   puuid: string;
   leaguePoints: number;

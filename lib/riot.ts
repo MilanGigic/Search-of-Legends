@@ -278,6 +278,7 @@ export async function fetchWithRateLimit(url: string, opts?: RequestInit) {
 }
 
 export async function fetchLatestVersion() {
+  console.log("FetchLatestVersion action hit");
   try {
     const versionRes = await fetch(
       "https://ddragon.leagueoflegends.com/api/versions.json",

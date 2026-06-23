@@ -1,23 +1,35 @@
+"use client";
+
 import { getChampionPerformance } from "@/actions/performance/getChampionPerformance";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { fetchLatestVersion } from "@/lib/riot";
+import { useEffect, useState } from "react";
 
-const ChampionPerformanceCard = async ({
+const ChampionPerformanceCard = ({
   puuid,
   riotId,
+  version,
 }: {
   puuid: string;
   riotId: string;
+  version: string;
 }) => {
-  const data = await getChampionPerformance(puuid);
+  const [championPerformance, setChampionPerformance] = useState<
+    ChampionPerformance[]
+  >([]);
 
-  const top5 = data
+  useEffect(() => {
+    (async () => {
+      const data = await getChampionPerformance(puuid);
+
+      setChampionPerformance(data);
+    })();
+  }, [puuid]);
+
+  const top5 = championPerformance
     .sort((a, b) => Number(b.gamesPlayed) - Number(a.gamesPlayed))
     .slice(0, 5);
-
-  const version = await fetchLatestVersion();
 
   return (
     <div className="pt-5 border border-gray-700/70 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#121624] to-[#1B1F35]  shadow-sm shadow-[#2A2A40]">
@@ -39,9 +51,9 @@ const ChampionPerformanceCard = async ({
                 <Image
                   src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${champ.championImage}`}
                   alt={champ.championName}
-                  width={40}
-                  height={40}
-                  className="mt-1 border border-gray-500 rounded-full"
+                  width={44}
+                  height={44}
+                  className="mt-1 rounded-full"
                 />
               </div>
 

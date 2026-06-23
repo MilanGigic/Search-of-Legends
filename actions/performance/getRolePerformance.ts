@@ -1,3 +1,5 @@
+"use server";
+
 import { db } from "@/db";
 import { matchParticipants } from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
@@ -48,34 +50,4 @@ export async function getRolePerformance(puuid: string) {
   );
 
   return enriched;
-
-  // Step 2: Join with champion table
-  // const enriched = await Promise.all(
-  //   stats.map(async (stat) => {
-  //     const champ = await db.query.champions.findFirst({
-  //       where: eq(champions.key, stat.championId!.toString()),
-  //     });
-
-  //     const userKda = kda(
-  //       Number(stat.avgKills),
-  //       Number(stat.avgDeaths),
-  //       Number(stat.avgAssists)
-  //     );
-  //     return {
-  //       championId: stat.championId,
-  //       gamesPlayed: stat.gamesPlayed,
-  //       wins: stat.wins,
-  //       losses: stat.gamesPlayed - stat.wins,
-  //       avgKills: stat.avgKills,
-  //       avgDeaths: stat.avgDeaths,
-  //       avgAssists: stat.avgAssists,
-  //       kda: userKda,
-  //       csPerMin: (stat.avgCS / (stat.avgTime / 60)).toFixed(1),
-  //       championName: champ?.name || "Unknown",
-  //       championImage: champ?.image || "",
-  //     };
-  //   })
-  // );
-
-  // return enriched;
 }

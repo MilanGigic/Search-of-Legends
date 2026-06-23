@@ -46,7 +46,7 @@ export default function Sidebar() {
             </Link>
             <SearchForm placeholder={"Search..."} version={"16.6.1"} />
           </div>
-          <div className="text-xs text-gray-500 text-center">SoL.gg © 2025</div>
+          <div className="text-xs text-gray-500 text-center">SoL.gg © 2026</div>
         </div>
       </aside>
 

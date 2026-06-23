@@ -1,0 +1,1 @@
+ALTER TABLE "champions" ALTER COLUMN "key" TYPE integer USING "key"::integer;

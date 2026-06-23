@@ -156,6 +156,8 @@ const MatchHistorySection = ({
 
   const loadedIds = useRef<Set<string>>(new Set());
 
+  const matchHistoryKey = useMemo(() => matchHistory.join(","), [matchHistory]);
+
   const markFailed = useCallback((matchId: string) => {
     setFailedMatches((prev) => {
       if (prev.has(matchId)) return prev;
@@ -288,7 +290,7 @@ const MatchHistorySection = ({
     return () => {
       cancelled = true;
     };
-  }, [matchHistory, puuid, region]);
+  }, [matchHistoryKey, puuid, region]);
 
   const { validGames, totalPages } = useMemo(() => {
     const valid = games

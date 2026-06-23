@@ -48,10 +48,15 @@ const GameMatchCard = ({
   console.log("Region:", region);
   console.log("Game info matchId:", game.info.matchId);
 
+  // FIX: depend on `game.info.matchId` (a stable primitive) instead of the
+  // `game` object itself. `game` is re-created as a new object/array entry
+  // upstream whenever MatchHistorySection's fetch effect re-runs, so using
+  // it as a dependency caused this effect to re-fire and reset state even
+  // when the actual match data hadn't changed.
   useEffect(() => {
     const currentUser = game.participants?.find((p) => p.puuid === puuid);
     setUser(currentUser || null);
-  }, [puuid, game]);
+  }, [puuid, game.info.matchId]);
 
   useEffect(() => {
     setShowGame(false);
@@ -68,45 +73,81 @@ const GameMatchCard = ({
       );
       setOpponent(opponentParticipant || null);
     }
-  }, [user, puuid, game]);
+  }, [user, puuid, game.info.matchId]);
 
   useEffect(() => {
+    if (!showGame) return; // don't fetch on close, only on open
+
+    let isCurrent = true;
+    const controller = new AbortController();
+
     const fetchMatchEvents = async () => {
-      const eventsRes = await fetch(
-        `/api/match-events?matchId=${game.info.matchId}&region=${region}`,
-      );
-
-      if (!eventsRes.ok) {
-        console.error(
-          `Fetching match events failed: ${eventsRes.statusText}: status:${eventsRes.status}`,
+      try {
+        const eventsRes = await fetch(
+          `/api/match-events?matchId=${game.info.matchId}&region=${region}`,
+          { signal: controller.signal },
         );
-      }
 
-      const matchEvents: MatchTimelineDto = await eventsRes.json();
-      setMatchEvents(matchEvents);
+        if (!eventsRes.ok) {
+          console.error(
+            `Fetching match events failed: ${eventsRes.statusText}: status:${eventsRes.status}`,
+          );
+          return;
+        }
+
+        const data: MatchTimelineDto = await eventsRes.json();
+        if (isCurrent) setMatchEvents(data);
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          console.error("Error fetching match events:", err);
+        }
+      }
     };
 
     fetchMatchEvents();
-  }, [showGame]);
+
+    return () => {
+      isCurrent = false;
+      controller.abort();
+    };
+  }, [showGame, game.info.matchId, region]);
 
   useEffect(() => {
+    if (!showGame) return; // don't fetch on close, only on open
+
+    let isCurrent = true;
+    const controller = new AbortController();
+
     const fetchGameInfoForRunesPage = async () => {
-      const runesRes = await fetch(
-        `/api/game-info-for-runes-page?matchId=${game.info.matchId}&region=${region}`,
-      );
-
-      if (!runesRes.ok) {
-        console.error(
-          `Fetching game info for runes page failed: ${runesRes.statusText}: status:${runesRes.status}`,
+      try {
+        const runesRes = await fetch(
+          `/api/game-info-for-runes-page?matchId=${game.info.matchId}&region=${region}`,
+          { signal: controller.signal },
         );
-      }
 
-      const runesData: RiotMatchDto = await runesRes.json();
-      setGameInfoForRunes(runesData);
+        if (!runesRes.ok) {
+          console.error(
+            `Fetching game info for runes page failed: ${runesRes.statusText}: status:${runesRes.status}`,
+          );
+          return;
+        }
+
+        const runesData: RiotMatchDto = await runesRes.json();
+        if (isCurrent) setGameInfoForRunes(runesData);
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          console.error("Error fetching game info for runes:", err);
+        }
+      }
     };
 
     fetchGameInfoForRunesPage();
-  }, [showGame]);
+
+    return () => {
+      isCurrent = false;
+      controller.abort();
+    };
+  }, [showGame, game.info.matchId, region]);
 
   useEffect(() => {
     if (!game.info.gameCreation) return;

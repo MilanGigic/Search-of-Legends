@@ -26,17 +26,15 @@ const UserCard = ({
   accountData,
   region,
   riotId,
-  fullUrl,
   version,
 }: {
   accountData: DbSummonerInfo;
   region: string;
   riotId: string;
-  fullUrl: string;
   version: string;
 }) => {
   const [tierImage, setTierImage] = useState<StaticImageData | undefined>(
-    undefined
+    undefined,
   );
   const puuid = accountData.puuid;
 
@@ -79,7 +77,6 @@ const UserCard = ({
         default:
           setTierImage(undefined);
       }
-
     }
   }, [tier]);
 
@@ -98,9 +95,7 @@ const UserCard = ({
 
       const data = await response.json();
 
-
       if (data.revalidated) {
-
       } else {
         console.error("Failed to update summoner data");
       }
@@ -113,11 +108,11 @@ const UserCard = ({
   const activeTab: PageContent = pathname.includes("/champions")
     ? "champions"
     : pathname.includes("/live")
-    ? "live"
-    : "overview";
+      ? "live"
+      : "overview";
 
   if (!accountData) {
-    return;
+    return null;
   }
 
   return (
@@ -166,7 +161,7 @@ const UserCard = ({
                       {Math.round(
                         (accountData.wins! /
                           (accountData.wins! + accountData.losses!)) *
-                          100
+                          100,
                       )}
                       %)
                     </p>

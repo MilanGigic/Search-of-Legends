@@ -1,46 +1,32 @@
-import { db } from "@/db";
-import {
-  champions,
-  matchDetails,
-  matchParticipants,
-  matches,
-} from "@/db/schema";
-import { fetchLatestVersion, kda } from "@/lib/riot";
-import { and, desc, eq, inArray } from "drizzle-orm";
+"use client";
+
+import { kda } from "@/lib/riot";
 import Image from "next/image";
-import WinrateGauge from "../WinrateGauge";
+import WinrateGauge from "../../../WinrateGauge";
+import { useEffect, useState } from "react";
+import { getLastThirtyMatches } from "@/actions/getLastThirtyMatches";
+import { useDataStore } from "@/lib/store/useConstantDataStore";
 
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
-const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
-  // Step 1: Get the last 30 match IDs for this player
-  const last30MatchIds = await db
-    .select({ matchId: matchParticipants.matchId })
-    .from(matchParticipants)
-    .where(eq(matchParticipants.puuid, puuid))
-    .orderBy(desc(matchDetails.gameCreation)) // Ideally use gameCreation desc
-    .innerJoin(
-      matchDetails,
-      eq(matchParticipants.matchId, matchDetails.matchId),
-    )
-    .limit(30);
+const LastThirtyGames = ({
+  puuid,
+  version,
+}: {
+  puuid: string;
+  version: string;
+}) => {
+  const [last30ParticipantRows, setLast30ParticipantRows] = useState<
+    LastThirtyMatches[]
+  >([]);
 
-  const matchIds = last30MatchIds.map((m) => m.matchId);
+  useEffect(() => {
+    (async () => {
+      const data = await getLastThirtyMatches(puuid);
 
-  if (matchIds.length === 0) {
-    return <div>No recent matches found</div>;
-  }
-
-  // Step 2: Get the 30 matchParticipants entries (1 per match)
-  const last30ParticipantRows = await db
-    .select()
-    .from(matchParticipants)
-    .where(
-      and(
-        eq(matchParticipants.puuid, puuid),
-        inArray(matchParticipants.matchId, matchIds),
-      ),
-    );
+      setLast30ParticipantRows(data);
+    })();
+  }, [puuid]);
 
   let wins = 0;
   let losses = 0;
@@ -50,7 +36,7 @@ const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
 
   // Step 3: Group manually in JS
   const statsByChampion = new Map<
-    number,
+    string,
     {
       gamesPlayed: number;
       kills: number;
@@ -60,6 +46,9 @@ const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
       time: number;
       wins: number;
       damage: number;
+      championName: string;
+      championImage: string;
+      championId: string;
     }
   >();
 
@@ -81,18 +70,19 @@ const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
       kills: existing.kills + row.kills!,
       deaths: existing.deaths + row.deaths!,
       assists: existing.assists + row.assists!,
-      cs: existing.cs + row.totalMinionsKilled!,
-      time: existing.time + row.timePlayed!,
+      cs: existing.cs + row.cs!,
+      time: existing.time + row.time!,
       wins: existing.wins + (row.win ? 1 : 0),
-      damage: existing.damage + row.totalDamageDealtToChampions!,
+      damage: existing.damage + row.damage!,
+      championImage: row.championImage,
+      championName: row.championName,
+      championId: champId,
     });
   }
 
   const sorted = Array.from(statsByChampion.entries())
     .sort((a, b) => b[1].gamesPlayed - a[1].gamesPlayed)
     .slice(0, 3);
-
-  const version = await fetchLatestVersion();
 
   return (
     <div className="p-5 py-3 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624]  shadow-sm shadow-[#2A2A40]">
@@ -107,10 +97,7 @@ const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
           size={100}
         />
       </div>
-      {sorted.map(async ([championId, stats], index) => {
-        const champ = await db.query.champions.findFirst({
-          where: eq(champions.key, championId!.toString()),
-        });
+      {sorted.map(([, stats], index) => {
         const avgKills = stats.kills / stats.time;
         const avgDeaths = stats.deaths / stats.time;
         const avgAssists = stats.assists / stats.time;
@@ -123,13 +110,13 @@ const LastThirtyGames = async ({ puuid }: { puuid: string }) => {
               index < sorted.length - 1 && "border-b"
             } p-1`}
           >
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center rounded-full">
               <Image
-                src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${champ?.image}`}
-                alt={`${champ?.name}`}
-                width={40}
-                height={40}
-                className="border border-gray-500 rounded-full"
+                src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${stats.championImage}`}
+                alt={`${stats.championName}`}
+                width={44}
+                height={44}
+                className="rounded-full"
               />
             </div>
             <div className="flex flex-col justify-center text-slate-300">

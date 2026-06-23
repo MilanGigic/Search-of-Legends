@@ -65,7 +65,7 @@ const Details = ({
 
   useEffect(() => {
     const currentUser = game.participants?.find(
-      (p) => p.participantId === selectedParticipantId
+      (p) => p.participantId === selectedParticipantId,
     );
     setUser(currentUser || null);
   }, [selectedParticipantId, game]);
@@ -76,7 +76,7 @@ const Details = ({
         (p) =>
           p.participantId !== selectedParticipantId &&
           p.teamPosition === user.teamPosition &&
-          p.teamId !== user.teamId
+          p.teamId !== user.teamId,
       );
       setOpponent(opponentParticipant || null);
     }
@@ -87,18 +87,8 @@ const Details = ({
 
     return matchEvents.info.frames.flatMap((frame) =>
       frame.events.filter(
-        (event) => event.participantId === selectedParticipantId
-      )
-    );
-  }, [matchEvents, selectedParticipantId]);
-
-  const eventsAt15 = useMemo(() => {
-    if (!matchEvents?.info?.frames) return [];
-
-    return matchEvents.info.frames.flatMap((frame) =>
-      Object.values(frame.participantFrames).filter(
-        (event) => event.participantId === selectedParticipantId
-      )
+        (event) => event.participantId === selectedParticipantId,
+      ),
     );
   }, [matchEvents, selectedParticipantId]);
 
@@ -107,52 +97,60 @@ const Details = ({
 
     return matchEvents.info.frames.flatMap((frame) =>
       Object.values(frame.participantFrames).filter(
-        (event) => event.participantId === selectedParticipantId
-      )
+        (event) => event.participantId === selectedParticipantId,
+      ),
     );
   }, [matchEvents, selectedParticipantId]);
+
   const opponentEvents = useMemo(() => {
     if (!matchEvents?.info?.frames) return [];
 
     return matchEvents.info.frames.flatMap((frame) =>
       Object.values(frame.participantFrames).filter(
-        (event) => event.participantId === opponent?.participantId
-      )
+        (event) => event.participantId === opponent?.participantId,
+      ),
     );
   }, [matchEvents, opponent]);
 
+  const FIFTEEN_MINUTES_MS = 15 * 60 * 1000;
+
+  const targetFrameIndex = useMemo(() => {
+    const frameInterval = matchEvents?.info?.frameInterval;
+    if (!frameInterval) return -1;
+
+    const idx = Math.round(FIFTEEN_MINUTES_MS / frameInterval);
+    return Math.min(idx, userEvents.length - 1);
+  }, [matchEvents, userEvents.length]);
+
   const userAndOpponentDifference = useMemo(() => {
-    if (!userEvents || !opponentEvents) return null;
+    if (!userEvents.length || !opponentEvents.length || targetFrameIndex < 0) {
+      return null;
+    }
 
-    const userAt15 = userEvents[15];
-    const opponentAt15 = opponentEvents[15];
+    const userAtTarget = userEvents[targetFrameIndex];
+    const opponentAtTarget = opponentEvents[targetFrameIndex];
 
-    if (!userAt15 || !opponentAt15) return null;
+    if (!userAtTarget || !opponentAtTarget) return null;
 
     return {
       user: {
-        gold: userAt15.totalGold,
-        level: userAt15.level,
-        minions: userAt15.minionsKilled + userAt15.jungleMinionsKilled,
-        damageDone: userAt15.damageStats.totalDamageDoneToChampions,
+        gold: userAtTarget.totalGold,
+        level: userAtTarget.level,
+        minions: userAtTarget.minionsKilled + userAtTarget.jungleMinionsKilled,
+        damageDone: userAtTarget.damageStats?.totalDamageDoneToChampions,
       },
       opponent: {
-        gold: opponentAt15.totalGold,
-        level: opponentAt15.level,
-        minions: opponentAt15.minionsKilled + opponentAt15.jungleMinionsKilled,
-        damageDone: opponentAt15.damageStats.totalDamageDoneToChampions,
+        gold: opponentAtTarget.totalGold,
+        level: opponentAtTarget.level,
+        minions:
+          opponentAtTarget.minionsKilled + opponentAtTarget.jungleMinionsKilled,
+        damageDone: opponentAtTarget.damageStats?.totalDamageDoneToChampions,
       },
     };
-  }, [userEvents, opponentEvents]);
-
-  useEffect(() => {
-  }, [participantEvents, selectedParticipantId]);
-
-
+  }, [userEvents, opponentEvents, targetFrameIndex]);
 
   const groupedItemEvents = useMemo(() => {
     if (!matchEvents?.info?.frames) {
-
       return [];
     }
 
@@ -227,8 +225,8 @@ const Details = ({
       frame.events.filter(
         (event) =>
           event.participantId === selectedParticipantId &&
-          event.type === "SKILL_LEVEL_UP"
-      )
+          event.type === "SKILL_LEVEL_UP",
+      ),
     );
   }, [selectedParticipantId, matchEvents]);
 
@@ -241,17 +239,15 @@ const Details = ({
 
   useEffect(() => {
     const getChampionSpell = async () => {
-
       const participant = game.participants.find(
-        (participant) => participant.participantId === selectedParticipantId
+        (participant) => participant.participantId === selectedParticipantId,
       );
       if (!participant) {
         return;
       }
 
-
       const champRes = await fetch(
-        `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion/${participant.championName}.json`
+        `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion/${participant.championName}.json`,
       );
 
       if (!champRes.ok) {
@@ -261,23 +257,17 @@ const Details = ({
 
       const data: ChampionDetailData = await champRes.json();
 
-
       const champData = data.data;
       const championDetail = champData[participant.championName!];
 
       setChampion(championDetail);
-
     };
 
     getChampionSpell();
   }, [selectedParticipantId]);
 
-  useEffect(() => {
-
-  }, [selectedParticipantId]);
-  useEffect(() => {
-
-  }, []);
+  useEffect(() => {}, [selectedParticipantId]);
+  useEffect(() => {}, []);
 
   if (!game.participants || game.participants.length === 0) {
     return <div>Loading game data...</div>;
@@ -437,7 +427,7 @@ const Details = ({
               </p>
               <p className="flex flex-col tracking-tight text-center">
                 {(user!.totalMinionsKilled! / (user!.timePlayed! / 60)).toFixed(
-                  1
+                  1,
                 )}
                 <span className="text-gray-400 text-xs font-semibold">
                   CS/m
@@ -500,7 +490,7 @@ const Details = ({
             {game.participants
               .filter(
                 (participant) =>
-                  participant.participantId === selectedParticipantId
+                  participant.participantId === selectedParticipantId,
               )
               .map((participant) => (
                 <div key={participant.puuid} className="flex flex-col gap-1">
@@ -543,7 +533,7 @@ const Details = ({
                     const skillAtLevel = skills.find(
                       (skill, index) =>
                         index + 1 === levelNumber &&
-                        skill.skillSlot === skillSlot
+                        skill.skillSlot === skillSlot,
                     );
 
                     if (!skillAtLevel) {

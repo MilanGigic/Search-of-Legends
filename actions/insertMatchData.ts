@@ -27,7 +27,6 @@ export default async function insertMatchData(
     .insert(matches)
     .values({
       matchId,
-      puuid,
     })
     .onConflictDoNothing();
 
@@ -150,7 +149,7 @@ export default async function insertMatchData(
       .insert(matchTeams)
       .values({
         matchId,
-        teamId: team.teamId,
+        teamId: team.teamId!,
         win: team.win === true ? 1 : 0,
       })
       .onConflictDoNothing();

@@ -1,3 +1,5 @@
+"use server";
+
 import { db } from "@/db";
 import { matchParticipants, champions } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
@@ -25,7 +27,7 @@ export async function getChampionPerformance(puuid: string) {
   const enriched = await Promise.all(
     stats.map(async (stat) => {
       const champ = await db.query.champions.findFirst({
-        where: eq(champions.key, stat.championId!.toString()),
+        where: eq(champions.key, stat.championId!),
       });
 
       const userKda = kda(

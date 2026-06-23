@@ -1,8 +1,19 @@
+"use client";
+
 import { getRolePerformance } from "@/actions/performance/getRolePerformance";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
-const RolesPerformanceCard = async ({ puuid }: { puuid: string }) => {
-  const data = await getRolePerformance(puuid);
+const RolesPerformanceCard = ({ puuid }: { puuid: string }) => {
+  const [rolePerformance, setRolePerformance] = useState<RolePerformance[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const data = await getRolePerformance(puuid);
+
+      setRolePerformance(data);
+    })();
+  }, [puuid]);
 
   return (
     <div className="p-5 py-3 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624]  shadow-sm shadow-[#2A2A40]">
@@ -14,12 +25,12 @@ const RolesPerformanceCard = async ({ puuid }: { puuid: string }) => {
         </ul>
 
         <ul className="mt-1">
-          {data.map((role, index) => (
+          {rolePerformance.map((role, index) => (
             <li key={role.role}>
               {role.role === "TOP" ? (
                 <div
                   className={`text-center grid grid-cols-4 py-1 ${
-                    index < data.length - 1 ? "border-b" : ""
+                    index < rolePerformance.length - 1 ? "border-b" : ""
                   }`}
                 >
                   <div className="col-span-2 w-full">

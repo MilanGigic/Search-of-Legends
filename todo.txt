@@ -18,3 +18,5 @@ params: xWCZ8vciPhFXjIGdA4VjRqISJCoFacEpjQV-ZEZs2PawGtEdqtKxV71XbS2-2Nrle6uc03tG
 > It still uses old schema structure, update it.
 > Seed champions table.
 > I don't like that components are server-side and are fetching from database, make them client side components, and make server actions that match functions in said components.
+
+Whats left is to make it work faster -----  

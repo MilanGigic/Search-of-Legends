@@ -19,16 +19,18 @@ export default function SearchForm({
   const [inputValue, setInputValue] = useState<string>("");
   const [region, setRegion] = useState<string>("");
 
-  // const BASE_URL = process.env.NEXT_PUBLIC_VERCEL_URL!;
-
   useEffect(() => {
+    if (gameName.trim() === "" || tagLine.trim() === "") {
+      setAccountInfo(null);
+      setRegion("");
+      return;
+    }
+
+    const controller = new AbortController();
+    let isCurrent = true;
+
     const fetchAccount = async () => {
       console.log("[fetchAccount] Called with", { gameName, tagLine });
-
-      if (gameName.trim() === "" || tagLine.trim() === "") {
-        console.log("[fetchAccount] Missing gameName or tagLine, aborting");
-        return;
-      }
 
       setLoading(true);
       setError("");
@@ -42,6 +44,7 @@ export default function SearchForm({
 
         const res = await fetch(
           `/api/account?gameName=${gameName}&tagLine=${tagLine}`,
+          { signal: controller.signal },
         );
         console.log("[fetchData] First fetch result:", res);
 
@@ -56,56 +59,47 @@ export default function SearchForm({
             await new Promise((r) => setTimeout(r, 1000));
             const retryRes = await fetch(
               `/api/account?gameName=${gameName}&tagLine=${tagLine}`,
+              { signal: controller.signal },
             );
             console.log("[fetchData] Retry fetch result:", retryRes);
             if (!retryRes.ok) throw new Error(retryRes.statusText);
-            const retryJson = await retryRes.json();
-            console.log("[fetchData] Retry fetch JSON:", retryJson);
-            return retryJson;
+            return retryRes.json();
           }
-
-          console.error(
-            "[fetchData] Fetch failed with status:",
-            res.status,
-            res.statusText,
-          );
           throw new Error(res.statusText);
         }
-
-        const jsonData = await res.json();
-        console.log("[fetchData] Fetch successful, JSON:", jsonData);
-        setLoading(false);
-        return jsonData;
+        return res.json();
       };
 
       try {
         const data = await fetchData();
+        if (!isCurrent) return;
         if (!data) {
           console.error("[fetchAccount] fetchData returned empty object");
           throw new Error("Empty data");
         }
 
-        console.log("[fetchAccount] Received data:", data);
         setAccountInfo(data);
         const displayRegion = getFrontendRegion(data.region);
-        console.log("[fetchAccount] Setting region to", displayRegion);
-        setLoading(false);
-
         setRegion(displayRegion);
       } catch (err) {
+        if (!isCurrent) return;
+        if ((err as Error).name === "AbortError") return;
         console.error("[fetchAccount] Error:", err);
         setError(`Sorry, we couldn't find what you're looking for: ${err}`);
         setAccountInfo(null);
       } finally {
         console.log("[fetchAccount] Fetch finished, setting loading to false");
-        setLoading(false);
+        if (isCurrent) setLoading(false);
       }
     };
 
-    // Delay search to avoid triggering on every keystroke instantly
-    const delay = setTimeout(fetchAccount, 500); // 500ms debounce
+    const debounceTimer = setTimeout(fetchAccount, 500);
 
-    return () => clearTimeout(delay); // Cleanup on re-type
+    return () => {
+      isCurrent = false;
+      controller.abort();
+      clearTimeout(debounceTimer);
+    };
   }, [gameName, tagLine]);
 
   const handleRiotNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -192,20 +186,3 @@ export default function SearchForm({
     </div>
   );
 }
-
-//     br1: "BR",
-// la1: "LAN",
-// la2: "LAS",
-// na1: "NA",
-// eun1: "EUNE",
-// euw1: "EUW",
-// tr1: "TR",
-// ru: "RU",
-// jp1: "JP",
-// kr: "KR",
-// oc1: "OCE",
-// ph2: "PH",
-// sg2: "SG",
-// th2: "TH",
-// tw2: "TW",
-// vn2: "VN",

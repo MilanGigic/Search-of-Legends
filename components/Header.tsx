@@ -8,14 +8,11 @@ import SearchForm from "./SearchForm";
 import { MenuIcon, SearchIcon, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSearchStore } from "@/lib/store/useSearchStore";
-import { signIn, signOut, useSession } from "next-auth/react";
 
 const Header = ({ showSearch }: { showSearch?: boolean }) => {
   const [searchOpen, setSearchOpen] = useState<boolean>(false);
 
   const { isOpen, toggle } = useSearchStore();
-
-  const { data: session } = useSession();
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 641px)");
