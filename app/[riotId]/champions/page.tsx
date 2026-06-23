@@ -33,17 +33,10 @@ const ChampionsPage = async ({ params }: AccountPageProps) => {
     return notFound();
   }
   const puuid = accountData.puuid;
-  const REGION = getRegionalEndpoint(accountData.region);
 
   const champions = await getChampionPerformance(puuid);
   return (
     <div className="relative z-10 min-h-screen p-4 text-slate-300">
-      <UserCard
-        accountData={accountData}
-        region={REGION}
-        riotId={riotId}
-        version={version!}
-      />
       <div className="pt-5 border border-gray-700/70 sm:mt-3 max-w-5xl mx-auto rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#121624] to-[#1B1F35]  shadow-sm shadow-[#2A2A40]">
         <ChampionStatsClient champions={champions} version={version!} />
       </div>

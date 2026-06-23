@@ -1,11 +1,9 @@
-"use server";
-
 import fetchAllMatchIds from "@/actions/match-history/fetchMatchIds";
 import getRegionalEndpoint from "@/actions/match-history/getRegionalEndpoint";
 import { notFound } from "next/navigation";
 import { fetchAccountByName } from "@/actions/fetchAccountByName";
-import ClientPage from "@/components/riotIdPage/ClientPage";
 import { fetchLatestVersion } from "@/lib/riot";
+import ClientPage from "@/components/riotIdPage/ClientPage";
 
 interface AccountPageProps {
   params: Promise<{ riotId: string; page: string }>;
@@ -17,9 +15,11 @@ const AccountPage = async ({ params, searchParams }: AccountPageProps) => {
   const { page } = await searchParams;
   const decodedRiotId = decodeURIComponent(riotId);
   const separator = decodedRiotId.lastIndexOf("-");
+
   if (separator === -1) {
     return notFound();
   }
+
   const gameName = decodedRiotId.slice(0, separator);
   const tagLine = decodedRiotId.slice(separator + 1);
 
@@ -27,22 +27,19 @@ const AccountPage = async ({ params, searchParams }: AccountPageProps) => {
     return notFound();
   }
 
+  // Same cached call the layout already made — within the cache window
+  // this resolves from cache rather than refetching live.
   const accountData = await fetchAccountByName(gameName, tagLine);
-
-  const REGION = getRegionalEndpoint(accountData.region);
 
   if (!accountData?.region) {
     return notFound();
   }
-  const matchHistory = await fetchAllMatchIds(
-    accountData.puuid,
-    accountData.region,
-    page,
-  );
 
-  const version = await fetchLatestVersion();
-
-  if (!version) throw new Error("No version found");
+  const REGION = getRegionalEndpoint(accountData.region);
+  const [matchHistory, version] = await Promise.all([
+    fetchAllMatchIds(accountData.puuid, accountData.region, page ?? "1"),
+    fetchLatestVersion(),
+  ]);
 
   return (
     <ClientPage
@@ -50,8 +47,9 @@ const AccountPage = async ({ params, searchParams }: AccountPageProps) => {
       accountData={accountData}
       region={REGION}
       riotId={riotId}
-      version={version}
+      version={version!}
     />
   );
 };
+
 export default AccountPage;
