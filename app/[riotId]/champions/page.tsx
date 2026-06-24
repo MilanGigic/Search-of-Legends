@@ -1,6 +1,4 @@
-import UserCard from "@/components/UserCard";
 import { notFound } from "next/navigation";
-import getRegionalEndpoint from "@/actions/match-history/getRegionalEndpoint";
 import { getChampionPerformance } from "@/actions/performance/getChampionPerformance";
 import ChampionStatsClient from "@/components/riotIdPage/champions/ChampionStatsClient";
 import { fetchLatestVersion } from "@/lib/riot";

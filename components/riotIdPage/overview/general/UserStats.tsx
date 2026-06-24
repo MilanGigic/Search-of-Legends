@@ -12,7 +12,7 @@ interface UserStatsProps {
 
 const UserStats = ({ riotId, puuid, version }: UserStatsProps) => {
   return (
-    <div className="h-full w-full md:w-[300px] flex flex-col gap-2">
+    <div className="h-full w-full md:w-[300px] flex flex-col gap-2 sticky top-84">
       <div className="sm:mr-4 rounded-md mt-5 shadow-sm shadow-slate-800">
         <LastThirtyGames puuid={puuid} version={version} />
       </div>

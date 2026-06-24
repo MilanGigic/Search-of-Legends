@@ -1,7 +1,7 @@
-import { topFiveQueue } from "@/queues/topFiveQueue";
+import { topFivePlayersQueue } from "@/queues/topFivePlayersQueue";
 
 async function main() {
-  await topFiveQueue.add("refresh-topFive-manual", {});
+  await topFivePlayersQueue.add("refresh-topFivePlayers-manual", {});
   console.log("Manual job queued");
   process.exit(0);
 }

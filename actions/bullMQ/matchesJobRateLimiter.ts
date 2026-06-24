@@ -1,42 +1,140 @@
 import pLimit from "p-limit";
 
-const limit = pLimit(18); // ~90% of the 20/sec limit
+const limit = pLimit(15);
+
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-export const REGIONS = [
-  "euw1",
-  "na1",
-  "kr",
-  "eun1",
-  "br1",
-  "la1",
-  "la2",
-  "oc1",
-  "tr1",
-  "ru",
-  "jp1",
-];
+class RateWindow {
+  private timestamps: number[] = [];
 
-export const calculateWinRate = (wins: number, losses: number) => {
-  const total = wins + losses;
-  if (total === 0) return 0;
-  return Math.round((wins / total) * 100);
-};
+  constructor(
+    private readonly maxRequests: number,
+    private readonly windowMs: number,
+  ) {}
 
-export const formatLP = (lp: number) => {
-  return `${lp.toLocaleString()}`;
-};
+  private prune(now: number) {
+    const cutoff = now - this.windowMs;
+    let i = 0;
+    while (i < this.timestamps.length && this.timestamps[i] <= cutoff) {
+      i++;
+    }
+    if (i > 0) {
+      this.timestamps.splice(0, i);
+    }
+  }
+
+  msUntilFree(now: number): number {
+    this.prune(now);
+    if (this.timestamps.length < this.maxRequests) {
+      return 0;
+    }
+    return this.timestamps[0] + this.windowMs - now + 1;
+  }
+
+  record(now: number) {
+    this.timestamps.push(now);
+  }
+}
+
+const perSecondWindow = new RateWindow(20, 1_000);
+const per2MinWindow = new RateWindow(100, 120_000);
+
+async function waitForRateWindow(): Promise<void> {
+  while (true) {
+    const now = Date.now();
+    const waitSecond = perSecondWindow.msUntilFree(now);
+    const waitTwoMin = per2MinWindow.msUntilFree(now);
+    const waitMs = Math.max(waitSecond, waitTwoMin);
+
+    if (waitMs <= 0) {
+      const recordedAt = Date.now();
+      perSecondWindow.record(recordedAt);
+      per2MinWindow.record(recordedAt);
+      return;
+    }
+
+    await delay(waitMs);
+  }
+}
+
+const exponentialBackoff = (attempt: number) =>
+  Math.min(5000 * Math.pow(2, attempt), 30000);
+
+export async function fetchWithRateLimit(
+  url: string,
+  opts?: RequestInit,
+  maxRetries: number = 3,
+): Promise<Response> {
+  return limit(async () => {
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      await waitForRateWindow();
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+        const response = await fetch(url, {
+          ...opts,
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        // Riot still rate-limited us despite our pacing (clock drift,
+        // shared key usage elsewhere, etc.) — honor Retry-After and retry.
+        if (response.status === 429) {
+          const retryAfter = response.headers.get("Retry-After");
+          const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : 2000;
+          console.log(`⚠️ Rate limited, waiting ${waitTime}ms...`);
+          await delay(waitTime);
+          continue;
+        }
+
+        if (!response.ok && response.status >= 500) {
+          throw new Error(
+            `Server error: ${response.status} ${response.statusText}`,
+          );
+        }
+
+        return response;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        lastError = error;
+
+        if (error.name === "AbortError") {
+          console.error(`❌ Request timeout for URL: ${url}`);
+        } else if (error.code === "ECONNRESET" || error.code === "ENOTFOUND") {
+          console.error(`❌ Connection error (${error.code}) for URL: ${url}`);
+        } else {
+          console.error(`❌ Request failed: ${error.message}`);
+        }
+
+        if (attempt === maxRetries) {
+          break;
+        }
+
+        const backoffDelay = exponentialBackoff(attempt);
+        console.log(
+          `⏳ Retrying request (attempt ${attempt + 1}/${maxRetries}) after ${backoffDelay}ms delay...`,
+        );
+        await delay(backoffDelay);
+      }
+    }
+
+    throw lastError || new Error("Request failed after all retries");
+  });
+}
 
 export const calculateAccurateGameDuration = (maxTimePlayer: number) => {
   const totalMinutes = Math.floor((maxTimePlayer * 1000) / 60000);
   const totalSeconds = Math.floor(((maxTimePlayer * 1000) % 60000) / 1000);
-
   return `${totalMinutes}m ${totalSeconds}s`;
 };
 
 export const calculateCsPerMin = (maxTimePlayed: number, totalCs: number) => {
   const totalMinutes = Math.floor((maxTimePlayed * 1000) / 60000);
-
   const avgCs = totalCs / totalMinutes;
   return avgCs.toFixed(1);
 };
@@ -50,13 +148,11 @@ export const kda = (kills: number, deaths: number, assists: number) => {
   } else {
     kdaValue = ((kills + assists) / deaths) * 100;
   }
-
   return Math.round(kdaValue) / 100;
 };
 
 export default function getQueueInfo(queueId: number) {
   switch (queueId) {
-    // Summoner's Rift queues
     case 400:
       return {
         map: "Summoner's Rift",
@@ -88,33 +184,17 @@ export default function getQueueInfo(queueId: number) {
         isRanked: false,
       };
     case 700:
-      return {
-        map: "Summoner's Rift",
-        description: "Clash",
-        isRanked: true,
-      };
-
-    // Howling Abyss (ARAM) queues
+      return { map: "Summoner's Rift", description: "Clash", isRanked: true };
     case 450:
-      return {
-        map: "Howling Abyss",
-        description: "ARAM",
-        isRanked: false,
-      };
+      return { map: "Howling Abyss", description: "ARAM", isRanked: false };
     case 720:
       return {
         map: "Howling Abyss",
         description: "ARAM Clash",
         isRanked: true,
       };
-
-    // Rotating Game Modes
     case 900:
-      return {
-        map: "Summoner's Rift",
-        description: "ARURF",
-        isRanked: false,
-      };
+      return { map: "Summoner's Rift", description: "ARURF", isRanked: false };
     case 1020:
       return {
         map: "Summoner's Rift",
@@ -129,19 +209,13 @@ export default function getQueueInfo(queueId: number) {
       };
     case 1700:
     case 1710:
-      return {
-        map: "Rings of Wrath",
-        description: "Arena",
-        isRanked: false,
-      };
+      return { map: "Rings of Wrath", description: "Arena", isRanked: false };
     case 1900:
       return {
         map: "Summoner's Rift",
         description: "Pick URF",
         isRanked: false,
       };
-
-    // Teamfight Tactics
     case 1090:
       return {
         map: "Convergence",
@@ -160,8 +234,6 @@ export default function getQueueInfo(queueId: number) {
         description: "Teamfight Tactics Tutorial",
         isRanked: false,
       };
-
-    // Co-op vs AI
     case 830:
     case 870:
       return {
@@ -183,14 +255,8 @@ export default function getQueueInfo(queueId: number) {
         description: "Co-op vs AI Intermediate",
         isRanked: false,
       };
-
-    // Special Event Modes
     case 910:
-      return {
-        map: "Crystal Scar",
-        description: "Ascension",
-        isRanked: false,
-      };
+      return { map: "Crystal Scar", description: "Ascension", isRanked: false };
     case 920:
       return {
         map: "Howling Abyss",
@@ -215,8 +281,6 @@ export default function getQueueInfo(queueId: number) {
         description: "Doom Bots Standard",
         isRanked: false,
       };
-
-    // Tutorials
     case 2000:
       return {
         map: "Summoner's Rift",
@@ -235,60 +299,18 @@ export default function getQueueInfo(queueId: number) {
         description: "Tutorial 3",
         isRanked: false,
       };
-
-    // Swarm Mode (PvE)
     case 1810:
     case 1820:
     case 1830:
     case 1840:
-      return {
-        map: "Swarm",
-        description: "Swarm Mode",
-        isRanked: false,
-      };
-
-    // Nexus Blitz
+      return { map: "Swarm", description: "Swarm Mode", isRanked: false };
     case 1300:
       return {
         map: "Nexus Blitz",
         description: "Nexus Blitz",
         isRanked: false,
       };
-
     default:
-      return {
-        map: "Unknown",
-        description: "Custom Game",
-        isRanked: false,
-      };
-  }
-}
-
-export async function fetchWithRateLimit(url: string, opts?: RequestInit) {
-  return limit(async () => {
-    return fetch(url, opts);
-  });
-}
-
-export async function fetchLatestVersion() {
-  console.log("FetchLatestVersion action hit");
-  try {
-    const versionRes = await fetch(
-      "https://ddragon.leagueoflegends.com/api/versions.json",
-    );
-
-    if (!versionRes.ok) {
-      console.error(
-        "Error fetching versions:",
-        versionRes.status,
-        versionRes.statusText,
-      );
-    }
-
-    const version: string[] = await versionRes.json();
-
-    return version[0];
-  } catch (error) {
-    console.error("Fetching versions failed:", error);
+      return { map: "Unknown", description: "Custom Game", isRanked: false };
   }
 }
