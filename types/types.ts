@@ -88,28 +88,29 @@ interface Metadata {
 interface TimelineInfo {
   endOfGameResult: string;
   frameInterval: number;
+  gameId: number;
+  pariticipants: ParticipantTimeLineDto[];
   frames: Frame[];
+}
+
+interface ParticipantTimeLineDto {
+  participantId: number;
+  puuid: string;
 }
 
 interface Frame {
   events: Events[];
   participantFrames: Record<string, ParticipantFrame>;
+  timestamp: number;
 }
-
-type EventType =
-  | "PAUSE_END"
-  | "ITEM_PURCHASED"
-  | "SKILL_LEVEL_UP"
-  | "WARD_PLACED"; // extend this as needed
 
 interface Events {
   realTimestamp?: number;
   timestamp: number;
-  type: EventType;
+  type: string;
   itemId?: number;
   participantId?: number;
   skillSlot?: number;
-  ward_type?: string;
 }
 
 type ItemEvents = {

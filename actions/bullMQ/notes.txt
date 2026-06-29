@@ -1,0 +1,64 @@
+// Concurrency cap: how many requests can be in flight at once.
+// This protects connection pool / memory, but does NOT enforce Riot's
+// rate limits on its own — see RateWindow below for that.
+//
+// Configurable via env since a production-tier key generally allows much
+// higher concurrency than a development key.
+
+
+// ---------------------------------------------------------------------------
+// Sliding-window rate limiter
+//
+// Riot enforces (at minimum) two windows simultaneously per API key.
+// Development keys are commonly 20 req/1s and 100 req/2min; production keys
+// are granted higher limits that vary by approval. Rather than hardcode
+// dev-key numbers, both windows are configurable via env vars — update
+// these (no code changes needed) once a production key is approved.
+//
+// pLimit alone can't satisfy this: it bounds *concurrency*, not *requests
+// over time*. Concurrent requests that each resolve in 50ms can blow
+// through a per-second cap easily even with a low concurrency limit. This
+// tracks call timestamps in both windows and makes callers wait until
+// there's room in whichever window is currently full, before the request
+// is allowed to fire.
+//
+// Important: this state is per Node process / module instance. If you ever
+// run multiple worker processes against the same Riot API key, each process
+// gets its own independent budget — they don't share one global counter.
+// That's fine for a single worker process, but is a real limitation if you
+// scale to multiple worker instances later (would need a Redis-backed
+// counter instead of in-memory arrays at that point).
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Per-method (per-endpoint) rate limiting
+//
+// Riot enforces THREE separate kinds of limits, not just one:
+//   - app rate limit: shared across every endpoint, for this key+region
+//   - method rate limit: specific to ONE endpoint, for this key+region
+//   - service rate limit: shared across a whole backend service
+// A call only succeeds if it clears ALL applicable limits. The app-wide
+// windows above only cover the first kind — a tight method-specific limit
+// on a single hot endpoint (e.g. match-ids-by-puuid, hit repeatedly by
+// every account's pagination loop) can still 429 you even while the
+// app-wide budget has room to spare. This is exactly what was happening:
+// 5 accounts paginating match IDs concurrently hammered ONE endpoint past
+// its own per-method cap, while the shared app-wide windows looked fine.
+//
+// Method limits are not published in a simple static table — Riot returns
+// the actual current limits in the X-Method-Rate-Limit response header per
+// call. Rather than hardcode possibly-wrong numbers, every method key gets
+// a configurable default (conservative) that you can override via env var
+// per method if you discover (via that header) a specific endpoint allows
+// more, or needs to be even more conservative.
+// ---------------------------------------------------------------------------
+
+
+// 401/403 means the API key itself is invalid or expired — this is
+// NOT a rate-limit problem and retrying will never help (the key
+// doesn't become valid on attempt 2). Riot dev keys in particular
+// expire every 24h. Throw a dedicated error type and return
+// immediately, bypassing the retry loop entirely — otherwise this
+// would fall into the generic catch block below and burn 3 retries
+// with backoff on a dead key, producing a wall of repeated failures
+// that looks like (but isn't) a rate-limiting bug.

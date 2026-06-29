@@ -19,7 +19,10 @@
     "trigger:leaderboard": "dotenv -e .env.local -- npx tsx scripts/triggerLeaderboard.ts",
     "worker:accountSync": "dotenv -e .env.local -- npx tsx --watch workers/accountSyncWorker.ts",
     "schedule:matchesQueue": "dotenv -e .env.local -- npx tsx --watch queues/matchesQueue.ts",
-    "worker:matchesWorker": "dotenv -e .env.local -- npx tsx --watch workers/matchesWorker.ts"
+    "worker:matchesWorker": "dotenv -e .env.local -- npx tsx --watch workers/matchesWorker.ts",
+    "worker:matchFetchWorker": "dotenv -e .env.local -- npx tsx --watch workers/matchFetchWorker.ts",
+    "worker:matchPersistWorker": "dotenv -e .env.local -- npx tsx --watch workers/matchPersistWorker.ts",
+    "worker:all": "concurrently \"pnpm worker:matchesWorker\" \"pnpm worker:matchFetchWorker\" \"pnpm worker:matchPersistWorker\""
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
@@ -35,6 +38,7 @@
     "drizzle-orm": "^0.44.1",
     "express": "^5.1.0",
     "framer-motion": "^12.18.1",
+    "ioredis": "^5.11.1",
     "lucide-react": "^0.511.0",
     "next": "16.2.9",
     "next-auth": "^4.24.11",
@@ -64,6 +68,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@types/stream-json": "^1.7.8",
+    "concurrently": "^10.0.3",
     "dotenv-cli": "^11.0.0",
     "drizzle-kit": "^0.31.1",
     "eslint": "^9",

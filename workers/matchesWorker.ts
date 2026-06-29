@@ -1,26 +1,34 @@
 import { Job, Worker } from "bullmq";
+import Redis, { type RedisOptions } from "ioredis";
 import dotenv from "dotenv";
 import { db } from "@/db";
-import { fetchWithRateLimit } from "@/lib/riot";
 import { redisConnection } from "@/lib/redis";
 import { matchesQueue } from "@/queues/matchesQueue";
 import fetchAllMatchIds from "@/actions/bullMQ/fetchAllMatchIds";
-import insertMatchData from "@/actions/insertMatchData";
-import { accounts, matches } from "@/db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { accounts } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import getRegionalEndpoint from "@/actions/match-history/getRegionalEndpoint";
+import { matchFetchQueue } from "@/queues/matchFetchQueue";
 
 dotenv.config();
-
-// Its fine, it works well
-// But it hits the rate limit
-// Make it fetch slower, e.g. 18 requests, then wait 2 seconds then go again, or something like that
 
 console.log("Initializing matches queue...");
 
 const ACCOUNT_WORKER_CONCURRENCY = Number(
-  process.env.ACCOUNT_WORKER_CONCURRENCY ?? 5,
+  process.env.ACCOUNT_WORKER_CONCURRENCY ?? 3,
 );
+
+const ENQUEUE_CHUNK_SIZE = Number(process.env.MATCH_FETCH_CHUNK_SIZE ?? 200);
+
+const MAX_PENDING_FETCH_JOBS = Number(
+  process.env.MAX_PENDING_FETCH_JOBS ?? 2000,
+);
+
+// NOT the actual rate-limit enforcement (workerRateLimit does that).
+const FETCH_JOB_STAGGER_MS = Number(process.env.FETCH_JOB_STAGGER_MS ?? 50);
+
+// How long to wait between depth checks when match-fetch is too full.
+const BACKPRESSURE_POLL_MS = Number(process.env.BACKPRESSURE_POLL_MS ?? 5_000);
 
 interface SyncAccountJobData {
   puuid: string;
@@ -33,13 +41,11 @@ export const matchesWorker = new Worker(
       await handleSyncAll();
       return;
     }
-
     if (job.name === "sync-account") {
       const { puuid } = job.data as SyncAccountJobData;
       await handleSyncAccount(puuid);
       return;
     }
-
     console.warn(`Unknown job name: ${job.name}`);
   },
   {
@@ -48,16 +54,8 @@ export const matchesWorker = new Worker(
   },
 );
 
-/**
- * Fan-out job: looks up every account and enqueues one "sync-account" job
- * per account, then returns immediately. Does no Riot fetching itself, so
- * one slow or failing account can no longer take down the whole sync run —
- * each account now lives in its own job with its own retry/failure state.
- */
 async function handleSyncAll() {
   console.log("🚀 sync-all: fanning out per-account jobs...");
-
-  console.log("Fetching accounts from DB...");
   const accounts = await db.query.accounts.findMany();
   console.log(`Fetched ${accounts.length} accounts.`);
 
@@ -74,131 +72,87 @@ async function handleSyncAll() {
       },
     })),
   );
-
-  console.log(`✅ sync-all: enqueued ${accounts.length} sync-account jobs.`);
+  console.log(`✅ Enqueued ${accounts.length} account jobs.`);
 }
 
-/**
- * Per-account job: fetches new match IDs for one account and processes
- * them. Failures here (Riot API errors, a single bad match payload, etc.)
- * only affect this account's job — BullMQ retries it independently with
- * backoff, and every other account's job is unaffected.
- */
+async function getMatchFetchPendingCount(): Promise<number> {
+  const counts = await matchFetchQueue.getJobCounts(
+    "wait",
+    "delayed",
+    "active",
+  );
+  return (counts.wait ?? 0) + (counts.delayed ?? 0) + (counts.active ?? 0);
+}
+async function waitForFetchQueueRoom(): Promise<void> {
+  while (true) {
+    const pending = await getMatchFetchPendingCount();
+    if (pending < MAX_PENDING_FETCH_JOBS) return;
+    console.log(
+      `⏸️ match-fetch queue has ${pending} pending jobs (limit ${MAX_PENDING_FETCH_JOBS}), waiting...`,
+    );
+    await new Promise((res) => setTimeout(res, BACKPRESSURE_POLL_MS));
+  }
+}
+let delayCounterClient: Redis | null = null;
+
+function getDelayCounterClient(): Redis {
+  if (!delayCounterClient) {
+    delayCounterClient = new Redis(redisConnection as RedisOptions);
+    delayCounterClient.on("error", (err) => {
+      console.error("❌ delay-offset Redis client error:", err);
+    });
+  }
+  return delayCounterClient;
+}
+async function reserveDelaySlots(count: number): Promise<number> {
+  const client = getDelayCounterClient();
+  const key = "match-fetch:delay-offset";
+  const start = await client.incrby(key, count);
+  // Refresh TTL so this resets if syncing goes quiet for a while.
+  await client.expire(key, 60 * 30); // 30 minutes
+  return start - count; // first slot index for this batch
+}
+
 async function handleSyncAccount(puuid: string) {
   console.log(`Fetching matchIds for account: ${puuid}`);
   const matchIds = await fetchAllMatchIds(puuid);
   console.log(`Fetched ${matchIds.length} matchIds for ${puuid}`);
-  await processMatchIds(matchIds, puuid);
-}
-
-export const processMatchIds = async (matchIds: string[], puuid: string) => {
-  const BATCH_SIZE = 25;
-
-  const RIOT_API_KEY = process.env.RIOT_API_KEY;
-
-  if (!RIOT_API_KEY) {
-    console.error("Riot Api Key not defined");
-    return;
-  }
 
   const accountData = await db.query.accounts.findFirst({
     where: eq(accounts.puuid, puuid),
   });
-
   if (!accountData) return;
 
   const REGION = getRegionalEndpoint(accountData.region);
 
-  console.log(`🔄 Processing ${matchIds.length} ids for puuid: ${puuid}...`);
+  const shuffled = [...matchIds].sort(() => Math.random() - 0.5);
 
-  for (let i = 0; i < matchIds.length; i += BATCH_SIZE) {
-    const batch = matchIds.slice(i, i + BATCH_SIZE);
-    console.log(
-      `🔄 Processing batch ${i / BATCH_SIZE + 1}: ${batch.length} matchIds`,
+  // Reserve our slice of the global stagger counter up front so every job
+  // in this batch gets a delay continuing from other accounts' batches,
+  // not restarting at 0.
+  const delayOffset = await reserveDelaySlots(shuffled.length);
+
+  let enqueued = 0;
+  for (let i = 0; i < shuffled.length; i += ENQUEUE_CHUNK_SIZE) {
+    await waitForFetchQueueRoom();
+
+    const chunk = shuffled.slice(i, i + ENQUEUE_CHUNK_SIZE);
+    await matchFetchQueue.addBulk(
+      chunk.map((matchId, j) => {
+        const globalIndex = delayOffset + i + j;
+        return {
+          name: "match-fetch",
+          data: { matchId, REGION, puuid },
+          opts: {
+            jobId: `fetch-${matchId}`,
+            delay: globalIndex * FETCH_JOB_STAGGER_MS,
+            attempts: 3,
+          },
+        };
+      }),
     );
-
-    const existingMatches = await db
-      .select({ matchId: matches.matchId })
-      .from(matches)
-      .where(inArray(matches.matchId, batch));
-
-    const existingIds = new Set(existingMatches.map((m) => m.matchId));
-
-    const jobs = batch.map((matchId) =>
-      (async () => {
-        console.log(`Checking matchId: ${matchId}`);
-
-        if (existingIds.has(matchId)) {
-          console.log(`Skipping ${matchId} (already exists)`);
-          return { skipped: true };
-        }
-
-        try {
-          console.log(`Fetching match info for matchId: ${matchId}`);
-          const matchInfoRes = await fetchWithRateLimit(
-            `https://${REGION}.api.riotgames.com/lol/match/v5/matches/${matchId}?api_key=${RIOT_API_KEY}`,
-          );
-
-          if (!matchInfoRes.ok) {
-            console.warn(
-              `❌ Failed to fetch match info for ${matchId}: Response not OK`,
-            );
-            return;
-          }
-
-          const matchInfo: RiotMatchDto = await matchInfoRes.json();
-
-          console.log(`✅ Inserting match data for matchId: ${matchId}`);
-          await insertMatchData(matchInfo, puuid);
-
-          console.log(`✅ Synced ${matchId} for ${puuid}`);
-        } catch (error) {
-          console.warn(`⚠️ Failed ${matchId} for ${puuid}`, error);
-        }
-      })(),
-    );
-
-    await Promise.all(jobs);
+    enqueued += chunk.length;
   }
 
-  console.log(`✅ Finished processing matchIds for ${puuid}`);
-};
-
-// Worker lifecycle events
-matchesWorker.on("ready", () => console.log("🟢 Worker is ready"));
-matchesWorker.on("active", (job) =>
-  console.log(`🔄 Job started: ${job.id} (${job.name})`),
-);
-matchesWorker.on("completed", (job) =>
-  console.log(`✅ Job completed: ${job.id} (${job.name})`),
-);
-matchesWorker.on("failed", (job, err) =>
-  console.error(`❌ Job failed: ${job?.id} (${job?.name})`, err),
-);
-
-// Add a manual trigger function for testing
-export async function triggerMatchesSync() {
-  console.log("🚀 Manually triggering matches sync...");
-  const job = await matchesQueue.add(
-    "sync-all",
-    {},
-    {
-      removeOnComplete: 100,
-      removeOnFail: 100,
-    },
-  );
-  console.log(`📋 Job added with ID: ${job.id}`);
-  return job;
-}
-
-// If this file is run directly, trigger a manual sync
-if (require.main === module) {
-  console.log("🏃 Running matches sync manually...");
-  triggerMatchesSync()
-    .then(() => {
-      console.log("✅ Manual trigger completed");
-    })
-    .catch((err) => {
-      console.error("❌ Manual trigger failed:", err);
-    });
+  console.log(`✅ Enqueued ${enqueued} match-fetch jobs for ${puuid}`);
 }

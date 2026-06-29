@@ -6,6 +6,9 @@ import {
   matchDetails,
   matches,
   matchObjectives,
+  matchParticipantPerks,
+  matchParticipantPerkSelections,
+  matchParticipantPerkStyles,
   matchParticipants,
   matchTeams,
 } from "@/db/schema";
@@ -47,6 +50,11 @@ export default async function insertMatchData(
       createdAt: new Date(),
     })
     .onConflictDoNothing();
+
+  const perkRows: (typeof matchParticipantPerks.$inferInsert)[] = [];
+  const perkStyleRows: (typeof matchParticipantPerkStyles.$inferInsert)[] = [];
+  const perkSelectionRows: (typeof matchParticipantPerkSelections.$inferInsert)[] =
+    [];
 
   for (const p of matchData.info.participants) {
     await db
@@ -126,6 +134,75 @@ export default async function insertMatchData(
         wardsPlaced: p.wardsPlaced,
         detectorWardsPlaced: p.detectorWardsPlaced,
       })
+      .onConflictDoNothing();
+
+    if (p.participantId == null) {
+      console.warn(
+        `⚠️ Skipping perks for a participant with no participantId in match ${matchId}`,
+      );
+      continue;
+    }
+
+    if (!p.perks) {
+      console.warn(
+        `⚠️ No perks data for participant ${p.participantId} in match ${matchId}`,
+      );
+      continue;
+    }
+
+    const { statPerks, styles } = p.perks;
+
+    if (statPerks) {
+      perkRows.push({
+        matchId,
+        participantId: p.participantId,
+        statPerkDefense: statPerks.defense,
+        statPerkFlex: statPerks.flex,
+        statPerkOffense: statPerks.offense,
+      });
+    }
+
+    for (const style of styles ?? []) {
+      perkStyleRows.push({
+        matchId,
+        participantId: p.participantId,
+        description: style.description,
+        style: style.style,
+      });
+
+      style.selections?.forEach((selection, selectionOrder) => {
+        perkSelectionRows.push({
+          matchId,
+          participantId: p.participantId!,
+          description: style.description,
+          selectionOrder,
+          perk: selection.perk,
+          var1: selection.var1,
+          var2: selection.var2,
+          var3: selection.var3,
+        });
+      });
+    }
+  }
+
+  if (perkRows.length) {
+    await db
+      .insert(matchParticipantPerks)
+      .values(perkRows)
+      .onConflictDoNothing();
+  }
+
+  if (perkStyleRows.length) {
+    await db
+      .insert(matchParticipantPerkStyles)
+      .values(perkStyleRows)
+      .onConflictDoNothing();
+  }
+
+  if (perkSelectionRows.length) {
+    await db
+      .insert(matchParticipantPerkSelections)
+      .values(perkSelectionRows)
       .onConflictDoNothing();
   }
 

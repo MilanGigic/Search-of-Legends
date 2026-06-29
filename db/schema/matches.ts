@@ -1,4 +1,5 @@
 import {
+  bigint,
   index,
   integer,
   jsonb,
@@ -209,7 +210,8 @@ export const matchTimelines = pgTable("match_timelines", {
     .notNull(),
   dataVersion: text("data_version"),
   endOfGameResult: text("end_of_game_result"),
-  frameInterval: integer("frame_interval").notNull(),
+  frameInterval: bigint("frame_interval", { mode: "number" }).notNull(),
+  gameId: bigint("game_id", { mode: "number" }).notNull(),
   participantPuuids: jsonb("participant_puuids").$type<string[]>(),
 });
 
@@ -223,8 +225,9 @@ export const matchTimelineFrames = pgTable(
     timestamp: integer("timestamp").notNull(), // ms into the game, from Riot
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.matchId, table.frameIndex] }),
-    matchIdx: index("match_timeline_frames_match_idx").on(table.matchId),
+    pk: primaryKey({
+      columns: [table.matchId, table.frameIndex],
+    }),
   }),
 );
 
@@ -234,13 +237,12 @@ export const matchTimelineEvents = pgTable(
     matchId: text("match_id").notNull(),
     frameIndex: integer("frame_index").notNull(),
     eventOrder: integer("event_order").notNull(), // position within frame.events[]
-    timestamp: integer("timestamp").notNull(),
-    realTimestamp: integer("real_timestamp"),
+    timestamp: bigint("timestamp", { mode: "number" }).notNull(),
+    realTimestamp: bigint("real_timestamp", { mode: "number" }),
     type: text("type").notNull(), // EventType union, validated at the app layer
     itemId: integer("item_id"),
     participantId: integer("participant_id"),
     skillSlot: integer("skill_slot"),
-    wardType: text("ward_type"),
   },
   (table) => ({
     pk: primaryKey({
