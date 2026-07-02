@@ -61,3 +61,11 @@ export const matchFetchWorker = new Worker(
     concurrency: 3, // IMPORTANT: keep low for Riot safety
   },
 );
+
+matchFetchWorker.on("error", (err) => {
+  console.error("❌ matchFetchWorker error:", err);
+});
+
+matchFetchWorker.on("ready", () => {
+  console.log("✅ matchFetchWorker connected and ready");
+});

@@ -19,4 +19,5 @@ params: xWCZ8vciPhFXjIGdA4VjRqISJCoFacEpjQV-ZEZs2PawGtEdqtKxV71XbS2-2Nrle6uc03tG
 > Seed champions table.
 > I don't like that components are server-side and are fetching from database, make them client side components, and make server actions that match functions in said components.
 
-Whats left is to make it work faster -----  
+>>> Use the newly added data from matches tables
+>>> Make a proper champions page, with pickrate, winrate, banrate, builds, runes.

@@ -74,6 +74,49 @@ interface Rune {
   longDesc?: string;
 }
 
+interface MetaChampion {
+  championId: number | null;
+  gamesPlayed: number;
+  wins: number;
+  losses: number;
+  avgKills: number;
+  avgDeaths: number;
+  avgAssists: number;
+  kda: number;
+  csPerMin: number;
+  championName: string;
+  championImage: string;
+  avgDamageDealt: number;
+  avgTime: number;
+  bans: number;
+  gameVersion: string | null;
+  rank: number;
+  lane: string | null;
+  totalGames: number;
+  tier: string | null;
+}
+
+interface TierWeights {
+  winRateWeight: number;
+  pickRateWeight: number;
+  banRateWeight: number;
+}
+
+interface MetaChampionStats {
+  championName: string;
+  lane: string | null;
+  winRate: number;
+  gamesPlayed: number;
+  bans: number;
+}
+
+interface ChampionTierResult {
+  name: string;
+  lane: string | null;
+  rawScore: number;
+  tier: "S+" | "S" | "A" | "B" | "C" | "D";
+}
+
 interface MatchTimelineDto {
   metadata: Metadata;
   info: TimelineInfo;

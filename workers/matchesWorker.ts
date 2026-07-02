@@ -54,6 +54,14 @@ export const matchesWorker = new Worker(
   },
 );
 
+matchesWorker.on("error", (err) => {
+  console.error("❌ matchesWorker error:", err);
+});
+
+matchesWorker.on("ready", () => {
+  console.log("✅ matchesWorker connected and ready");
+});
+
 async function handleSyncAll() {
   console.log("🚀 sync-all: fanning out per-account jobs...");
   const accounts = await db.query.accounts.findMany();

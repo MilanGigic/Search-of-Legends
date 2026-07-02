@@ -26,3 +26,11 @@ export const matchPersistWorker = new Worker(
     concurrency: 6, // DB-safe level
   },
 );
+
+matchPersistWorker.on("error", (err) => {
+  console.error("❌ matchPersistWorker error:", err);
+});
+
+matchPersistWorker.on("ready", () => {
+  console.log("✅ matchPersistWorker connected and ready");
+});

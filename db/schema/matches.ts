@@ -14,25 +14,35 @@ export const matches = pgTable("matches", {
   matchId: text("match_id").primaryKey(),
 });
 
-export const matchDetails = pgTable("match_details", {
-  matchId: text("match_id")
-    .primaryKey()
-    .references(() => matches.matchId, { onDelete: "cascade" })
-    .notNull(),
-  gameCreation: timestamp("game_creation", { withTimezone: true }).notNull(),
-  gameMode: text("game_mode"),
-  gameType: text("game_type"),
-  gameVersion: text("game_version"),
-  mapId: integer("map_id"),
-  platformId: text("platform_id"),
-  queueId: integer("queue_id").notNull(),
-  tournamentCode: text("tournament_code"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+export const matchDetails = pgTable(
+  "match_details",
+  {
+    matchId: text("match_id")
+      .references(() => matches.matchId, { onDelete: "cascade" })
+      .notNull(),
+    gameCreation: timestamp("game_creation", { withTimezone: true }).notNull(),
+    gameMode: text("game_mode"),
+    gameType: text("game_type"),
+    gameVersion: text("game_version"),
+    mapId: integer("map_id"),
+    platformId: text("platform_id"),
+    queueId: integer("queue_id").notNull(),
+    tournamentCode: text("tournament_code"),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => {
+    return {
+      detailsVersionQueueId: index("details_version_queue_id").on(
+        table.gameVersion,
+        table.queueId,
+      ),
 
-// PARTICIPANTS TABLE REWORK
-// ====> I think matchId should be connected to gameId of match info
-// ====> Riot changed the API a little, they added PlayerScore values
+      pk: primaryKey({
+        columns: [table.matchId, table.gameVersion],
+      }),
+    };
+  },
+);
 
 export const matchParticipants = pgTable(
   "match_participants",
@@ -147,6 +157,11 @@ export const matchParticipants = pgTable(
         table.championId,
         table.queueId,
       ),
+      participantMatchIdIdx: index("participant_match_id_idx").on(
+        table.matchId,
+      ),
+      championIdIdx: index("champion_id_idx").on(table.championId),
+      participantWinIdx: index("participant_win_idx").on(table.win),
       pk: primaryKey({
         columns: [table.matchId, table.participantId],
       }),
@@ -197,6 +212,9 @@ export const matchBans = pgTable(
     pickTurn: integer("pick_turn"),
   },
   (table) => ({
+    matchBansChampionIdIdx: index("match_bans_champion_id_idx").on(
+      table.championId,
+    ),
     pk: primaryKey({
       columns: [table.matchId, table.championId],
     }),
