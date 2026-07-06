@@ -2,6 +2,7 @@
 import { flexRender, Row, Table as TableProp } from "@tanstack/react-table";
 import { memo, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import Link from "next/link";
 
 interface ChampionsTableProps {
   table: TableProp<MetaChampion>;
@@ -36,6 +37,57 @@ export default function ChampionsTable({ table }: ChampionsTableProps) {
     estimateSize: () => 56,
     overscan: 10,
   });
+
+  function getCompletedName(name: string) {
+    if (!name) return;
+
+    switch (name) {
+      case "Aurelion Sol":
+        return "AurelionSol";
+      case "Bel'Veth":
+        return "Belveth";
+      case "Cho'Gath":
+        return "Chogath";
+      case "Dr. Mundo":
+        return "DrMundo";
+      case "Jarvan IV":
+        return "JarvanIV";
+      case "Kai'Sa":
+        return "Kaisa";
+      case "Kog'Maw":
+        return "KogMaw";
+      case "Kha'Zix":
+        return "Khazix";
+      case "K'Sante":
+        return "KSante";
+      case "LeBlanc":
+        return "Leblanc";
+      case "Lee Sin":
+        return "LeeSin";
+      case "Master Yi":
+        return "MasterYi";
+      case "Miss Fortune":
+        return "MissFortune";
+      case "Wukong":
+        return "MonkeyKing";
+      case "Nunu & Willump":
+        return "Nunu";
+      case "Rek'Sai":
+        return "RekSai";
+      case "Renata Glasc":
+        return "Renata";
+      case "Tahm Kench":
+        return "TahmKench";
+      case "Twisted Fate":
+        return "TwistedFate";
+      case "Vel'Koz":
+        return "Velkoz";
+      case "Xin Zhao":
+        return "XinZhao";
+      default:
+        return name;
+    }
+  }
 
   return (
     <div className="w-full text-white">
@@ -88,8 +140,9 @@ export default function ChampionsTable({ table }: ChampionsTableProps) {
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
             const row = rows[virtualRow.index];
             return (
-              <div
+              <Link
                 key={row.id}
+                href={`/champions/${getCompletedName(row.original.championName)}`}
                 style={{
                   position: "absolute",
                   top: 0,
@@ -101,7 +154,7 @@ export default function ChampionsTable({ table }: ChampionsTableProps) {
                 className="bg-gradient-to-r from-[#121624] to-[#1B1F35]"
               >
                 <MemoChampionRow row={row} />
-              </div>
+              </Link>
             );
           })}
         </div>
