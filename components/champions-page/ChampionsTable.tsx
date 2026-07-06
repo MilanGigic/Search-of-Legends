@@ -26,9 +26,9 @@ export default function ChampionsTable({
   // gameVersion,
 }: ChampionsTableProps) {
   return (
-    <Table className="text-white border w-full">
+    <Table className="text-white w-full">
       <TableCaption>Champions tierlist. Master+</TableCaption>
-      <TableHeader>
+      <TableHeader className="">
         {table.getHeaderGroups().map((hg) => (
           <TableRow key={hg.id}>
             {hg.headers.map((header) => {
@@ -38,7 +38,7 @@ export default function ChampionsTable({
                 <TableHead key={header.id}>
                   {header.isPlaceholder ? null : (
                     <div
-                      className={`flex text-white items-center justify-center gap-2 select-none ${
+                      className={`flex text-slate-400 font-semibold uppercase tracking-wide items-center justify-center gap-2 select-none ${
                         canSort ? "cursor-pointer" : "cursor-default"
                       }`}
                     >
@@ -59,7 +59,7 @@ export default function ChampionsTable({
         ))}
       </TableHeader>
 
-      <TableBody>
+      <TableBody className="bg-gradient-to-b from-[#121624] via-[#1B1F35] to-[#121624] z-50">
         {table.getRowModel().rows.map((row) => (
           <TableRow key={row.id} className="text-center hover:bg-white/15">
             {row.getVisibleCells().map((cell) => {
@@ -68,7 +68,14 @@ export default function ChampionsTable({
                 cell.getContext(),
               );
 
-              return <TableCell key={cell.id}>{value}</TableCell>;
+              return (
+                <TableCell
+                  key={cell.id}
+                  className="border-t border-gray-700/70 rounded-lg"
+                >
+                  {value}
+                </TableCell>
+              );
             })}
           </TableRow>
         ))}
