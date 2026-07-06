@@ -14,7 +14,7 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 
 export default function ChampionsPage() {
   const [metaChampions, setMetaChampions] = useState<MetaChampion[]>([]);
@@ -31,7 +31,11 @@ export default function ChampionsPage() {
       sorting,
       columnFilters,
     },
-    onSortingChange: setSorting,
+    onSortingChange: (updater) => {
+      startTransition(() => {
+        setSorting(updater);
+      });
+    },
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),

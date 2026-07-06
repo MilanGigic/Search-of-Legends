@@ -57,7 +57,7 @@ export function calculateMetaTiers(
       if (!champ.isValidSample) {
         assignedTier = "D";
       } else if (score >= mean + 2 * standardDeviation) {
-        assignedTier = "S+";
+        assignedTier = "S_PLUS";
       } else if (score >= mean + standardDeviation) {
         assignedTier = "S";
       } else if (score >= mean) {

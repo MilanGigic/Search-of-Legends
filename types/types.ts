@@ -114,7 +114,7 @@ interface ChampionTierResult {
   name: string;
   lane: string | null;
   rawScore: number;
-  tier: "S+" | "S" | "A" | "B" | "C" | "D";
+  tier: "S_PLUS" | "S" | "A" | "B" | "C" | "D";
 }
 
 interface MatchTimelineDto {

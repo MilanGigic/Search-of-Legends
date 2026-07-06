@@ -1,5 +1,4 @@
 "use server";
-
 import { db } from "@/db";
 import {
   champions,
@@ -21,6 +20,7 @@ export async function getMetaChampions() {
     .groupBy(matchBans.championId)
     .as("banCounts");
 
+  // Step A: overall stats per champion, no lane grouping
   const stats = await db
     .select({
       championId: matchParticipants.championId,
@@ -34,11 +34,9 @@ export async function getMetaChampions() {
       avgAssists: sql<number>`round(avg(${matchParticipants.assists})::numeric, 2)`,
       avgCS: sql<number>`round(avg(${matchParticipants.totalMinionsKilled})::numeric, 1)`,
       avgTime: sql<number>`round(avg(${matchParticipants.timePlayed})::numeric, 0)`,
-      winRate: sql<number>`round((sum(case when ${matchParticipants.win} = 1 then 1 else 0 end)::numeric / count(*)) * 100, 2)`,
       avgDamageDealt: sql<number>`round(avg(${matchParticipants.totalDamageDealtToChampions})::numeric, 0)`,
-      gameVersion: matchDetails.gameVersion,
+      gameVersion: sql<string>`max(${matchDetails.gameVersion})`,
       bans: sql<number>`coalesce(${banCounts.bans}, 0)`,
-      lane: matchParticipants.individualPosition!,
     })
     .from(matchParticipants)
     .innerJoin(
@@ -51,18 +49,53 @@ export async function getMetaChampions() {
       matchParticipants.championId,
       champions.name,
       champions.image,
-      matchDetails.gameVersion,
       banCounts.bans,
+    );
+
+  // Step B: games per (champion, lane), used only to find each champion's top lane
+  const laneCounts = await db
+    .select({
+      championId: matchParticipants.championId,
+      lane: matchParticipants.individualPosition!,
+      games: sql<number>`cast(count(*) as integer)`,
+    })
+    .from(matchParticipants)
+    .groupBy(
+      matchParticipants.championId,
       matchParticipants.individualPosition,
     );
 
-  const tiers = calculateMetaTiers(stats, {
+  // Step C: reduce to "most played lane" per champion
+  const topLaneMap = new Map<number, string>();
+  const topLaneGames = new Map<number, number>();
+  for (const row of laneCounts) {
+    const currentBest = topLaneGames.get(row.championId!) ?? -1;
+    if (row.games > currentBest) {
+      topLaneMap.set(row.championId!, row.lane!);
+      topLaneGames.set(row.championId!, row.games);
+    }
+  }
+
+  // Step D: attach derived lane to each champion row
+  const statsWithLane = stats.map((stat) => ({
+    ...stat,
+    lane: topLaneMap.get(stat.championId!) ?? "UNKNOWN",
+    winRate: (stat.wins / stat.gamesPlayed) * 100,
+  }));
+
+  const tiers = calculateMetaTiers(statsWithLane, {
     winRateWeight: 0.5,
     banRateWeight: 0.35,
     pickRateWeight: 0.15,
   });
+  const tierMap = new Map(tiers.map((t) => [t.name, t.tier]));
 
-  return stats.map((stat, index) => ({
+  const totalGames = statsWithLane.reduce(
+    (sum, stat) => sum + stat.gamesPlayed,
+    0,
+  );
+
+  return statsWithLane.map((stat, index) => ({
     championId: stat.championId,
     gamesPlayed: stat.gamesPlayed,
     wins: stat.wins,
@@ -82,11 +115,9 @@ export async function getMetaChampions() {
     avgTime: stat.avgTime,
     bans: stat.bans,
     gameVersion: stat.gameVersion,
-    totalGames: stats.length,
+    totalGames,
     rank: index + 1,
     lane: stat.lane,
-    tier: tiers.find(
-      (t) => t.name === stat.championName && t.lane === stat.lane,
-    )!.tier,
+    tier: tierMap.get(stat.championName)!,
   }));
 }

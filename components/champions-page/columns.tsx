@@ -1,9 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 
-type Tier = "S" | "A" | "B" | "C" | "D" | "F";
+type Tier = "S_PLUS" | "S" | "A" | "B" | "C" | "D" | "F";
 
 const tierColors: Record<Tier, string> = {
+  S_PLUS: "text-cyan-300",
   S: "text-amber-400",
   A: "text-rose-400",
   B: "text-violet-400",
@@ -32,9 +33,10 @@ export const getColumns = (version: string): ColumnDef<MetaChampion>[] => {
                 <Image
                   src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${row.original.championImage}`}
                   alt={row.original.championName}
-                  width={1000}
-                  height={1000}
-                  className="object-cover scale-110 absolute h-[100%] w-[100%] inset-0 bg-transparent"
+                  width={96}
+                  height={40}
+                  loading="eager"
+                  className="object-cover absolute h-[100%] w-[100%] inset-0 bg-transparent"
                 />
               </div>
               <h1 className="font-semibold text-lg truncate">
@@ -74,15 +76,16 @@ export const getColumns = (version: string): ColumnDef<MetaChampion>[] => {
           <div
             className={`font-semibold ${tierColors[row.original.tier as Tier]}`}
           >
-            {row.original.tier}
+            {row.original.tier === "S_PLUS" ? "S+" : row.original.tier}
           </div>
         );
       },
     },
     {
-      accessorKey: "winRate",
+      id: "winRate",
       header: "Winrate",
       enableSorting: true,
+      accessorFn: (row) => row.wins / row.gamesPlayed,
       cell: ({ row }) => {
         return (
           <div>
@@ -92,9 +95,10 @@ export const getColumns = (version: string): ColumnDef<MetaChampion>[] => {
       },
     },
     {
-      accessorKey: "pickRate",
+      id: "pickRate",
       header: "Pickrate",
       enableSorting: true,
+      accessorFn: (row) => row.gamesPlayed / row.totalGames,
       cell: ({ row }) => {
         return (
           <div>
