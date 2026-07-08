@@ -3,6 +3,7 @@ import { flexRender, Row, Table as TableProp } from "@tanstack/react-table";
 import { memo, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import Link from "next/link";
+import { getCompletedName } from "@/lib/riot";
 
 interface ChampionsTableProps {
   table: TableProp<MetaChampion>;
@@ -38,64 +39,8 @@ export default function ChampionsTable({ table }: ChampionsTableProps) {
     overscan: 10,
   });
 
-  function getCompletedName(name: string) {
-    if (!name) return;
-
-    switch (name) {
-      case "Aurelion Sol":
-        return "AurelionSol";
-      case "Bel'Veth":
-        return "Belveth";
-      case "Cho'Gath":
-        return "Chogath";
-      case "Dr. Mundo":
-        return "DrMundo";
-      case "Jarvan IV":
-        return "JarvanIV";
-      case "Kai'Sa":
-        return "Kaisa";
-      case "Kog'Maw":
-        return "KogMaw";
-      case "Kha'Zix":
-        return "Khazix";
-      case "K'Sante":
-        return "KSante";
-      case "LeBlanc":
-        return "Leblanc";
-      case "Lee Sin":
-        return "LeeSin";
-      case "Master Yi":
-        return "MasterYi";
-      case "Miss Fortune":
-        return "MissFortune";
-      case "Wukong":
-        return "MonkeyKing";
-      case "Nunu & Willump":
-        return "Nunu";
-      case "Rek'Sai":
-        return "RekSai";
-      case "Renata Glasc":
-        return "Renata";
-      case "Tahm Kench":
-        return "TahmKench";
-      case "Twisted Fate":
-        return "TwistedFate";
-      case "Vel'Koz":
-        return "Velkoz";
-      case "Xin Zhao":
-        return "XinZhao";
-      default:
-        return name;
-    }
-  }
-
   return (
     <div className="w-full text-white">
-      <div className="text-center text-slate-500 text-sm py-2">
-        Champions tierlist. Master+
-      </div>
-
-      {/* Header row: a normal (non-virtualized) grid row */}
       <div className={`grid ${GRID_COLS} border-b border-gray-700/70`}>
         {table.getHeaderGroups().map((hg) =>
           hg.headers.map((header) => {
@@ -124,11 +69,10 @@ export default function ChampionsTable({ table }: ChampionsTableProps) {
         )}
       </div>
 
-      {/* Virtualized scroll container for body rows only */}
       <div
         ref={parentRef}
-        className="w-full overflow-auto"
-        style={{ height: "1000px" }}
+        className="w-full overflow-auto border-b border-slate-400"
+        style={{ height: "1100px" }}
       >
         <div
           style={{
@@ -142,7 +86,7 @@ export default function ChampionsTable({ table }: ChampionsTableProps) {
             return (
               <Link
                 key={row.id}
-                href={`/champions/${getCompletedName(row.original.championName)}`}
+                href={`/champions/${getCompletedName(row.original.championName)}?role=${row.original.lane}`}
                 style={{
                   position: "absolute",
                   top: 0,

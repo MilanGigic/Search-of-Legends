@@ -96,6 +96,27 @@ interface MetaChampion {
   tier: string | null;
 }
 
+interface TopFiveChampions {
+  tier: "S_PLUS" | "S" | "A" | "B" | "C" | "D";
+  score: number;
+  lane: string;
+  winRate: number;
+  championId: number | null;
+  championName: string;
+  championImage: string;
+  gamesPlayed: number;
+  wins: number;
+  losses: number;
+  avgKills: number;
+  avgDeaths: number;
+  avgAssists: number;
+  avgCS: number;
+  avgTime: number;
+  avgDamageDealt: number;
+  gameVersion: string;
+  bans: number;
+}
+
 interface TierWeights {
   winRateWeight: number;
   pickRateWeight: number;
@@ -693,7 +714,7 @@ interface ChampionDetailData {
 
 interface ChampionDetail {
   id: string;
-  key: string;
+  key: number;
   name: string;
   title: string;
   image: {

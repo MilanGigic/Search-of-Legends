@@ -49,7 +49,7 @@ export async function getMostBannedChampions() {
 
         // Get champion info
         const champ = await db.query.champions.findFirst({
-          where: eq(champions.key, championId!.toString()),
+          where: eq(champions.key, championId!),
         });
 
         // If no participant stats, create defaults (champions that are only banned, never played)

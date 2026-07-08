@@ -17,6 +17,57 @@ export const REGIONS = [
   "jp1",
 ];
 
+export function getCompletedName(name: string) {
+  if (!name) return;
+
+  switch (name) {
+    case "Aurelion Sol":
+      return "AurelionSol";
+    case "Bel'Veth":
+      return "Belveth";
+    case "Cho'Gath":
+      return "Chogath";
+    case "Dr. Mundo":
+      return "DrMundo";
+    case "Jarvan IV":
+      return "JarvanIV";
+    case "Kai'Sa":
+      return "Kaisa";
+    case "Kog'Maw":
+      return "KogMaw";
+    case "Kha'Zix":
+      return "Khazix";
+    case "K'Sante":
+      return "KSante";
+    case "LeBlanc":
+      return "Leblanc";
+    case "Lee Sin":
+      return "LeeSin";
+    case "Master Yi":
+      return "MasterYi";
+    case "Miss Fortune":
+      return "MissFortune";
+    case "Wukong":
+      return "MonkeyKing";
+    case "Nunu & Willump":
+      return "Nunu";
+    case "Rek'Sai":
+      return "RekSai";
+    case "Renata Glasc":
+      return "Renata";
+    case "Tahm Kench":
+      return "TahmKench";
+    case "Twisted Fate":
+      return "TwistedFate";
+    case "Vel'Koz":
+      return "Velkoz";
+    case "Xin Zhao":
+      return "XinZhao";
+    default:
+      return name;
+  }
+}
+
 export const calculateWinRate = (wins: number, losses: number) => {
   const total = wins + losses;
   if (total === 0) return 0;
