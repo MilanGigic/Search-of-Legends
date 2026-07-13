@@ -6,8 +6,13 @@ import {
   matchParticipantPerks,
   matchParticipantPerkStyles,
   matchParticipantPerkSelections,
+  matchTimelineEvents,
+  items,
 } from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
+
+const CORE_ITEM_GOLD_THRESHOLD = 2000;
+const MAX_CORE_ITEMS = 6; // caps the build path length, avoids late-game rebuy noise
 
 export interface ChampionBuildResult {
   gamesPlayed: number;
@@ -18,20 +23,21 @@ export interface ChampionBuildResult {
   primaryStyle: number | null;
   subStyle: number | null;
   keystone: number | null;
-  primaryPerks: (number | null)[]; // [perk1, perk2, perk3]
-  subPerks: (number | null)[]; // [perk1, perk2]
+  primaryPerks: (number | null)[];
+  subPerks: (number | null)[];
   shards: {
     offense: number | null;
     flex: number | null;
     defense: number | null;
   };
+  itemOrder: number[];
 }
 
 export async function getChampionBuild(
   championId: number,
   role: string,
 ): Promise<ChampionBuildResult | null> {
-  // One row per participant: their rune tree choices, pivoted into columns
+  // --- Rune pivots, same as before ---
   const perkStylesAgg = db
     .select({
       matchId: matchParticipantPerkStyles.matchId,
@@ -52,7 +58,6 @@ export async function getChampionBuild(
     )
     .as("perkStylesAgg");
 
-  // One row per participant: their 6 individual rune picks, pivoted into columns
   const perkSelectionsAgg = db
     .select({
       matchId: matchParticipantPerkSelections.matchId,
@@ -89,9 +94,16 @@ export async function getChampionBuild(
     )
     .as("perkSelectionsAgg");
 
-  // One row per (matchId, participantId) for this champion/role: full build signature
-  const participantBuilds = db
+  // Flat per-participant rows: NOT grouped to a single top build yet,
+  // because we still need to merge in item order before we can tally.
+  const buildConditions = [eq(matchParticipants.championId, championId)];
+  if (role)
+    buildConditions.push(eq(matchParticipants.individualPosition, role));
+
+  const participantBuildRows = await db
     .select({
+      matchId: matchParticipants.matchId,
+      participantId: matchParticipants.participantId,
       win: matchParticipants.win,
       summoner1Id: matchParticipants.summoner1Id,
       summoner2Id: matchParticipants.summoner2Id,
@@ -132,75 +144,115 @@ export async function getChampionBuild(
         ),
       ),
     )
-    .where(
-      role
-        ? and(
-            eq(matchParticipants.championId, championId),
-            eq(matchParticipants.individualPosition, role),
-          )
-        : eq(matchParticipants.championId, championId),
-    )
-    .as("participantBuilds");
+    .where(and(...buildConditions));
 
-  // Group by the FULL signature to find the most-played exact combo
-  const [topBuild] = await db
+  // --- Core item purchase order, from timeline events ---
+  const itemConditions = [
+    eq(matchTimelineEvents.type, "ITEM_PURCHASED"),
+    eq(matchParticipants.championId, championId),
+    sql`${items.totalGold} >= ${CORE_ITEM_GOLD_THRESHOLD}`,
+    sql`not (${items.tags} @> '["Boots"]'::jsonb)`,
+    sql`not (${items.tags} @> '["Consumable"]'::jsonb)`,
+    sql`not (${items.tags} @> '["Trinket"]'::jsonb)`,
+  ];
+  if (role) itemConditions.push(eq(matchParticipants.individualPosition, role));
+
+  const coreItemRows = await db
     .select({
-      primaryStyle: participantBuilds.primaryStyle,
-      subStyle: participantBuilds.subStyle,
-      keystone: participantBuilds.keystone,
-      primaryPerk1: participantBuilds.primaryPerk1,
-      primaryPerk2: participantBuilds.primaryPerk2,
-      primaryPerk3: participantBuilds.primaryPerk3,
-      subPerk1: participantBuilds.subPerk1,
-      subPerk2: participantBuilds.subPerk2,
-      shardOffense: participantBuilds.shardOffense,
-      shardFlex: participantBuilds.shardFlex,
-      shardDefense: participantBuilds.shardDefense,
-      summoner1Id: participantBuilds.summoner1Id,
-      summoner2Id: participantBuilds.summoner2Id,
-      gamesPlayed: sql<number>`cast(count(*) as integer)`,
-      wins: sql<number>`cast(sum(case when ${participantBuilds.win} = 1 then 1 else 0 end) as integer)`,
+      matchId: matchTimelineEvents.matchId,
+      participantId: matchTimelineEvents.participantId,
+      itemId: matchTimelineEvents.itemId,
     })
-    .from(participantBuilds)
-    .groupBy(
-      participantBuilds.primaryStyle,
-      participantBuilds.subStyle,
-      participantBuilds.keystone,
-      participantBuilds.primaryPerk1,
-      participantBuilds.primaryPerk2,
-      participantBuilds.primaryPerk3,
-      participantBuilds.subPerk1,
-      participantBuilds.subPerk2,
-      participantBuilds.shardOffense,
-      participantBuilds.shardFlex,
-      participantBuilds.shardDefense,
-      participantBuilds.summoner1Id,
-      participantBuilds.summoner2Id,
+    .from(matchTimelineEvents)
+    .innerJoin(
+      matchParticipants,
+      and(
+        eq(matchTimelineEvents.matchId, matchParticipants.matchId),
+        eq(matchTimelineEvents.participantId, matchParticipants.participantId),
+      ),
     )
-    .orderBy(sql`count(*) desc`)
-    .limit(1);
+    .innerJoin(items, eq(matchTimelineEvents.itemId, items.itemId))
+    .where(and(...itemConditions))
+    .orderBy(
+      matchTimelineEvents.matchId,
+      matchTimelineEvents.participantId,
+      matchTimelineEvents.timestamp,
+    );
 
-  if (!topBuild) return null;
+  // Chronological order is already guaranteed by the orderBy above,
+  // so pushing into an array per (matchId, participantId) preserves purchase order.
+  const itemOrderMap = new Map<string, number[]>();
+  for (const row of coreItemRows) {
+    if (row.itemId == null) continue;
+    const key = `${row.matchId}-${row.participantId}`;
+    const arr = itemOrderMap.get(key) ?? [];
+    if (arr.length < MAX_CORE_ITEMS) arr.push(row.itemId);
+    itemOrderMap.set(key, arr);
+  }
+
+  // --- Merge runes + item order into one full signature, tally in JS ---
+  const tally = new Map<
+    string,
+    {
+      games: number;
+      wins: number;
+      sample: (typeof participantBuildRows)[number] & { itemOrder: number[] };
+    }
+  >();
+
+  for (const row of participantBuildRows) {
+    const key = `${row.matchId}-${row.participantId}`;
+    const itemOrder = itemOrderMap.get(key) ?? [];
+    const signature = [
+      row.primaryStyle,
+      row.subStyle,
+      row.keystone,
+      row.primaryPerk1,
+      row.primaryPerk2,
+      row.primaryPerk3,
+      row.subPerk1,
+      row.subPerk2,
+      row.shardOffense,
+      row.shardFlex,
+      row.shardDefense,
+      row.summoner1Id,
+      row.summoner2Id,
+      itemOrder.join(">"),
+    ].join("|");
+
+    const entry = tally.get(signature) ?? {
+      games: 0,
+      wins: 0,
+      sample: { ...row, itemOrder },
+    };
+    entry.games += 1;
+    entry.wins += row.win === 1 ? 1 : 0;
+    tally.set(signature, entry);
+  }
+
+  const top = [...tally.values()].sort((a, b) => b.games - a.games)[0];
+  if (!top) return null;
 
   return {
-    gamesPlayed: topBuild.gamesPlayed,
-    wins: topBuild.wins,
-    winRate: Number(((topBuild.wins / topBuild.gamesPlayed) * 100).toFixed(1)),
-    summoner1Id: topBuild.summoner1Id,
-    summoner2Id: topBuild.summoner2Id,
-    primaryStyle: topBuild.primaryStyle,
-    subStyle: topBuild.subStyle,
-    keystone: topBuild.keystone,
+    gamesPlayed: top.games,
+    wins: top.wins,
+    winRate: Number(((top.wins / top.games) * 100).toFixed(1)),
+    summoner1Id: top.sample.summoner1Id,
+    summoner2Id: top.sample.summoner2Id,
+    primaryStyle: top.sample.primaryStyle,
+    subStyle: top.sample.subStyle,
+    keystone: top.sample.keystone,
     primaryPerks: [
-      topBuild.primaryPerk1,
-      topBuild.primaryPerk2,
-      topBuild.primaryPerk3,
+      top.sample.primaryPerk1,
+      top.sample.primaryPerk2,
+      top.sample.primaryPerk3,
     ],
-    subPerks: [topBuild.subPerk1, topBuild.subPerk2],
+    subPerks: [top.sample.subPerk1, top.sample.subPerk2],
     shards: {
-      offense: topBuild.shardOffense,
-      flex: topBuild.shardFlex,
-      defense: topBuild.shardDefense,
+      offense: top.sample.shardOffense,
+      flex: top.sample.shardFlex,
+      defense: top.sample.shardDefense,
     },
+    itemOrder: top.sample.itemOrder,
   };
 }

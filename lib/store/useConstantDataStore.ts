@@ -7,6 +7,8 @@ type DataStore = {
   setTopFive: (topFive: TopFivePerRegion[]) => void;
   puuid: string;
   setPuuid: (puuid: string) => void;
+  selectedChampion: MetaChampion | null;
+  setSelectedChampion: (selectedChampion: MetaChampion | null) => void;
 };
 
 export const useDataStore = create<DataStore>((set) => ({
@@ -16,4 +18,7 @@ export const useDataStore = create<DataStore>((set) => ({
   setTopFive: (topFive: TopFivePerRegion[]) => set({ topFive }),
   puuid: "",
   setPuuid: (puuid: string) => set({ puuid }),
+  selectedChampion: null,
+  setSelectedChampion: (selectedChampion: MetaChampion | null) =>
+    set({ selectedChampion }),
 }));

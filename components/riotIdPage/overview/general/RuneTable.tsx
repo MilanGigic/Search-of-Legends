@@ -1,4 +1,16 @@
 import Image from "next/image";
+function findRuneInTree(
+  tree: RuneStyle,
+  perkId: number | null,
+): Rune | undefined {
+  if (perkId == null) return undefined;
+  for (const slot of tree.slots) {
+    const found = slot.runes.find((r) => r.id === perkId);
+    if (found) return found;
+  }
+  return undefined;
+}
+
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 const RuneTable = ({
   participant,
@@ -13,7 +25,6 @@ const RuneTable = ({
         const runeTree = runesApi.find((r) => r.id === style.style);
 
         // Debug: Log the result
-
 
         return (
           <div key={styleIndex} className="">
@@ -36,14 +47,9 @@ const RuneTable = ({
               }  mb-2`}
             >
               {style.selections.map((selection, selectionIndex) => {
-
-
-
                 // Find the specific rune across all slots using flatMap
-                const matchingRune =
-                  runeTree?.slots
-                    ?.flatMap((slot) => slot.runes)
-                    ?.find((rune) => rune.id === selection.perk) || null;
+                const rune = findRuneInTree(runeTree!, selection.perk);
+                if (!rune) return null;
 
                 return (
                   <div
@@ -54,12 +60,12 @@ const RuneTable = ({
                         : ""
                     }`}
                   >
-                    {matchingRune ? (
+                    {rune ? (
                       <Image
-                        src={`https://raw.communitydragon.org/latest/game/assets/perks/styles/${matchingRune.icon
+                        src={`https://raw.communitydragon.org/latest/game/assets/perks/styles/${rune.icon
                           .replace("perk-images/Styles/", "")
                           .toLowerCase()}`}
-                        alt={matchingRune.key || `Rune ${selection.perk}`}
+                        alt={rune.key || `Rune ${selection.perk}`}
                         width={24}
                         height={24}
                         className={`rounded-full ${

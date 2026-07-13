@@ -1,0 +1,1 @@
+ALTER TABLE "items" ADD COLUMN "total_gold" integer NOT NULL;

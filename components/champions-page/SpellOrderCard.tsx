@@ -5,6 +5,5 @@ export default function SpellOrderCard({
 }: {
   data: ChampionSkillOrderResult | null;
 }) {
-  console.log("Data for spell order card:", data);
   return <div>SpellOrderCard</div>;
 }

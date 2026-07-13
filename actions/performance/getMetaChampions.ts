@@ -37,6 +37,7 @@ export async function getMetaChampions() {
       avgDamageDealt: sql<number>`round(avg(${matchParticipants.totalDamageDealtToChampions})::numeric, 0)`,
       gameVersion: sql<string>`max(${matchDetails.gameVersion})`,
       bans: sql<number>`coalesce(${banCounts.bans}, 0)`,
+      accentColor: champions.accentColor,
     })
     .from(matchParticipants)
     .innerJoin(
@@ -50,6 +51,7 @@ export async function getMetaChampions() {
       champions.name,
       champions.image,
       banCounts.bans,
+      champions.accentColor,
     );
 
   // Step B: games per (champion, lane), used only to find each champion's top lane
@@ -119,5 +121,6 @@ export async function getMetaChampions() {
     rank: index + 1,
     lane: stat.lane,
     tier: tierMap.get(stat.championName)!,
+    accentColor: stat.accentColor,
   }));
 }

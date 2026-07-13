@@ -17,6 +17,7 @@ export const champions = pgTable("champions", {
   blurb: text("blurb").notNull(), // Short description
   image: text("image").notNull(), // Full image URL
   tags: text("tags").array().notNull(), // e.g., ["Fighter", "Tank"]
+  accentColor: text("accent_color"),
 });
 
 export const championPatchStats = pgTable(

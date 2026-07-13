@@ -5,5 +5,6 @@ export const items = pgTable("items", {
   name: text("name").notNull(),
   image: text("image").notNull(),
   tags: jsonb("tags").$type<string[]>().notNull(),
+  totalGold: integer("total_gold").notNull(),
   gameVersion: text("game_version").notNull(),
 });

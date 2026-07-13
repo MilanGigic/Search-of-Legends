@@ -94,6 +94,7 @@ interface MetaChampion {
   lane: string | null;
   totalGames: number;
   tier: string | null;
+  accentColor: string | null;
 }
 
 interface TopFiveChampions {

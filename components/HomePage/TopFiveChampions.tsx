@@ -22,7 +22,7 @@ const TopFiveChampions = ({
           <div key={index} className="h-[50px]">
             <ul className="px-1 py-1.5">
               <Link
-                href={`/champions/${getCompletedName(champion.championName)}`}
+                href={`/champions/${getCompletedName(champion.championName)}?role=${champion.lane}`}
                 className="text-center grid grid-cols-5 hover:bg-[#2A2A40] transition-colors py-1 duration-200 rounded-md cursor-pointer"
               >
                 <div className="flex items-center justify-start col-span-2 gap-2">
@@ -43,7 +43,7 @@ const TopFiveChampions = ({
                   {champion.tier === "S_PLUS" ? "S+" : champion.tier}
                 </p>
                 <p className="flex flex-col items-center justify-center text-slate-300">
-                  {champion.winRate}%
+                  {champion.winRate.toFixed(2)}%
                 </p>
                 <p className="flex flex-col items-center justify-center">
                   {champion.gamesPlayed}

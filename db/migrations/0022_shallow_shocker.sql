@@ -1,0 +1,1 @@
+ALTER TABLE "champions" ADD COLUMN "accent_color" text;

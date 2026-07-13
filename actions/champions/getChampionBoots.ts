@@ -31,16 +31,16 @@ export async function getChampionBoots(
   );
 
   const equippedBoots = sql<number | null>`
-    case
-      when ${matchParticipants.item0} = any(array[${bootsIdList}]) then ${matchParticipants.item0}
-      when ${matchParticipants.item1} = any(array[${bootsIdList}]) then ${matchParticipants.item1}
-      when ${matchParticipants.item2} = any(array[${bootsIdList}]) then ${matchParticipants.item2}
-      when ${matchParticipants.item3} = any(array[${bootsIdList}]) then ${matchParticipants.item3}
-      when ${matchParticipants.item4} = any(array[${bootsIdList}]) then ${matchParticipants.item4}
-      when ${matchParticipants.item5} = any(array[${bootsIdList}]) then ${matchParticipants.item5}
-      when ${matchParticipants.item6} = any(array[${bootsIdList}]) then ${matchParticipants.item6}
-      else null
-    end
+    (
+      select item
+      from unnest(array[
+        ${matchParticipants.item0}, ${matchParticipants.item1}, ${matchParticipants.item2},
+        ${matchParticipants.item3}, ${matchParticipants.item4}, ${matchParticipants.item5},
+        ${matchParticipants.item6}
+      ]::integer[]) as t(item)
+      where item = any(array[${bootsIdList}]::integer[])
+      limit 1
+    )
   `;
 
   const conditions = [eq(matchParticipants.championId, championId)];

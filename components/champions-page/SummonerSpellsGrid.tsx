@@ -5,6 +5,5 @@ export default function SummonerSpellsGrid({
 }: {
   data: ChampionBuildResult | null;
 }) {
-  console.log("Data for summoner spells grid:", data);
   return <div>SummonerSpellsGrid</div>;
 }

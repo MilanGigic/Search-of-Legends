@@ -42,6 +42,7 @@ export async function seedItems() {
       name: item.name,
       image: item.image.full,
       tags: item.tags || [], // Fallback to an empty array if tags are missing
+      totalGold: item.gold.total,
       gameVersion: gameVersion,
     };
   });

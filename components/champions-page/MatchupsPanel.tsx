@@ -11,6 +11,5 @@ export default function MatchupsPanel({
 }: {
   data: MatchupsProps | null | undefined;
 }) {
-  console.log("Data for matchups panel:", data);
   return <div>MatchupsPanel</div>;
 }

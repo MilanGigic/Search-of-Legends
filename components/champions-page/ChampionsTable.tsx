@@ -4,6 +4,7 @@ import { memo, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import Link from "next/link";
 import { getCompletedName } from "@/lib/riot";
+import { useDataStore } from "@/lib/store/useConstantDataStore";
 
 interface ChampionsTableProps {
   table: TableProp<MetaChampion>;
@@ -29,6 +30,8 @@ function ChampionRow({ row }: { row: Row<MetaChampion> }) {
 const MemoChampionRow = memo(ChampionRow) as typeof ChampionRow;
 
 export default function ChampionsTable({ table }: ChampionsTableProps) {
+  const { setSelectedChampion } = useDataStore();
+
   const parentRef = useRef<HTMLDivElement>(null);
   const rows = table.getRowModel().rows;
 
@@ -87,6 +90,7 @@ export default function ChampionsTable({ table }: ChampionsTableProps) {
               <Link
                 key={row.id}
                 href={`/champions/${getCompletedName(row.original.championName)}?role=${row.original.lane}`}
+                onClick={() => setSelectedChampion(row.original)}
                 style={{
                   position: "absolute",
                   top: 0,
