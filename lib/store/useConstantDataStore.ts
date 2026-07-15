@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 type DataStore = {
   version: string;
@@ -11,14 +12,23 @@ type DataStore = {
   setSelectedChampion: (selectedChampion: MetaChampion | null) => void;
 };
 
-export const useDataStore = create<DataStore>((set) => ({
-  version: "",
-  setVersion: (version: string) => set({ version }),
-  topFive: [],
-  setTopFive: (topFive: TopFivePerRegion[]) => set({ topFive }),
-  puuid: "",
-  setPuuid: (puuid: string) => set({ puuid }),
-  selectedChampion: null,
-  setSelectedChampion: (selectedChampion: MetaChampion | null) =>
-    set({ selectedChampion }),
-}));
+export const useDataStore = create<DataStore>()(
+  persist(
+    (set) => ({
+      version: "",
+      setVersion: (version: string) => set({ version }),
+      topFive: [],
+      setTopFive: (topFive: TopFivePerRegion[]) => set({ topFive }),
+      puuid: "",
+      setPuuid: (puuid: string) => set({ puuid }),
+      selectedChampion: null,
+      setSelectedChampion: (selectedChampion: MetaChampion | null) =>
+        set({ selectedChampion }),
+    }),
+    {
+      name: "data-store",
+      storage: createJSONStorage(() => localStorage),
+      version: 1,
+    },
+  ),
+);

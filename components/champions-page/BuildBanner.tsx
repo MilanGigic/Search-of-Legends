@@ -2,6 +2,7 @@
 
 import { ChampionBuildResult } from "@/actions/champions/getChampionBuild";
 import { perks } from "@/lib/perks";
+import { useDataStore } from "@/lib/store/useConstantDataStore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -17,6 +18,26 @@ function findRuneInTree(
   return undefined;
 }
 
+const getSummonerSpellImageUrl = (spellId: number, version: string) => {
+  const spellMap: { [key: number]: string } = {
+    4: "SummonerFlash",
+    21: "SummonerBarrier",
+    1: "SummonerBoost",
+    14: "SummonerDot",
+    3: "SummonerExhaust",
+    6: "SummonerHaste",
+    7: "SummonerHeal",
+    13: "SummonerMana",
+    11: "SummonerSmite",
+    12: "SummonerTeleport",
+  };
+
+  const spellName = spellMap[spellId];
+  return spellName
+    ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spellName}.png`
+    : null;
+};
+
 export default function BuildBanner({
   data,
   version,
@@ -24,6 +45,8 @@ export default function BuildBanner({
   data: ChampionBuildResult | null;
   version: string;
 }) {
+  const { selectedChampion } = useDataStore();
+
   const [runesApi, setRunesApi] = useState<RuneStyle[] | null>(null);
 
   useEffect(() => {
@@ -84,10 +107,15 @@ export default function BuildBanner({
     );
   }
   return (
-    <div className="text-white p-16 flex justify-between">
+    <div className="text-white px-10 py-4 flex justify-between border-b border-[#EDEAE2]/17">
       {/* RUNES */}
       <div className="flex flex-col gap-4">
-        <h1 className="text-sm text-[#726e78] uppercase leading-[0.95] mt-1.5 block tracking-widest font-semibold">
+        <h1
+          style={{
+            color: selectedChampion!.accentColor!,
+          }}
+          className="text-lg text-[#726e78] uppercase leading-[0.95] mt-1.5 block tracking-widest font-semibold"
+        >
           Runes
         </h1>
         <div className="flex gap-4">
@@ -98,7 +126,7 @@ export default function BuildBanner({
             alt={`${keyStone?.key}`}
             width={64}
             height={64}
-            className="mb-0.5 border rounded-full object-cover scale-110"
+            className="rounded-full object-cover scale-110 object-center"
           />
           <div className="flex gap-4">
             {data.primaryPerks.map((perkId, index) => {
@@ -114,7 +142,7 @@ export default function BuildBanner({
                   key={index}
                   width={64}
                   height={64}
-                  className="mb-0.5 border rounded-full object-cover border-slate-600"
+                  className="w-full h-full object-cover rounded-full"
                 />
               );
             })}
@@ -131,7 +159,7 @@ export default function BuildBanner({
                   key={index}
                   width={64}
                   height={64}
-                  className="mb-0.5 border rounded-full object-cover border-slate-600"
+                  className="w-full h-full object-cover rounded-full"
                 />
               );
             })}
@@ -147,9 +175,9 @@ export default function BuildBanner({
                 ?.types.find((type) => type.id === data.shards.defense)!.name
             }.png`}
             alt={`${data.shards.defense!}`}
-            width={36}
-            height={36}
-            className="mb-0.5 border rounded-full object-cover"
+            width={40}
+            height={40}
+            className="mb-0.5 border rounded-full object-cover bg-white/8"
           />
           <Image
             src={`https://raw.communitydragon.org/latest/game/assets/perks/statmods/${
@@ -160,9 +188,9 @@ export default function BuildBanner({
                 ?.types.find((type) => type.id === data.shards.offense)!.name
             }.png`}
             alt={`${data.shards.offense!}`}
-            width={36}
-            height={36}
-            className="mb-0.5 border rounded-full object-cover"
+            width={40}
+            height={40}
+            className="mb-0.5 border rounded-full object-cover bg-white/8 object-center"
           />
           <Image
             src={`https://raw.communitydragon.org/latest/game/assets/perks/statmods/${
@@ -173,19 +201,51 @@ export default function BuildBanner({
                 ?.types.find((type) => type.id === data.shards.flex)!.name
             }.png`}
             alt={`${data.shards.flex!}`}
-            width={36}
-            height={36}
-            className="mb-0.5 border rounded-full object-cover"
+            width={40}
+            height={40}
+            className="mb-0.5 border rounded-full object-cover bg-white/8 object-center"
           />
         </div>
       </div>
 
-      <div>
-        <h1 className="text-sm text-[#726e78] uppercase leading-[0.95] mt-1.5 block tracking-widest font-semibold">
+      <div className="flex flex-col gap-4">
+        <h1
+          style={{
+            color: selectedChampion!.accentColor!,
+          }}
+          className="text-lg text-[#726e78] uppercase w-full text-end leading-[0.95] mt-1.5 block tracking-widest font-semibold"
+        >
           Build
         </h1>
 
-        <div></div>
+        <div className="flex gap-4">
+          {data.itemOrder.map((item) => (
+            <Image
+              src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${item}.png`}
+              alt="Item"
+              key={item}
+              width={64}
+              height={64}
+              className="w-full h-full object-cover rounded-full"
+            />
+          ))}
+        </div>
+        <div className="flex gap-4 w-full items-end justify-end">
+          <Image
+            src={getSummonerSpellImageUrl(data.summoner1Id!, version)!}
+            alt={"Summoner1"}
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+          <Image
+            src={getSummonerSpellImageUrl(data.summoner2Id!, version)!}
+            alt={"Summoner2"}
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+        </div>
       </div>
     </div>
   );

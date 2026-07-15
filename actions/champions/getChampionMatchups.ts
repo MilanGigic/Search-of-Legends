@@ -1,9 +1,8 @@
-"use server";
-
 import { db } from "@/db";
 import { matchParticipants } from "@/db/schema";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
+import { cacheLife, cacheTag } from "next/cache";
 
 export interface ChampionMatchupResult {
   opponentChampionId: number;
@@ -14,6 +13,12 @@ export interface ChampionMatchupResult {
 }
 
 export async function getChampionMatchups(championId: number, lane: string) {
+  "use cache";
+
+  cacheLife("hours");
+
+  cacheTag("champion-stats", `champion-${championId}`);
+
   if (!championId || !lane) {
     console.error("Both parameters needed!");
     return;

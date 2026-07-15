@@ -1,5 +1,3 @@
-"use server";
-
 import { db } from "@/db";
 import {
   matchParticipants,
@@ -10,7 +8,7 @@ import {
   items,
 } from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
-
+import { cacheLife, cacheTag } from "next/cache";
 const CORE_ITEM_GOLD_THRESHOLD = 2000;
 const MAX_CORE_ITEMS = 6; // caps the build path length, avoids late-game rebuy noise
 
@@ -37,6 +35,12 @@ export async function getChampionBuild(
   championId: number,
   role: string,
 ): Promise<ChampionBuildResult | null> {
+  "use cache";
+
+  cacheLife("hours");
+
+  cacheTag("champion-stats", `champion-${championId}`);
+
   // --- Rune pivots, same as before ---
   const perkStylesAgg = db
     .select({

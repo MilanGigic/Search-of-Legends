@@ -3,13 +3,42 @@
 import { useDataStore } from "@/lib/store/useConstantDataStore";
 import Image from "next/image";
 
-export default function HeroSection() {
+export default function HeroSection({ version }: { version: string }) {
   const { selectedChampion } = useDataStore();
 
   if (!selectedChampion) {
     console.error("No champion found");
     return;
   }
+
+  const getChampionImageUrl = (championName: string) => {
+    const championMap: { [key: string]: string } = {
+      "Aurelion Sol": "AurelionSol",
+      "Bel'Veth": "Belveth",
+      "Cho'Gath": "Chogath",
+      "Dr. Mundo": "DrMundo",
+      "Jarvan IV": "JarvanIV",
+      "Kai'Sa": "Kaisa",
+      "Kog'Maw": "Kogmaw",
+      "Kha'Zix": "Khazix",
+      "K'Sante": "KSante",
+      LeBlanc: "Leblanc",
+      "Lee Sin": "LeeSin",
+      "Master Yi": "MasterYi",
+      "Miss Fortune": "MissFortune",
+      Wukong: "MonkeyKing",
+      "Nunu & Willump": "Nunu",
+      "Rek'Sai": "RekSai",
+      "Tahm Kench": "TahmKench",
+      "Twisted Fate": "TwistedFate",
+      "Vel'Koz": "Velkoz",
+      "Xin Zhao": "XinZhao",
+      FiddleSticks: "Fiddlesticks",
+    };
+
+    const mappedName = championMap[championName] || championName;
+    return `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${mappedName}_0.jpg`;
+  };
 
   return (
     <section
@@ -18,9 +47,9 @@ export default function HeroSection() {
       }}
       className="border-b border-[#EDEAE2]/17"
     >
-      <div className="flex gap-[60px] items-center px-10 py-[72px] min-h-[420px] max-w-[1120px] m-auto p-10">
+      <div className="flex gap-[60px] items-center px-10 max-w-[1140px] m-auto">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.16rem]">
+          <p className="font-mono uppercase tracking-[0.16rem]">
             {selectedChampion.lane} -{" "}
             <span>
               {selectedChampion.tier === "S_PLUS"
@@ -68,12 +97,12 @@ export default function HeroSection() {
           </div>
         </div>
 
-        <div className="relative w-full h-[380px] rounded-r-md overflow-hidden bg-[radial-gradient(circle_at_65%_35%,var(--accent-deep)_0%,var(--surface)_70%)] flex items-center justify-center">
+        <div className="relative w-full h-[380px] rounded-tr-md overflow-hidden bg-[radial-gradient(circle_at_65%_35%,var(--accent-deep)_0%,var(--surface)_70%)] flex items-center justify-center">
           <span className="font-display text-[340px] font-light text-[#edeae2]/[0.06] leading-none select-none">
             {selectedChampion.championName.charAt(0)}
           </span>
           <Image
-            src={`https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${selectedChampion.championName}_0.jpg`}
+            src={getChampionImageUrl(selectedChampion.championName)}
             alt={selectedChampion.championName}
             fill
             className="object-cover"

@@ -1,8 +1,7 @@
-"use server";
-
 import { db } from "@/db";
 import { items, matchParticipants, matchTimelineEvents } from "@/db/schema";
 import { and, eq, inArray, lte } from "drizzle-orm";
+import { cacheLife, cacheTag, unstable_cache } from "next/cache";
 
 const START_PHASE_CUTOFF_MS = 90_000; // adjust based on what your data shows
 
@@ -18,6 +17,12 @@ export async function getChampionStartItems(
   championId: number,
   role: string,
 ): Promise<ChampionStartItemsResult[]> {
+  "use cache";
+
+  cacheLife("hours");
+
+  cacheTag("champion-stats", `champion-${championId}`);
+
   const conditions = [eq(matchParticipants.championId, championId)];
   if (role) conditions.push(eq(matchParticipants.individualPosition, role));
 

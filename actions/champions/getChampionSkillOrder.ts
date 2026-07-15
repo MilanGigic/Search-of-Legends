@@ -1,8 +1,7 @@
-"use server";
-
 import { db } from "@/db";
 import { matchParticipants, matchTimelineEvents } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
+import { cacheLife, cacheTag } from "next/cache";
 
 const SKILL_LABELS: Record<number, string> = { 1: "Q", 2: "W", 3: "E" };
 
@@ -18,6 +17,12 @@ export async function getChampionSkillOrder(
   championId: number,
   role: string,
 ): Promise<ChampionSkillOrderResult | null> {
+  "use cache";
+
+  cacheLife("hours");
+
+  cacheTag("champion-stats", `champion-${championId}`);
+
   const conditions = [
     eq(matchTimelineEvents.type, "SKILL_LEVEL_UP"),
     eq(matchParticipants.championId, championId),
