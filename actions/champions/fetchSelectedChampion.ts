@@ -1,19 +1,35 @@
 "use server";
 
-export async function fetchSelectedChampion(name: string, version: string) {
-  if (!name) return null;
+import { getMetaChampions } from "../performance/getMetaChampions";
 
-  const res = await fetch(
-    `https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion/${name}.json`,
-  );
+export interface ChampionSummary {
+  championId: number | null;
+  championName: string;
+  championImage: string;
+  lane: string | null;
+  tier: string | null;
+  wins: number;
+  gamesPlayed: number;
+  totalGames: number;
+  accentColor: string | null;
+}
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${name}: ${res.statusText}`);
-  }
+export async function getChampionSummary(
+  name: string,
+): Promise<ChampionSummary | null> {
+  const allChampions = await getMetaChampions(); // cached — this is a lookup, not a fresh scan
+  const champion = allChampions.find((c) => c.championName === name);
+  if (!champion) return null;
 
-  const data: ChampionDetailData = await res.json();
-
-  const championData = data.data[name];
-
-  return championData;
+  return {
+    championId: champion.championId,
+    championName: champion.championName,
+    championImage: champion.championImage,
+    lane: champion.lane,
+    tier: champion.tier,
+    wins: champion.wins,
+    gamesPlayed: champion.gamesPlayed,
+    totalGames: champion.totalGames,
+    accentColor: champion.accentColor,
+  };
 }

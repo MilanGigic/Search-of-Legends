@@ -1,5 +1,5 @@
 import fetchChampions from "@/actions/champions/fetchChampions";
-import { fetchSelectedChampion } from "@/actions/champions/fetchSelectedChampion";
+import { getChampionSummary } from "@/actions/champions/fetchSelectedChampion";
 import { getChampionBuild } from "@/actions/champions/getChampionBuild";
 import { getChampionMatchups } from "@/actions/champions/getChampionMatchups";
 import { getChampionSkillOrder } from "@/actions/champions/getChampionSkillOrder";
@@ -34,74 +34,58 @@ async function BuildBannerLoader({
   id,
   version,
   defaultRole,
-  searchParams,
 }: {
   id: number;
   version: string;
   defaultRole: string;
-  searchParams: SearchParamsPromise;
 }) {
-  const { role } = await searchParams;
-  const data = await getChampionBuild(id, role ?? defaultRole);
+  const data = await getChampionBuild(id, defaultRole);
   return <BuildBanner data={data} version={version} />;
 }
 
 async function MatchupsPanelLoader({
   id,
   defaultRole,
-  searchParams,
   version,
 }: {
   id: number;
   defaultRole: string;
-  searchParams: SearchParamsPromise;
   version: string;
 }) {
-  const { role } = await searchParams;
-  const effectiveRole = role ?? defaultRole;
-  const data = await getChampionMatchups(id, effectiveRole);
-  return <MatchupsPanel data={data!} lane={effectiveRole} version={version} />;
+  const data = await getChampionMatchups(id, defaultRole);
+  return <MatchupsPanel data={data!} lane={defaultRole} version={version} />;
 }
 
 async function SpellOrderLoader({
   id,
   defaultRole,
-  searchParams,
 }: {
   id: number;
   defaultRole: string;
-  searchParams: SearchParamsPromise;
 }) {
-  const { role } = await searchParams;
-  const data = await getChampionSkillOrder(id, role ?? defaultRole);
+  const data = await getChampionSkillOrder(id, defaultRole);
   return <SpellOrderCard data={data} />;
 }
 
 async function StartItemsGridLoader({
   id,
   defaultRole,
-  searchParams,
   version,
 }: {
   id: number;
   defaultRole: string;
-  searchParams: SearchParamsPromise;
   version: string;
 }) {
-  const { role } = await searchParams;
-  const data = await getChampionStartItems(id, role ?? defaultRole);
+  const data = await getChampionStartItems(id, defaultRole);
   return <StartItemsGrid data={data} version={version} />;
 }
 
 const ChampionPage = async ({
   params,
-  searchParams,
 }: {
   params: Promise<{ name: string }>;
-  searchParams: Promise<{ role: string }>;
 }) => {
   const { name } = await params;
-  const { role } = await searchParams;
 
   const version = await fetchLatestVersion();
   if (!version) {
@@ -109,47 +93,50 @@ const ChampionPage = async ({
     return;
   }
 
-  const champ = await fetchSelectedChampion(name, version);
+  const champ = await getChampionSummary(name);
   if (!champ) {
     console.log("No champion data found, exiting.");
     return;
   }
 
+  const role = champ.lane;
+
+  if (!role) {
+    return (
+      <div>
+        <h1 className="text-white">No role found!</h1>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col p-8">
-      <HeroSection version={version} />
+      <HeroSection selectedChampion={champ} />
 
       <div className="flex w-full justify-between px-10 border-b border-[#EDEAE2]/17">
         <Suspense fallback={<SectionSkeleton label="Spell order" />}>
-          <SpellOrderLoader
-            id={champ.key}
-            defaultRole={role}
-            searchParams={searchParams}
-          />
+          <SpellOrderLoader id={champ.championId!} defaultRole={role} />
         </Suspense>
         <Suspense fallback={<SectionSkeleton label="Start items" />}>
           <StartItemsGridLoader
-            id={champ.key}
+            id={champ.championId!}
             defaultRole={role}
             version={version}
-            searchParams={searchParams}
           />
         </Suspense>
       </div>
       <Suspense fallback={<SectionSkeleton label="Build" />}>
         <BuildBannerLoader
-          id={champ.key}
+          id={champ.championId!}
           version={version}
           defaultRole={role}
-          searchParams={searchParams}
         />
       </Suspense>
       <Suspense fallback={<SectionSkeleton label="Matchups" />}>
         <MatchupsPanelLoader
-          id={champ.key}
+          id={champ.championId!}
           defaultRole={role}
           version={version}
-          searchParams={searchParams}
         />
       </Suspense>
     </div>

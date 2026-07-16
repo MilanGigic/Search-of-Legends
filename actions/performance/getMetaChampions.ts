@@ -9,8 +9,15 @@ import {
 import { kda } from "@/lib/riot";
 import { eq, sql } from "drizzle-orm";
 import { calculateMetaTiers } from "./calculateMetaTiers";
+import { cacheLife, cacheTag } from "next/cache";
 
 export async function getMetaChampions() {
+  "use cache";
+
+  cacheLife("hours");
+
+  cacheTag("champion-stats");
+
   const banCounts = db
     .select({
       championId: matchBans.championId,

@@ -1,11 +1,14 @@
 "use client";
 
+import { ChampionSummary } from "@/actions/champions/fetchSelectedChampion";
 import { useDataStore } from "@/lib/store/useConstantDataStore";
 import Image from "next/image";
 
-export default function HeroSection({ version }: { version: string }) {
-  const { selectedChampion } = useDataStore();
-
+export default function HeroSection({
+  selectedChampion,
+}: {
+  selectedChampion: ChampionSummary;
+}) {
   if (!selectedChampion) {
     console.error("No champion found");
     return;
