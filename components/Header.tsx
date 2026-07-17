@@ -8,10 +8,12 @@ import SearchForm from "./SearchForm";
 import { MenuIcon, SearchIcon, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSearchStore } from "@/lib/store/useSearchStore";
+import { useDataStore } from "@/lib/store/useConstantDataStore";
 
 const Header = ({ showSearch }: { showSearch?: boolean }) => {
   const [searchOpen, setSearchOpen] = useState<boolean>(false);
 
+  const { version } = useDataStore();
   const { isOpen, toggle } = useSearchStore();
 
   useEffect(() => {
@@ -53,12 +55,12 @@ const Header = ({ showSearch }: { showSearch?: boolean }) => {
           className={`flex ${isOpen && "flex-1"} items-center gap-2 sm:gap-5`}
         >
           {showSearch && searchOpen ? (
-            <div className="flex items-center w-full gap-2">
+            <div className="flex items-center w-full gap-2 z-100">
               <div className="max-w-xs sm:block sm:max-w-md h-12 mr-8">
                 {!isOpen ? (
                   <SearchForm
                     placeholder="Search for a Summoner..."
-                    version={"16.6.1"}
+                    version={version}
                   />
                 ) : null}
               </div>
@@ -125,17 +127,6 @@ const Header = ({ showSearch }: { showSearch?: boolean }) => {
           )}
         </ul>
         <div></div>
-        {/* <div className="hidden md:flex items-center">
-          {session ? (
-            <>
-              <h1>Welcome, Riot User</h1>
-              <button onClick={() => signOut()}>Sign Out</button>
-            </>
-          ) : (
-            <button onClick={() => signIn("riot")}>Sign In with Riot</button>
-          )}
-
-        </div> */}
       </div>
     </div>
   );

@@ -3,7 +3,6 @@ import Header from "@/components/Header";
 import UserCard from "@/components/UserCard";
 import { notFound } from "next/navigation";
 import { fetchAccountByName } from "@/actions/fetchAccountByName";
-import { fetchLatestVersion } from "@/lib/riot";
 import getRegionalEndpoint from "@/actions/match-history/getRegionalEndpoint";
 
 export default async function RiotIdLayout({
@@ -31,19 +30,13 @@ export default async function RiotIdLayout({
   if (!accountData?.region) return notFound();
 
   const region = getRegionalEndpoint(accountData.region);
-  const version = await fetchLatestVersion();
 
   return (
     <>
       <Header showSearch={true} />
       <Sidebar />
       <div className="w-full flex flex-col sticky top-16 z-50">
-        <UserCard
-          accountData={accountData}
-          region={region}
-          riotId={riotId}
-          version={version!}
-        />
+        <UserCard accountData={accountData} region={region} riotId={riotId} />
       </div>
       {children}
     </>

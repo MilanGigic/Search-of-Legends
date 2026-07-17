@@ -2,7 +2,12 @@
 import getFrontendRegion from "@/actions/match-history/getFrontendRegion";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+
+interface ChampionSearchResult {
+  name: string;
+  image: string;
+}
 
 export default function SearchForm({
   placeholder,
@@ -11,18 +16,59 @@ export default function SearchForm({
   placeholder: string;
   version: string;
 }) {
-  const [gameName, setGameName] = useState("");
-  const [tagLine, setTagLine] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [accountInfo, setAccountInfo] = useState<DbSummonerInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [inputValue, setInputValue] = useState<string>("");
-  const [region, setRegion] = useState<string>("");
+  const [region, setRegion] = useState("");
+  const [allChampions, setAllChampions] = useState<ChampionSearchResult[]>([]);
+  const [showResults, setShowResults] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (gameName.trim() === "" || tagLine.trim() === "") {
+    const controller = new AbortController();
+    fetch("/api/champions", { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: ChampionSearchResult[]) => setAllChampions(data))
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Derived directly from inputValue every render — no separate
+  // gameName/tagLine state to fall out of sync with what's actually typed.
+  const hashIndex = inputValue.indexOf("#");
+  const isSummonerQuery = hashIndex !== -1;
+  const gameName = isSummonerQuery ? inputValue.slice(0, hashIndex).trim() : "";
+  const tagLine = isSummonerQuery ? inputValue.slice(hashIndex + 1).trim() : "";
+
+  const championMatches =
+    !isSummonerQuery && inputValue.trim().length > 0
+      ? allChampions
+          .filter((c) =>
+            c.name.toLowerCase().includes(inputValue.trim().toLowerCase()),
+          )
+          .slice(0, 6)
+      : [];
+
+  useEffect(() => {
+    if (!isSummonerQuery || gameName === "" || tagLine === "") {
       setAccountInfo(null);
       setRegion("");
+      setError("");
       return;
     }
 
@@ -30,38 +76,22 @@ export default function SearchForm({
     let isCurrent = true;
 
     const fetchAccount = async () => {
-      console.log("[fetchAccount] Called with", { gameName, tagLine });
-
       setLoading(true);
       setError("");
 
       const fetchData = async (): Promise<DbSummonerInfo | null> => {
-        console.log(
-          "[fetchData] Fetching account info for:",
-          gameName,
-          tagLine,
-        );
-
         const res = await fetch(
-          `/api/account?gameName=${gameName}&tagLine=${tagLine}`,
+          `/api/account?gameName=${encodeURIComponent(gameName)}&tagLine=${encodeURIComponent(tagLine)}`,
           { signal: controller.signal },
         );
-        console.log("[fetchData] First fetch result:", res);
 
         if (!res.ok) {
-          // Retry once after a delay if first request fails
           if (res.status === 404 || res.status === 500) {
-            console.log(
-              "[fetchData] First fetch failed with status",
-              res.status,
-              "retrying in 1s...",
-            );
             await new Promise((r) => setTimeout(r, 1000));
             const retryRes = await fetch(
-              `/api/account?gameName=${gameName}&tagLine=${tagLine}`,
+              `/api/account?gameName=${encodeURIComponent(gameName)}&tagLine=${encodeURIComponent(tagLine)}`,
               { signal: controller.signal },
             );
-            console.log("[fetchData] Retry fetch result:", retryRes);
             if (!retryRes.ok) throw new Error(retryRes.statusText);
             return retryRes.json();
           }
@@ -73,22 +103,16 @@ export default function SearchForm({
       try {
         const data = await fetchData();
         if (!isCurrent) return;
-        if (!data) {
-          console.error("[fetchAccount] fetchData returned empty object");
-          throw new Error("Empty data");
-        }
+        if (!data) throw new Error("Empty data");
 
         setAccountInfo(data);
-        const displayRegion = getFrontendRegion(data.region);
-        setRegion(displayRegion);
+        setRegion(getFrontendRegion(data.region));
       } catch (err) {
         if (!isCurrent) return;
         if ((err as Error).name === "AbortError") return;
-        console.error("[fetchAccount] Error:", err);
-        setError(`Sorry, we couldn't find what you're looking for: ${err}`);
+        setError("Sorry, we couldn't find what you're looking for.");
         setAccountInfo(null);
       } finally {
-        console.log("[fetchAccount] Fetch finished, setting loading to false");
         if (isCurrent) setLoading(false);
       }
     };
@@ -100,89 +124,111 @@ export default function SearchForm({
       controller.abort();
       clearTimeout(debounceTimer);
     };
-  }, [gameName, tagLine]);
+  }, [isSummonerQuery, gameName, tagLine]);
 
-  const handleRiotNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    setInputValue(value);
-
-    const hashIndex = value.indexOf("#");
-
-    if (hashIndex === -1) {
-      // No hashtag present
-      console.log("No hashtag present, setting gameName:", value.trim());
-
-      setGameName(value.trim());
-
-      setTagLine("");
-    } else if (value.split("#").length - 1 > 1) {
-      // more than one #
-      console.error("Only one # allowed");
-    } else {
-      const [name, tag] = value.split("#");
-      console.log("Parsed gameName:", name.trim(), "tagLine:", tag.trim());
-      setGameName(name.trim());
-      setTagLine(tag.trim());
-    }
-  };
+  const hasResults = championMatches.length > 0 || accountInfo !== null;
+  const isPanelOpen = showResults && inputValue.trim().length > 0;
 
   return (
-    <div className="w-full flex flex-col justify-center items-center">
+    <div
+      ref={containerRef}
+      className="relative w-full flex flex-col items-center"
+    >
       <input
         placeholder={placeholder}
         className="border-b border-slate-400/50 text-gray-200 focus:outline-none p-2 w-[200px] md:w-md text-center"
         value={inputValue}
-        onChange={(e) => handleRiotNameChange(e)}
+        onChange={(e) => setInputValue(e.target.value)}
+        onFocus={() => setShowResults(true)}
       />
 
-      {error && (
-        <div className="px-4 py-1 animate-pulse animate-duration-[3s] text-slate-300 text-start flex items-center bg-[#2A2A40] rounded-b-lg shadow border-x border-b border-gray-200 w-full h-[85px]">
-          {error}
+      {isPanelOpen && (
+        <div className="absolute top-full mt-2 w-[240px] md:w-md bg-gradient-to-b from-[#121624] to-[#1B1F35] rounded-lg shadow-lg border border-slate-400/50 overflow-hidden z-50">
+          {loading && (
+            <div className="flex gap-4 items-center p-4">
+              <div className="w-14 h-14 rounded-full skeleton" />
+              <div className="flex flex-col gap-2">
+                <div className="w-40 h-4 skeleton" />
+                <div className="w-24 h-3 skeleton" />
+              </div>
+              <div className="ml-auto w-16 h-6 skeleton rounded" />
+            </div>
+          )}
+
+          {!loading && error && (
+            <div className="px-4 py-3 text-slate-300 text-sm text-left">
+              {error}
+            </div>
+          )}
+
+          {!loading && !error && championMatches.length > 0 && (
+            <div className="py-2">
+              <p className="px-4 pb-1 text-[11px] uppercase tracking-widest text-slate-500">
+                Champions
+              </p>
+              {championMatches.map((champion) => (
+                <Link
+                  key={champion.name}
+                  href={`/champions/${encodeURIComponent(champion.name)}`}
+                  className="flex items-center gap-3 px-4 py-2 hover:bg-white/5 transition-colors"
+                  onClick={() => setShowResults(false)}
+                >
+                  <Image
+                    src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${champion.image}`}
+                    alt={champion.name}
+                    width={32}
+                    height={32}
+                    className="rounded-full"
+                  />
+                  <span className="text-[#EAEAEA] text-sm">
+                    {champion.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {!loading && !error && accountInfo && (
+            <div className="py-2">
+              <p className="px-4 pb-1 text-[11px] uppercase tracking-widest text-slate-500">
+                Summoner
+              </p>
+              <Link
+                href={`/${encodeURIComponent(accountInfo.gameName)}-${encodeURIComponent(accountInfo.tagLine)}`}
+                className="flex items-center justify-between px-4 py-2 hover:bg-white/5 transition-colors"
+                onClick={() => setShowResults(false)}
+              >
+                <div className="flex items-center gap-3">
+                  <Image
+                    src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${accountInfo.profileIconId}.png`}
+                    alt=""
+                    width={44}
+                    height={44}
+                    className="rounded-full border-2 border-[#5C87F8]"
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-[#EAEAEA] text-sm">
+                      {accountInfo.gameName}#{accountInfo.tagLine}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      Level {accountInfo.summonerLevel}
+                    </span>
+                  </div>
+                </div>
+                <span className="bg-[#1E2A78] text-[#EAEAEA] text-xs uppercase px-2 py-1 rounded-md">
+                  {region}
+                </span>
+              </Link>
+            </div>
+          )}
+
+          {!loading && !error && !hasResults && (
+            <div className="px-4 py-3 text-sm text-slate-500">
+              {isSummonerQuery ? "Still typing…" : "No champions found."}
+            </div>
+          )}
         </div>
       )}
-      <div className="min-h-[90px] w-full flex justify-center items-center transition-all duration-300">
-        {loading && (
-          <div className="flex gap-4 items-center p-4 rounded-lg bg-[#2A2A40] w-[200px] md:w-md h-[85px]">
-            <div className="w-14 h-14 rounded-full skeleton" />
-            <div className="flex flex-col gap-2">
-              <div className="w-40 h-4 skeleton" />
-              <div className="w-24 h-3 skeleton" />
-            </div>
-            <div className="ml-auto w-16 h-6 skeleton rounded" />
-          </div>
-        )}
-
-        {!loading && accountInfo && (
-          <div className="px-4 bg-gradient-to-b from-[#121624] to-[#1B1F35] rounded-b-lg shadow border-x border-b border-slate-400/50 w-[200px] md:w-md">
-            <Link
-              href={`/${encodeURIComponent(
-                accountInfo.gameName,
-              )}-${encodeURIComponent(accountInfo.tagLine)}`}
-              className="flex items-center justify-between p-2 text-center gap-2 hover:opacity-85 cursor-pointer"
-            >
-              <div className="flex items-center">
-                <Image
-                  src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${accountInfo.profileIconId}.png`}
-                  alt={``}
-                  width={60}
-                  height={60}
-                  className="rounded-full border-2 border-[#5C87F8] animate-pulse animate-duration-5000 mr-4"
-                />
-                <h1 className="text-[#EAEAEA] text-lg md:text-2xl flex flex-col">
-                  {accountInfo.gameName}#{accountInfo.tagLine}
-                  <span className="text-xs md:text-sm text-gray-400">
-                    Level: {accountInfo.summonerLevel}
-                  </span>
-                </h1>
-              </div>
-              <h4 className="bg-[#1E2A78] text-[#EAEAEA] p-2 px-3 uppercase rounded-md font-normal md:font-semibold">
-                {region}
-              </h4>
-            </Link>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

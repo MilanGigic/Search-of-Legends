@@ -18,6 +18,7 @@ import { GiCrestedHelmet } from "react-icons/gi";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import VODCarousel from "./VodCarousel";
+import { useDataStore } from "@/lib/store/useConstantDataStore";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 type PageContent = "overview" | "champions" | "live";
@@ -26,16 +27,16 @@ const UserCard = ({
   accountData,
   region,
   riotId,
-  version,
 }: {
   accountData: DbSummonerInfo;
   region: string;
   riotId: string;
-  version: string;
 }) => {
   const [tierImage, setTierImage] = useState<StaticImageData | undefined>(
     undefined,
   );
+
+  const { version } = useDataStore();
   const puuid = accountData.puuid;
 
   const rank = accountData.rank;

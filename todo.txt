@@ -21,3 +21,6 @@ params: xWCZ8vciPhFXjIGdA4VjRqISJCoFacEpjQV-ZEZs2PawGtEdqtKxV71XbS2-2Nrle6uc03tG
 
 >>> Use the newly added data from matches tables
 >>> Make a proper champions page, with pickrate, winrate, banrate, builds, runes.
+
+>>> Fix the account page -> There are some display bugs happening
+>>> Rewrite the Searching logic, add champions search and make the display better

@@ -150,7 +150,6 @@ const MatchHistorySection = ({
   const [failedMatches, setFailedMatches] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [dbChecked, setDbChecked] = useState<boolean>(false);
-  const gamesPerPage = 9;
 
   const riotRateLimiter = useRef(createRiotRateLimiter()).current;
 
