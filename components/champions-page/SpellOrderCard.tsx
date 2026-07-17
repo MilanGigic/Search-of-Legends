@@ -1,5 +1,6 @@
 "use client";
 
+import { ChampionSummary } from "@/actions/champions/fetchSelectedChampion";
 import { ChampionSkillOrderResult } from "@/actions/champions/getChampionSkillOrder";
 import { useDataStore } from "@/lib/store/useConstantDataStore";
 
@@ -7,14 +8,17 @@ const SKILL_LABELS: Record<number, string> = { 1: "Q", 2: "W", 3: "E" };
 
 export default function SpellOrderCard({
   data,
+  selectedChampion,
 }: {
   data: ChampionSkillOrderResult | null;
+  selectedChampion: ChampionSummary | null;
 }) {
-  const { selectedChampion } = useDataStore();
-
   if (!selectedChampion) {
-    console.error("No champion found");
-    return;
+    return (
+      <div>
+        <h1 className="text-white">No champion found</h1>
+      </div>
+    );
   }
   if (!data) {
     return (
@@ -36,7 +40,7 @@ export default function SpellOrderCard({
     <div className="text-white py-4 flex flex-col gap-4">
       <h1
         style={{
-          color: selectedChampion.accentColor!,
+          color: selectedChampion.accentColor ?? "#edeae2",
         }}
         className="text-lg text-[#726e78] uppercase leading-[0.95] mt-1.5 block tracking-widest font-semibold"
       >

@@ -1,7 +1,10 @@
 import "dotenv";
+import { NextRequest } from "next/server";
 
-export async function GET({ params }: { params: { puuid: string } }) {
-  const { puuid } = params;
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const puuid = searchParams.get("puuid");
+
   console.log("[Number of Matches API] Received request for puuid:", puuid);
 
   const API_KEY = process.env.RIOT_API_KEY;

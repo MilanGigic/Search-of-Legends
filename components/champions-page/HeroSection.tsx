@@ -1,7 +1,6 @@
 "use client";
 
 import { ChampionSummary } from "@/actions/champions/fetchSelectedChampion";
-import { useDataStore } from "@/lib/store/useConstantDataStore";
 import Image from "next/image";
 
 export default function HeroSection({
@@ -10,8 +9,11 @@ export default function HeroSection({
   selectedChampion: ChampionSummary;
 }) {
   if (!selectedChampion) {
-    console.error("No champion found");
-    return;
+    return (
+      <div>
+        <h1 className="text-white">No champion found</h1>
+      </div>
+    );
   }
 
   const getChampionImageUrl = (championName: string) => {
@@ -46,7 +48,7 @@ export default function HeroSection({
   return (
     <section
       style={{
-        color: selectedChampion.accentColor!,
+        color: selectedChampion.accentColor ?? "#edeae2",
       }}
       className="border-b border-[#EDEAE2]/17"
     >

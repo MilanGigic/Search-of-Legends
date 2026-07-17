@@ -56,7 +56,7 @@ export async function getTopFiveChampions() {
   const laneCounts = await db
     .select({
       championId: matchParticipants.championId,
-      lane: matchParticipants.individualPosition!,
+      lane: matchParticipants.individualPosition,
       games: sql<number>`cast(count(*) as integer)`,
     })
     .from(matchParticipants)
@@ -69,18 +69,23 @@ export async function getTopFiveChampions() {
   const topLaneMap = new Map<number, string>();
   const topLaneGames = new Map<number, number>();
   for (const row of laneCounts) {
-    const currentBest = topLaneGames.get(row.championId!) ?? -1;
+    if (!row.championId || !row.lane) continue;
+
+    const currentBest = topLaneGames.get(row.championId) ?? -1;
+
     if (row.games > currentBest) {
-      topLaneMap.set(row.championId!, row.lane!);
-      topLaneGames.set(row.championId!, row.games);
+      topLaneMap.set(row.championId, row.lane);
+      topLaneGames.set(row.championId, row.games);
     }
   }
 
   // Step D: attach derived lane to each champion row
   const statsWithLane = stats.map((stat) => ({
     ...stat,
-    lane: topLaneMap.get(stat.championId!) ?? "UNKNOWN",
-    winRate: (stat.wins / stat.gamesPlayed) * 100,
+    lane: stat.championId
+      ? (topLaneMap.get(stat.championId) ?? "UNKNOWN")
+      : "UNKNOWN",
+    winRate: stat.gamesPlayed > 0 ? (stat.wins / stat.gamesPlayed) * 100 : 0,
   }));
 
   const tiers = calculateMetaTiers(statsWithLane, {
@@ -90,11 +95,15 @@ export async function getTopFiveChampions() {
   });
   const tierMap = new Map(tiers.map((t) => [t.name, t.tier]));
 
-  const metaChampions = statsWithLane.map((stat) => ({
-    ...stat,
-    tier: tierMap.get(stat.championName)!,
-    score: tiers.find((t) => t.name === stat.championName)!.rawScore,
-  }));
+  const metaChampions = statsWithLane.map((stat) => {
+    const tierData = tiers.find((t) => t.name === stat.championName);
+
+    return {
+      ...stat,
+      tier: tierMap.get(stat.championName) ?? "C",
+      score: tierData?.rawScore ?? 0,
+    };
+  });
 
   const topFive = metaChampions.sort((a, b) => b.score - a.score).slice(0, 5);
 

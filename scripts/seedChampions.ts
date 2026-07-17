@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { champions } from "@/db/schema";
-import { fetchLatestVersion } from "@/lib/riot";
+import { fetchLatestVersion } from "@/lib/riot-server";
 
 export async function seedChampions() {
   const version = await fetchLatestVersion();

@@ -137,15 +137,20 @@ async function readTimelineFromDb(
     info: {
       endOfGameResult: timeline.endOfGameResult ?? "",
       frameInterval: timeline.frameInterval,
+      gameId: timeline.gameId,
+      participants: (timeline.participantPuuids ?? []).map((puuid, index) => ({
+        participantId: index + 1,
+        puuid,
+      })),
       frames: frames.map((frame) => ({
+        timestamp: frame.timestamp,
         events: (eventsByFrame.get(frame.frameIndex) ?? []).map((e) => ({
-          timestamp: e.timestamp,
+          timestamp: e.timestamp ?? undefined,
           realTimestamp: e.realTimestamp ?? undefined,
           type: e.type as Events["type"],
           itemId: e.itemId ?? undefined,
           participantId: e.participantId ?? undefined,
           skillSlot: e.skillSlot ?? undefined,
-          ward_type: e.wardType ?? undefined,
         })),
         participantFrames: Object.fromEntries(
           (pFramesByFrame.get(frame.frameIndex) ?? []).map((pf) => [
@@ -222,6 +227,7 @@ async function writeTimelineToDb(matchId: string, data: MatchTimelineDto) {
       dataVersion: data.metadata.dataVersion,
       endOfGameResult: data.info.endOfGameResult,
       frameInterval: data.info.frameInterval,
+      gameId: data.info.gameId,
       participantPuuids: data.metadata.participants,
     })
     .onConflictDoNothing();
@@ -249,7 +255,6 @@ async function writeTimelineToDb(matchId: string, data: MatchTimelineDto) {
       itemId: event.itemId ?? null,
       participantId: event.participantId ?? null,
       skillSlot: event.skillSlot ?? null,
-      wardType: event.ward_type ?? null,
     })),
   );
   if (eventRows.length > 0) {

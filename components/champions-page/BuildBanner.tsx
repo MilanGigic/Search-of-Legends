@@ -1,5 +1,6 @@
 "use client";
 
+import { ChampionSummary } from "@/actions/champions/fetchSelectedChampion";
 import { ChampionBuildResult } from "@/actions/champions/getChampionBuild";
 import { perks } from "@/lib/perks";
 import { useDataStore } from "@/lib/store/useConstantDataStore";
@@ -41,12 +42,12 @@ const getSummonerSpellImageUrl = (spellId: number, version: string) => {
 export default function BuildBanner({
   data,
   version,
+  selectedChampion,
 }: {
   data: ChampionBuildResult | null;
   version: string;
+  selectedChampion: ChampionSummary | null;
 }) {
-  const { selectedChampion } = useDataStore();
-
   const [runesApi, setRunesApi] = useState<RuneStyle[] | null>(null);
 
   useEffect(() => {
@@ -84,6 +85,14 @@ export default function BuildBanner({
     );
   }
 
+  if (!selectedChampion) {
+    return (
+      <div>
+        <h1 className="text-white">No champion found</h1>
+      </div>
+    );
+  }
+
   const runeTree = runesApi.find((r) => r.id === data.primaryStyle);
   const subRuneTree = runesApi.find((r) => r.id === data.subStyle);
   const keyStone = runeTree?.slots[0].runes.find((r) => r.id === data.keystone);
@@ -112,7 +121,7 @@ export default function BuildBanner({
       <div className="flex flex-col gap-4">
         <h1
           style={{
-            color: selectedChampion!.accentColor!,
+            color: selectedChampion.accentColor ?? "#edeae2",
           }}
           className="text-lg text-[#726e78] uppercase leading-[0.95] mt-1.5 block tracking-widest font-semibold"
         >
@@ -174,7 +183,7 @@ export default function BuildBanner({
                 )
                 ?.types.find((type) => type.id === data.shards.defense)!.name
             }.png`}
-            alt={`${data.shards.defense!}`}
+            alt={`${data.shards.defense ?? "1"}`}
             width={40}
             height={40}
             className="mb-0.5 border rounded-full object-cover bg-white/8"
@@ -187,7 +196,7 @@ export default function BuildBanner({
                 )
                 ?.types.find((type) => type.id === data.shards.offense)!.name
             }.png`}
-            alt={`${data.shards.offense!}`}
+            alt={`${data.shards.offense ?? "2"}`}
             width={40}
             height={40}
             className="mb-0.5 border rounded-full object-cover bg-white/8 object-center"
@@ -200,7 +209,7 @@ export default function BuildBanner({
                 )
                 ?.types.find((type) => type.id === data.shards.flex)!.name
             }.png`}
-            alt={`${data.shards.flex!}`}
+            alt={`${data.shards.flex ?? "3"}`}
             width={40}
             height={40}
             className="mb-0.5 border rounded-full object-cover bg-white/8 object-center"
@@ -211,7 +220,7 @@ export default function BuildBanner({
       <div className="flex flex-col gap-4">
         <h1
           style={{
-            color: selectedChampion!.accentColor!,
+            color: selectedChampion.accentColor ?? "#edeae2",
           }}
           className="text-lg text-[#726e78] uppercase w-full text-end leading-[0.95] mt-1.5 block tracking-widest font-semibold"
         >

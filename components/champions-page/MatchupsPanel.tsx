@@ -1,5 +1,6 @@
 "use client";
 
+import { ChampionSummary } from "@/actions/champions/fetchSelectedChampion";
 import { ChampionMatchupResult } from "@/actions/champions/getChampionMatchups";
 import { useDataStore } from "@/lib/store/useConstantDataStore";
 import Image from "next/image";
@@ -14,13 +15,13 @@ export default function MatchupsPanel({
   data,
   lane,
   version,
+  selectedChampion,
 }: {
   data: ChampionMatchupsResult | null;
   lane: string;
   version: string;
+  selectedChampion: ChampionSummary | null;
 }) {
-  const { selectedChampion } = useDataStore();
-
   if (
     !data ||
     (data.goodAgainst.length === 0 && data.badAgainst.length === 0)
@@ -33,6 +34,14 @@ export default function MatchupsPanel({
         <p className="text-sm text-[#726e78]">
           No matchup data found for this lane yet.
         </p>
+      </div>
+    );
+  }
+
+  if (!selectedChampion) {
+    return (
+      <div>
+        <h1 className="text-white">No champion found</h1>
       </div>
     );
   }
@@ -55,7 +64,7 @@ export default function MatchupsPanel({
     <div className="text-white px-10 py-4 flex flex-col gap-4 border-b border-[#EDEAE2]/17">
       <h1
         style={{
-          color: selectedChampion!.accentColor!,
+          color: selectedChampion.accentColor ?? "#edeae2",
         }}
         className="text-lg text-[#726e78] uppercase leading-[0.95] mt-1.5 block tracking-widest font-semibold"
       >

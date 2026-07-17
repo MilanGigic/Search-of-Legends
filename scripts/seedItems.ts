@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { items } from "@/db/schema";
-import { fetchLatestVersion } from "@/lib/riot";
+import { fetchLatestVersion } from "@/lib/riot-server";
 
 interface LeagueItemJson {
   type: string;

@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { champions } from "@/db/schema";
-import { fetchLatestVersion } from "../../lib/riot";
+import { fetchLatestVersion } from "../../lib/riot-server";
 
 export default async function fetchChampions() {
   const dbChampions = await db.select().from(champions);
@@ -23,21 +23,25 @@ export default async function fetchChampions() {
 
     const championArray = Object.values(data);
 
-    if (championArray.length > dbChampions.length) {
-      await Promise.all(
-        championArray.map((champion) =>
-          db.insert(champions).values({
-            id: champion.id,
-            key: champion.key,
-            name: champion.name,
-            title: champion.title,
-            blurb: champion.blurb,
-            image: champion.image.full,
-            tags: champion.tags,
-          }),
-        ),
-      );
-    }
+    const existingIds = new Set(dbChampions.map((c) => c.id));
+
+    const missingChampions = championArray.filter(
+      (champion) => !existingIds.has(champion.id),
+    );
+
+    await Promise.all(
+      missingChampions.map((champion) =>
+        db.insert(champions).values({
+          id: champion.id,
+          key: champion.key,
+          name: champion.name,
+          title: champion.title,
+          blurb: champion.blurb,
+          image: champion.image.full,
+          tags: champion.tags,
+        }),
+      ),
+    );
 
     return await db.select().from(champions);
   } catch (error) {

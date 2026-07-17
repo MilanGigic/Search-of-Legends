@@ -320,26 +320,3 @@ export async function fetchWithRateLimit(url: string, opts?: RequestInit) {
     return fetch(url, opts);
   });
 }
-
-export async function fetchLatestVersion() {
-  console.log("FetchLatestVersion action hit");
-  try {
-    const versionRes = await fetch(
-      "https://ddragon.leagueoflegends.com/api/versions.json",
-    );
-
-    if (!versionRes.ok) {
-      console.error(
-        "Error fetching versions:",
-        versionRes.status,
-        versionRes.statusText,
-      );
-    }
-
-    const version: string[] = await versionRes.json();
-
-    return version[0];
-  } catch (error) {
-    console.error("Fetching versions failed:", error);
-  }
-}

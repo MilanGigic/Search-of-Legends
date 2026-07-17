@@ -12,14 +12,14 @@ import Diamond from "@/public/ranked-emblems/Rank=Diamond.png";
 import Master from "@/public/ranked-emblems/Rank=Master.png";
 import Grandmaster from "@/public/ranked-emblems/Rank=Grandmaster.png";
 import Challenger from "@/public/ranked-emblems/Rank=Challenger.png";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { RxActivityLog } from "react-icons/rx";
 import { GiCrestedHelmet } from "react-icons/gi";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import VODCarousel from "./VodCarousel";
 import { useDataStore } from "@/lib/store/useConstantDataStore";
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { updateAccountAction } from "@/actions/updateAccount";
 
 type PageContent = "overview" | "champions" | "live";
 
@@ -35,8 +35,11 @@ const UserCard = ({
   const [tierImage, setTierImage] = useState<StaticImageData | undefined>(
     undefined,
   );
+  const [isPending, startTransition] = useTransition();
+  const [updateError, setUpdateError] = useState<string | null>(null);
 
   const { version } = useDataStore();
+  const router = useRouter();
   const puuid = accountData.puuid;
 
   const rank = accountData.rank;
@@ -82,30 +85,18 @@ const UserCard = ({
   }, [tier]);
 
   const handleUpdate = () => {
-    const update = async () => {
-      const response = await fetch("/api/game-info", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ puuid, region }),
-      });
-
-      if (!response.ok) {
-        console.error("Failed to update summoner data");
+    setUpdateError(null);
+    startTransition(async () => {
+      const result = await updateAccountAction(puuid);
+      if (!result.ok) {
+        setUpdateError(result.error);
         return;
       }
-
-      const data = await response.json();
-
-      if (data.revalidated) {
-      } else {
-        console.error("Failed to update summoner data");
-      }
-    };
-    update();
+      router.refresh();
+    });
   };
 
   const pathname = usePathname();
-
   const activeTab: PageContent = pathname.includes("/champions")
     ? "champions"
     : pathname.includes("/live")
@@ -129,16 +120,26 @@ const UserCard = ({
 
             <h1 className="text-white font-bold text-2xl flex flex-col">
               {accountData.gameName}#{accountData.tagLine}{" "}
-              <span className="text-lg font-semibold text-gray-200">
+              <span className="text-lg font-semibold text-gray-200 flex items-center flex-wrap gap-2">
                 Level {accountData.summonerLevel || "N/A"}
                 <Button
                   onClick={handleUpdate}
-                  className="p-3 cursor-pointer hover:bg-[#5C87F8]/50 transition-all duration-200 ml-2 text-white bg-[#5C87F8]"
+                  disabled={isPending}
+                  className="p-3 cursor-pointer hover:bg-[#5C87F8]/50 transition-all duration-200 text-white bg-[#5C87F8] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <div className="p-1 bg-violet-600 animate-pulse animate-duration-2000 rounded-full" />{" "}
-                  Update
+                  <div
+                    className={`p-1 rounded-full bg-violet-600 ${
+                      isPending ? "animate-pulse animate-duration-1000" : ""
+                    }`}
+                  />{" "}
+                  {isPending ? "Updating…" : "Update"}
                 </Button>
               </span>
+              {updateError && (
+                <span className="text-xs font-normal text-red-400 mt-1">
+                  {updateError}
+                </span>
+              )}
             </h1>
           </div>
           <div className="flex items-center">

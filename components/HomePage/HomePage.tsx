@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Spotlight from "../ui/spotlight";
 import { useDataStore } from "@/lib/store/useConstantDataStore";
-import { fetchLatestVersion } from "@/lib/riot";
+import { fetchLatestVersion } from "@/lib/riot-server";
 import HomePageHero from "@/components/HomePage/HomePageHero";
 import HomePageFooter from "@/components/HomePage/HomePageFooter";
 import TopFiveChampions from "./TopFiveChampions";
@@ -13,10 +13,11 @@ import { Button } from "../ui/button";
 
 type Props = {
   champions: TopFiveChampions[];
+  version: string | undefined;
 };
 
-const HomePage = ({ champions }: Props) => {
-  const { version, setVersion } = useDataStore();
+const HomePage = ({ champions, version }: Props) => {
+  const { setVersion } = useDataStore();
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
   const [selectedRegion, setSelectedRegion] = useState<string>("euw1");
@@ -26,14 +27,13 @@ const HomePage = ({ champions }: Props) => {
   }, []);
 
   useEffect(() => {
-    (async () => {
-      const data = await fetchLatestVersion();
-
-      if (data) {
-        setVersion(data);
-      }
+    (() => {
+      if (!version) return null;
+      setVersion(version);
     })();
-  }, []);
+  }, [version]);
+
+  if (!version) return null;
 
   return (
     <div className="container relative h-full flex flex-col items-center justify-between">

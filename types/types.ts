@@ -154,7 +154,7 @@ interface TimelineInfo {
   endOfGameResult: string;
   frameInterval: number;
   gameId: number;
-  pariticipants: ParticipantTimeLineDto[];
+  participants: ParticipantTimeLineDto[];
   frames: Frame[];
 }
 

@@ -1,7 +1,8 @@
 "use client";
 
 import PlayerList from "@/components/leaderboard/PlayerList";
-import { fetchLatestVersion, REGIONS } from "@/lib/riot";
+import { REGIONS } from "@/lib/riot";
+import { fetchLatestVersion } from "@/lib/riot-server";
 import { useState, useEffect } from "react";
 import PaginationControls from "../../components/leaderboard/PaginationControls";
 import TopThreeDisplay from "@/components/leaderboard/TopThreeDisplay";
