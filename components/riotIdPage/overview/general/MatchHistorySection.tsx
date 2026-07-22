@@ -12,6 +12,8 @@ import {
 import GameMatchCard from "./GameMatchCard";
 import checkDbGames from "@/actions/checkDbGames";
 import { createRiotRateLimiter } from "@/actions/rateLimiter";
+import PaginationControlsSkeleton from "./PaginationControlsSkeleton";
+import GameMatchCardSkeleton from "./GameMatchCardSkeleton";
 
 const GAMES_PER_PAGE = 9;
 const FETCH_CONCURRENCY = 3; // tune to Riot's effective rate limit
@@ -248,7 +250,7 @@ const MatchHistorySection = ({
     setGames([]);
     setFailedMatches(new Set());
     setDbChecked(false);
-    setIsLoading(false);
+    setIsLoading(true);
 
     (async () => {
       try {
@@ -318,22 +320,23 @@ const MatchHistorySection = ({
 
   if (isLoading && validGames.length === 0) {
     return (
-      <div className="mt-5 text-center">
-        <div className="text-white">
-          {dbChecked ? "Loading remaining matches..." : "Checking database..."}
+      <div className="bg-gradient-to-b w-full from-[#121624] via-[#1B1F35] to-[#121624] shadow-sm shadow-[#2A2A40] border rounded-md border-gray-700/70 mt-4 max-w-2xl">
+        <PaginationControlsSkeleton position="top" />
+
+        <div>
+          {Array.from({ length: 9 }).map((_, i) => (
+            <GameMatchCardSkeleton key={i} />
+          ))}
         </div>
-        <div className="text-gray-400 mt-2">
-          Loaded {games.length} of {matchHistory.length} matches
-          {dbChecked &&
-            ` (${matchHistory.length - games.length} from database)`}
-        </div>
+
+        <PaginationControlsSkeleton position="bottom" />
       </div>
     );
   }
 
   if (validGames.length === 0 && !isLoading) {
     return (
-      <div className="mt-5 text-center">
+      <div className="bg-gradient-to-b w-full from-[#121624] via-[#1B1F35] to-[#121624] shadow-sm shadow-[#2A2A40] border rounded-md border-gray-700/70 mt-4 max-w-2xl">
         <div className="text-white">
           {failedMatches.size === matchHistory.length
             ? "Failed to load matches"

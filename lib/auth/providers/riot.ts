@@ -1,4 +1,3 @@
-// lib/auth/providers/riot.ts
 import { OAuthConfig } from "next-auth/providers/oauth";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 

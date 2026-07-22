@@ -1,4 +1,3 @@
-// app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
 import RiotProvider from "@/lib/auth/providers/riot";
 

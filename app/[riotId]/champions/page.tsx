@@ -4,6 +4,7 @@ import ChampionStatsClient from "@/components/riotIdPage/champions/ChampionStats
 import { fetchLatestVersion } from "@/lib/riot-server";
 import { fetchAccountByName } from "@/actions/fetchAccountByName";
 import { Suspense } from "react";
+import ChampionsTableSkeleton from "@/components/riotIdPage/champions/ChampionsTableSkeleton";
 
 interface AccountPageProps {
   params: Promise<{ riotId: string }>;
@@ -11,7 +12,7 @@ interface AccountPageProps {
 
 export default function ChampionsPage({ params }: AccountPageProps) {
   return (
-    <Suspense fallback={<div>Loading champions...</div>}>
+    <Suspense fallback={<ChampionsTableSkeleton />}>
       <ChampionsContent params={params} />
     </Suspense>
   );

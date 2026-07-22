@@ -8,7 +8,7 @@ type ClientPageProps = {
   region: string;
   matchHistory: string[];
   riotId: string;
-  version: string; // now passed as a prop from the server, not read from the store
+  version: string;
 };
 
 export default function ClientPage({
@@ -18,7 +18,7 @@ export default function ClientPage({
   riotId,
   version,
 }: ClientPageProps) {
-  const puuid = accountData.puuid; // derived directly from the prop, always correct on refresh
+  const puuid = accountData.puuid;
 
   return (
     <div className="relative z-10 min-h-screen p-4">
