@@ -5,9 +5,6 @@ import Image from "next/image";
 import WinrateGauge from "../../../WinrateGauge";
 import { useEffect, useState } from "react";
 import { getLastThirtyMatches } from "@/actions/getLastThirtyMatches";
-import { useDataStore } from "@/lib/store/useConstantDataStore";
-
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 
 const LastThirtyGames = ({
   puuid,
@@ -19,22 +16,25 @@ const LastThirtyGames = ({
   const [last30ParticipantRows, setLast30ParticipantRows] = useState<
     LastThirtyMatches[]
   >([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true); // reset on puuid change too, not just mount
     (async () => {
       const data = await getLastThirtyMatches(puuid);
-
       setLast30ParticipantRows(data);
+      setIsLoading(false);
     })();
   }, [puuid]);
 
   let wins = 0;
   let losses = 0;
-  last30ParticipantRows.map((row) => {
-    row.win === 1 ? wins++ : losses++;
-  });
+  for (const row of last30ParticipantRows) {
+    if (row.win === 1) wins++;
+    else losses++;
+  }
+  const winRate = wins + losses > 0 ? (wins / (wins + losses)) * 100 : 0;
 
-  // Step 3: Group manually in JS
   const statsByChampion = new Map<
     string,
     {
@@ -64,7 +64,6 @@ const LastThirtyGames = ({
       wins: 0,
       damage: 0,
     };
-
     statsByChampion.set(champId, {
       gamesPlayed: existing.gamesPlayed + 1,
       kills: existing.kills + row.kills!,
@@ -84,15 +83,32 @@ const LastThirtyGames = ({
     .sort((a, b) => b[1].gamesPlayed - a[1].gamesPlayed)
     .slice(0, 3);
 
+  if (isLoading) {
+    return (
+      <div className="p-5 py-3 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-3 bg-gradient-to-b from-[#1B1F35] to-[#121624] shadow-sm shadow-[#2A2A40]">
+        <h1 className="flex items-center justify-center font-semibold text-lg">
+          Last 30 Games
+        </h1>
+        <div className="w-[100px] h-[70px] mx-auto rounded-full bg-white/5 animate-pulse" />
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex justify-between items-center p-1">
+            <div className="w-11 h-11 rounded-full bg-white/5 animate-pulse" />
+            <div className="w-12 h-4 rounded bg-white/5 animate-pulse" />
+            <div className="w-8 h-4 rounded bg-white/5 animate-pulse" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="p-5 py-3 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624]  shadow-sm shadow-[#2A2A40]">
+    <div className="p-5 py-3 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624] shadow-sm shadow-[#2A2A40]">
       <div>
         <h1 className="flex items-center justify-center font-semibold text-lg">
           Last 30 Games
         </h1>
         <WinrateGauge
-          percentage={(wins / (wins + losses)) * 100}
-          title={"Winrate"}
+          percentage={winRate}
           subtitle={`${wins}W-${losses}L`}
           size={100}
         />
@@ -106,9 +122,7 @@ const LastThirtyGames = ({
         return (
           <div
             key={index}
-            className={`flex justify-between ${
-              index < sorted.length - 1 && "border-b"
-            } p-1`}
+            className={`flex justify-between ${index < sorted.length - 1 && "border-b"} p-1`}
           >
             <div className="flex items-center justify-center rounded-full">
               <Image
@@ -120,7 +134,6 @@ const LastThirtyGames = ({
               />
             </div>
             <div className="flex flex-col justify-center text-slate-300">
-              {/* <p>{stats.gamesPlayed}/</p> */}
               <div className="flex flex-col items-center text-center">
                 <div className="flex">
                   <p>{stats.wins}W</p>

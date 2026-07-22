@@ -1,19 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 const WinrateGauge = ({
   percentage,
-  title,
   subtitle,
   size,
 }: {
   percentage: number;
-  title: string;
   subtitle: string;
   size: number;
 }) => {
+  const safePercentage = Number.isFinite(percentage)
+    ? Math.min(100, Math.max(0, percentage))
+    : 0;
+
   // Calculate the semicircle properties
   const radius = (size - 8) / 2; // Account for stroke width
   const circumference = Math.PI * radius; // Half circle circumference
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  const strokeDashoffset =
+    circumference - (safePercentage / 100) * circumference;
 
   // Center position
   const centerX = size / 2;
