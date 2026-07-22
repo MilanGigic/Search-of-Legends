@@ -26,6 +26,8 @@ export default function SearchForm({
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
   useEffect(() => {
     const controller = new AbortController();
     fetch("/api/champions", { signal: controller.signal })
@@ -81,7 +83,7 @@ export default function SearchForm({
 
       const fetchData = async (): Promise<DbSummonerInfo | null> => {
         const res = await fetch(
-          `/api/account?gameName=${encodeURIComponent(gameName)}&tagLine=${encodeURIComponent(tagLine)}`,
+          `${BASE_URL}/api/account?gameName=${encodeURIComponent(gameName)}&tagLine=${encodeURIComponent(tagLine)}`,
           { signal: controller.signal },
         );
 
