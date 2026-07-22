@@ -5,6 +5,7 @@ import { fetchAccountByName } from "@/actions/fetchAccountByName";
 import { fetchLatestVersion } from "@/lib/riot-server";
 import ClientPage from "@/components/riotIdPage/ClientPage";
 import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 interface AccountPageProps {
   params: Promise<{ riotId: string; page: string }>;
@@ -13,7 +14,13 @@ interface AccountPageProps {
 
 export default function AccountPage(props: AccountPageProps) {
   return (
-    <Suspense fallback={<div>Loading Page...</div>}>
+    <Suspense
+      fallback={
+        <div className="w-full h-full flex items-center justify-center">
+          <Spinner width={64} hanging={64} />
+        </div>
+      }
+    >
       <AccountPageContent {...props} />
     </Suspense>
   );
