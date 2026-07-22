@@ -5,6 +5,7 @@ import Image from "next/image";
 import WinrateGauge from "../../../WinrateGauge";
 import { useEffect, useState } from "react";
 import { getLastThirtyMatches } from "@/actions/getLastThirtyMatches";
+import Last30GamesSkeleton from "../../Last30GamesSkeleton";
 
 const LastThirtyGames = ({
   puuid,
@@ -84,21 +85,7 @@ const LastThirtyGames = ({
     .slice(0, 3);
 
   if (isLoading) {
-    return (
-      <div className="p-5 py-3 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-3 bg-gradient-to-b from-[#1B1F35] to-[#121624] shadow-sm shadow-[#2A2A40]">
-        <h1 className="flex items-center justify-center font-semibold text-lg">
-          Last 30 Games
-        </h1>
-        <div className="w-[100px] h-[70px] mx-auto rounded-full bg-white/5 animate-pulse" />
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex justify-between items-center p-1">
-            <div className="w-11 h-11 rounded-full bg-white/5 animate-pulse" />
-            <div className="w-12 h-4 rounded bg-white/5 animate-pulse" />
-            <div className="w-8 h-4 rounded bg-white/5 animate-pulse" />
-          </div>
-        ))}
-      </div>
-    );
+    return <Last30GamesSkeleton />;
   }
 
   return (
