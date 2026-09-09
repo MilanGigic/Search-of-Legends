@@ -24,18 +24,12 @@ export default function ChampionsPage() {
   const { version } = useDataStore();
 
   const columns = useMemo(() => getColumns(version), [version]);
+
   const table = useReactTable({
     data: metaChampions,
     columns,
-    state: {
-      sorting,
-      columnFilters,
-    },
-    onSortingChange: (updater) => {
-      startTransition(() => {
-        setSorting(updater);
-      });
-    },
+    state: { sorting, columnFilters },
+    onSortingChange: (updater) => startTransition(() => setSorting(updater)),
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -46,28 +40,26 @@ export default function ChampionsPage() {
   useEffect(() => {
     (async () => {
       const data = await getMetaChampions();
-
-      if (data.length > 0) {
-        setMetaChampions(data);
-      }
+      if (data.length > 0) setMetaChampions(data);
     })();
   }, []);
+
   return (
-    <div className="w-5xl mx-auto flex flex-col gap-4">
+    <div className="w-full px-4 sm:px-0 sm:w-[600px] md:w-2xl lg:w-4xl xl:w-5xl mx-auto flex flex-col gap-4">
       <header className="flex items-center justify-center flex-col p-4 bg-gradient-to-b from-[#1B1F35] to-[#121624] border-b border-slate-400 z-50">
-        <div className="flex flex-col items-center">
-          <h1 className="text-white font-semibold text-2xl">
+        <div className="flex flex-col items-center text-center">
+          <h1 className="text-white font-semibold text-xl sm:text-2xl">
             Tierlist & Builds Master+
           </h1>
-          <h4 className="text-white font-semibold text-2xl">
+          <h4 className="text-white font-semibold text-lg sm:text-2xl">
             Patch: {version.slice(0, 5)}
           </h4>
         </div>
         <div className="flex items-center gap-2">
-          <h1 className="text-slate-300 uppercase font-semibold text-lg tracking-wider">
+          <h1 className="text-slate-300 uppercase font-semibold text-sm sm:text-lg tracking-wider">
             Champions Analyzed
           </h1>{" "}
-          <span className="text-cyan-300 font-semibold tracking-wider text-lg">
+          <span className="text-cyan-300 font-semibold tracking-wider text-sm sm:text-lg">
             {metaChampions.length}
           </span>
         </div>

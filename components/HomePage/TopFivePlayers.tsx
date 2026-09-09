@@ -35,7 +35,7 @@ const TopFivePlayers = ({
   const isInitialLoad = topFive.length === 0 && isPending;
 
   return (
-    <div className="py-2 px-1 border border-gray-700/70 text-sm text-slate-300 rounded-md flex flex-col bg-gradient-to-b from-[#1B1F35] to-[#121624]">
+    <div className="py-2 px-1 border border-gray-700/70 text-sm text-slate-300 rounded-md flex flex-col bg-gradient-to-b from-[#1B1F35] to-[#121624] max-w-[500px] w-full md:w-full">
       <ul className="grid grid-cols-6 text-slate-300 font-semibold">
         <li className="text-center font-semibold">Rank</li>
         <li className="col-span-3 font-semibold text-center">Player</li>
@@ -74,16 +74,16 @@ const TopFivePlayers = ({
                       {account.gameName} {/* Name */}
                     </h1>
                   </div>
-                  <p className="flex flex-col items-center text-xs justify-center text-slate-300 tracking-tighter">
+                  <p className="flex flex-col items-center text-sm font-semibold md:text-xs md:font-normal justify-center text-slate-300 tracking-tighter">
                     {Math.round(
                       (account.wins! / (account.wins! + account.losses!)) * 100,
                     )}
                     % {/* Win rate */}
-                    <span className="text-[11px] flex text-gray-400">
+                    <span className="text-xs md:text-[11px] flex text-gray-400">
                       {account.wins}W / {account.losses}L {/* Wins & Losses */}
                     </span>
                   </p>
-                  <p className="flex flex-col items-center justify-center">
+                  <p className="flex flex-col items-center justify-center text-lg font-semibold md:text-base md:font-normal">
                     {account.leaguePoints} {/* LP */}
                   </p>
                 </Link>

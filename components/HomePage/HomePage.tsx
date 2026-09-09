@@ -42,12 +42,12 @@ const HomePage = ({ champions, version }: Props) => {
       <main className="relative z-10 w-full flex flex-col items-center justify-center">
         <HomePageHero />
 
-        <section className="flex flex-col sm:flex-row gap-4 md:gap-12 items-center w-sm sm:w-2xl md:w-3xl">
+        <section className="flex flex-col md:flex-row gap-4 md:gap-12 items-center w-sm sm:w-2xl md:w-3xl">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.7 }}
-            className="w-full space-y-4"
+            className="w-full space-y-4 flex flex-col items-center justify-center"
           >
             <h2 className="text-lg font-semibold my-4 text-gray-200 text-center">
               Top Champions This Patch
@@ -59,9 +59,9 @@ const HomePage = ({ champions, version }: Props) => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.7 }}
-            className="w-full space-y-4"
+            className="w-full space-y-4 flex flex-col items-center justify-center"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-center justify-between">
               <h2 className="text-lg font-semibold my-1.5 text-gray-200 text-center">
                 Leaderboards
               </h2>

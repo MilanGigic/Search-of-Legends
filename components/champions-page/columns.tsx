@@ -1,3 +1,4 @@
+// components/champions-page/columns.tsx
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 
@@ -13,110 +14,98 @@ const tierColors: Record<Tier, string> = {
   F: "text-slate-500",
 };
 
-export const getColumns = (version: string): ColumnDef<MetaChampion>[] => {
-  return [
-    {
-      accessorKey: "rank",
-      header: "Rank",
-      cell: ({ row }) => {
-        return <div className="text-lg font-semibold">{row.original.rank}</div>;
-      },
+export const getColumns = (version: string): ColumnDef<MetaChampion>[] => [
+  {
+    accessorKey: "rank",
+    header: "Rank",
+    cell: ({ row }) => (
+      <span className="text-lg font-semibold">{row.original.rank}</span>
+    ),
+  },
+  {
+    accessorKey: "championName",
+    header: "Champion",
+    cell: ({ row }) => (
+      <div className="mx-auto flex w-full max-w-xs items-center gap-3 text-left">
+        <div className="relative h-10 w-16 shrink-0 overflow-hidden rounded bg-black/40">
+          <Image
+            src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${row.original.championImage}`}
+            alt={row.original.championName}
+            fill
+            sizes="64px"
+            loading="eager"
+            className="object-cover"
+          />
+        </div>
+        <span className="truncate font-semibold">
+          {row.original.championName}
+        </span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "lane",
+    header: "Lane",
+    enableSorting: true,
+    cell: ({ row }) => {
+      const lane = row.original.lane;
+      const label =
+        lane === "MIDDLE"
+          ? "MID"
+          : lane === "UTILITY"
+            ? "SUPPORT"
+            : lane === "BOTTOM"
+              ? "ADC"
+              : lane;
+      return <span>{label}</span>;
     },
-    {
-      accessorKey: "championName",
-      header: "Champion",
-      cell: ({ row }) => {
-        return (
-          <div className="flex justify-center">
-            <div className="flex items-center justify-start gap-4 w-56">
-              <div className="relative w-24 h-[40px] min-h-[40px] overflow-hidden rounded bg-black-700 shrink-0">
-                <Image
-                  src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${row.original.championImage}`}
-                  alt={row.original.championName}
-                  width={96}
-                  height={40}
-                  loading="eager"
-                  className="object-cover absolute h-[100%] w-[100%] inset-0 bg-transparent"
-                />
-              </div>
-              <h1 className="font-semibold text-lg truncate">
-                {row.original.championName}
-              </h1>
-            </div>
-          </div>
-        );
-      },
+  },
+  {
+    accessorKey: "tier",
+    header: "Tier",
+    enableSorting: true,
+    cell: ({ row }) => {
+      const tier = row.original.tier as Tier;
+      return (
+        <span className={`font-semibold ${tierColors[tier]}`}>
+          {tierLabel(tier)}
+        </span>
+      );
     },
-    {
-      accessorKey: "lane",
-      header: "Lane",
-      enableSorting: true,
-      cell: ({ row }) => {
-        return (
-          <div>
-            <h1>
-              {row.original.lane === "MIDDLE"
-                ? "MID"
-                : row.original.lane === "UTILITY"
-                  ? "SUPPORT"
-                  : row.original.lane === "BOTTOM"
-                    ? "ADC"
-                    : row.original.lane}
-            </h1>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "tier",
-      header: "Tier",
-      enableSorting: true,
-      cell: ({ row }) => {
-        return (
-          <div
-            className={`font-semibold ${tierColors[row.original.tier as Tier]}`}
-          >
-            {row.original.tier === "S_PLUS" ? "S+" : row.original.tier}
-          </div>
-        );
-      },
-    },
-    {
-      id: "winRate",
-      header: "Winrate",
-      enableSorting: true,
-      accessorFn: (row) => row.wins / row.gamesPlayed,
-      cell: ({ row }) => {
-        return (
-          <div>
-            {Math.round((row.original.wins / row.original.gamesPlayed) * 100)}%
-          </div>
-        );
-      },
-    },
-    {
-      id: "pickRate",
-      header: "Pickrate",
-      enableSorting: true,
-      accessorFn: (row) => row.gamesPlayed / row.totalGames,
-      cell: ({ row }) => {
-        return (
-          <div>
-            {Math.round(
-              (row.original.gamesPlayed / row.original.totalGames) * 100,
-            )}
-            %
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "gamesPlayed",
-      header: "Games",
-      enableSorting: true,
-      cell: ({ row }) => {
-        return <div className="text-slate-400">{row.original.gamesPlayed}</div>;
-      },
-    },
-  ];
-};
+  },
+  {
+    id: "winRate",
+    header: "Winrate",
+    enableSorting: true,
+    accessorFn: (row) => row.wins / row.gamesPlayed,
+    cell: ({ row }) => (
+      <span>
+        {Math.round((row.original.wins / row.original.gamesPlayed) * 100)}%
+      </span>
+    ),
+  },
+  {
+    id: "pickRate",
+    header: "Pickrate",
+    enableSorting: true,
+    accessorFn: (row) => row.gamesPlayed / row.totalGames,
+    cell: ({ row }) => (
+      <span>
+        {Math.round((row.original.gamesPlayed / row.original.totalGames) * 100)}
+        %
+      </span>
+    ),
+  },
+  {
+    accessorKey: "gamesPlayed",
+    header: "Games",
+    enableSorting: true,
+    cell: ({ row }) => (
+      <span className="text-slate-400">{row.original.gamesPlayed}</span>
+    ),
+  },
+];
+
+function tierLabel(tier: Tier) {
+  return tier === "S_PLUS" ? "S+" : tier;
+}
