@@ -2,27 +2,14 @@
 
 import { db } from "@/db";
 import { champions, matchDetails, matchParticipants } from "@/db/schema";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 export async function getLastThirtyMatches(puuid: string) {
   if (!puuid) {
-    throw new Error("[getLastThirtyMatches]Puuid required!");
+    throw new Error("[getLastThirtyMatches] puuid required");
   }
 
-  const last30MatchIds = await db
-    .select({ matchId: matchParticipants.matchId })
-    .from(matchParticipants)
-    .where(eq(matchParticipants.puuid, puuid))
-    .orderBy(desc(matchDetails.gameCreation)) // Ideally use gameCreation desc
-    .innerJoin(
-      matchDetails,
-      eq(matchParticipants.matchId, matchDetails.matchId),
-    )
-    .limit(30);
-
-  const matchIds = last30MatchIds.map((m) => m.matchId);
-
-  const last30ParticipantRows = await db
+  return db
     .select({
       kills: matchParticipants.kills,
       deaths: matchParticipants.deaths,
@@ -36,13 +23,12 @@ export async function getLastThirtyMatches(puuid: string) {
       championId: champions.id,
     })
     .from(matchParticipants)
-    .where(
-      and(
-        eq(matchParticipants.puuid, puuid),
-        inArray(matchParticipants.matchId, matchIds),
-      ),
+    .innerJoin(
+      matchDetails,
+      eq(matchParticipants.matchId, matchDetails.matchId),
     )
-    .innerJoin(champions, eq(matchParticipants.championId, champions.key));
-
-  return last30ParticipantRows;
+    .innerJoin(champions, eq(matchParticipants.championId, champions.key))
+    .where(eq(matchParticipants.puuid, puuid))
+    .orderBy(desc(matchDetails.gameCreation))
+    .limit(30);
 }

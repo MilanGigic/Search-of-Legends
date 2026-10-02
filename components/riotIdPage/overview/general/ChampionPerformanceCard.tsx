@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ChampionStatsSkeleton from "../../ChampionStatsSkeleton";
+import { useAccountData } from "../../hooks/useAccountData";
 
 const ChampionPerformanceCard = ({
   puuid,
@@ -16,32 +17,24 @@ const ChampionPerformanceCard = ({
   riotId: string;
   version: string;
 }) => {
-  const [championPerformance, setChampionPerformance] = useState<
-    ChampionPerformance[]
-  >([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      try {
-        const data = await getChampionPerformance(puuid);
-
-        setChampionPerformance(data);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Failed to get champion performance");
-      }
-    })();
-  }, [puuid]);
-
-  const top5 = championPerformance
-    .sort((a, b) => Number(b.gamesPlayed) - Number(a.gamesPlayed))
-    .slice(0, 5);
+  const { data, error, isLoading } = useAccountData(
+    puuid,
+    getChampionPerformance,
+  );
 
   if (isLoading) {
     return <ChampionStatsSkeleton />;
   }
+
+  if (!data) {
+    return (
+      <div className="p-5 py-3 border border-gray-700/70 rounded-md text-sm text-red-400">
+        {error}
+      </div>
+    );
+  }
+
+  const top5 = data.slice(0, 5);
 
   return (
     <div className="pt-5 border border-gray-700/70 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#121624] to-[#1B1F35]  shadow-sm shadow-[#2A2A40]">

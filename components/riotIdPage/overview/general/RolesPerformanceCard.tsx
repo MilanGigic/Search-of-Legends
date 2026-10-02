@@ -4,29 +4,51 @@ import { getRolePerformance } from "@/actions/performance/getRolePerformance";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import RoleStatsSkeleton from "../../RoleStatsSkeleton";
+import { useAccountData } from "../../hooks/useAccountData";
+import { winRateColor, winRatePercent } from "@/lib/winrate";
+
+const ROLE_META: Record<string, { label: string; icon: string }> = {
+  TOP: {
+    label: "TOP",
+    icon: "https://wiki.leagueoflegends.com/en-us/images/Top_icon.png?58442",
+  },
+  JUNGLE: {
+    label: "JUNGLE",
+    icon: "https://wiki.leagueoflegends.com/en-us/images/Jungle_icon.png?9225d",
+  },
+  MIDDLE: {
+    label: "MID",
+    icon: "https://wiki.leagueoflegends.com/en-us/images/Middle_icon.png?fa3f0",
+  },
+  BOTTOM: {
+    label: "ADC",
+    icon: "https://wiki.leagueoflegends.com/en-us/images/Bottom_icon.png?6d4b2",
+  },
+  UTILITY: {
+    label: "SUPPORT",
+    icon: "https://wiki.leagueoflegends.com/en-us/images/Support_icon.png?af1ff",
+  },
+};
 
 const RolesPerformanceCard = ({ puuid }: { puuid: string }) => {
-  const [rolePerformance, setRolePerformance] = useState<RolePerformance[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-
-      try {
-        const data = await getRolePerformance(puuid);
-
-        setRolePerformance(data);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error while getting role performance data");
-      }
-    })();
-  }, [puuid]);
+  const { data, error, isLoading } = useAccountData(puuid, getRolePerformance);
 
   if (isLoading) {
     return <RoleStatsSkeleton />;
   }
+
+  if (!data) {
+    return (
+      <div className="p-5 py-3 border border-gray-700/70 rounded-md text-sm text-red-400">
+        {error}
+      </div>
+    );
+  }
+
+  const rows = data.flatMap((role) => {
+    const meta = role.role ? ROLE_META[role.role] : undefined;
+    return meta ? [{ ...role, meta }] : [];
+  });
 
   return (
     <div className="p-5 py-3 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624]  shadow-sm shadow-[#2A2A40]">
@@ -38,205 +60,39 @@ const RolesPerformanceCard = ({ puuid }: { puuid: string }) => {
         </ul>
 
         <ul className="mt-1">
-          {rolePerformance.map((role, index) => (
-            <li key={role.role}>
-              {role.role === "TOP" ? (
-                <div
-                  className={`text-center grid grid-cols-4 py-1 ${
-                    index < rolePerformance.length - 1 ? "border-b" : ""
-                  }`}
-                >
-                  <div className="col-span-2 w-full">
-                    <div className="flex items-center w-full">
-                      <Image
-                        src={
-                          "https://static.wikia.nocookie.net/leagueoflegends/images/e/ef/Top_icon.png/revision/latest?cb=20181117143602"
-                        }
-                        alt={`${(<div className="p-2 border rounded-sm" />)}`}
-                        width={30}
-                        height={30}
-                      />
-                      <h2 className="font-semibold text-slate-300 flex w-full justify-center mr-8">
-                        TOP
-                      </h2>
-                    </div>
-                  </div>
-                  <div>
-                    <p>{role.gamesPlayed}</p>
-                  </div>
-                  <div>
-                    <p
-                      className={`${
-                        Math.round((role.wins / role.gamesPlayed) * 100) >= 50
-                          ? "text-emerald-600"
-                          : "text-red-700"
-                      }
-                  ${
-                    Math.round((role.wins / role.gamesPlayed) * 100) === 50 &&
-                    "text-white"
-                  }
-                flex items-center justify-center`}
-                    >
-                      {Math.round((role.wins / role.gamesPlayed) * 100)}
-                      <span className="text-gray-300 text-xs">%</span>
-                    </p>
+          {rows.map((role, index) => {
+            const winRate = winRatePercent(role.wins, role.gamesPlayed);
+
+            return (
+              <li
+                key={role.role}
+                className={`text-center grid grid-cols-4 py-1 ${
+                  index < rows.length - 1 ? "border-b" : ""
+                }`}
+              >
+                <div className="col-span-2 w-full">
+                  <div className="flex items-center w-full">
+                    {/* Decorative: the label next to it carries the meaning. */}
+                    <Image src={role.meta.icon} alt="" width={30} height={30} />
+                    <h2 className="font-semibold text-slate-300 flex w-full justify-center mr-8">
+                      {role.meta.label}
+                    </h2>
                   </div>
                 </div>
-              ) : role.role === "JUNGLE" ? (
-                <div className="text-center grid grid-cols-4 border-b py-1">
-                  <div className="col-span-2 w-full">
-                    <div className="flex items-center w-full">
-                      <Image
-                        src={
-                          "https://static.wikia.nocookie.net/leagueoflegends/images/1/1b/Jungle_icon.png/revision/latest?cb=20181117143559"
-                        }
-                        alt={`${(<div className="p-2 border rounded-sm" />)}`}
-                        width={30}
-                        height={30}
-                      />
-                      <h2 className="font-semibold text-slate-300 flex w-full justify-center mr-8">
-                        JUNGLE
-                      </h2>
-                    </div>
-                  </div>
-                  <div>
-                    <p>{role.gamesPlayed}</p>
-                  </div>
-                  <div>
-                    <p
-                      className={`${
-                        Math.round((role.wins / role.gamesPlayed) * 100) >= 50
-                          ? "text-emerald-600"
-                          : "text-red-700"
-                      }
-                  ${
-                    Math.round((role.wins / role.gamesPlayed) * 100) === 50 &&
-                    "text-white"
-                  }
-                flex items-center justify-center`}
-                    >
-                      {Math.round((role.wins / role.gamesPlayed) * 100)}
-                      <span className="text-gray-300 text-xs">%</span>
-                    </p>
-                  </div>
+                <div>
+                  <p>{role.gamesPlayed}</p>
                 </div>
-              ) : role.role === "MIDDLE" ? (
-                <div className="text-center grid grid-cols-4 border-b py-1">
-                  <div className="col-span-2 w-full">
-                    <div className="flex items-center w-full">
-                      <Image
-                        src={
-                          "https://static.wikia.nocookie.net/leagueoflegends/images/9/98/Middle_icon.png/revision/latest?cb=20181117143644"
-                        }
-                        alt={`${(<div className="p-2 border rounded-sm" />)}`}
-                        width={30}
-                        height={30}
-                      />
-                      <h2 className="font-semibold text-slate-300 flex w-full justify-center mr-8">
-                        MID
-                      </h2>
-                    </div>
-                  </div>
-                  <div>
-                    <p>{role.gamesPlayed}</p>
-                  </div>
-                  <div>
-                    <p
-                      className={`${
-                        Math.round((role.wins / role.gamesPlayed) * 100) >= 50
-                          ? "text-emerald-600"
-                          : "text-red-700"
-                      }
-                  ${
-                    Math.round((role.wins / role.gamesPlayed) * 100) === 50 &&
-                    "text-white"
-                  }
-                flex items-center justify-center`}
-                    >
-                      {Math.round((role.wins / role.gamesPlayed) * 100)}
-                      <span className="text-gray-300 text-xs">%</span>
-                    </p>
-                  </div>
+                <div>
+                  <p
+                    className={`${winRateColor(winRate)} flex items-center justify-center`}
+                  >
+                    {winRate}
+                    <span className="text-gray-300 text-xs">%</span>
+                  </p>
                 </div>
-              ) : role.role === "BOTTOM" ? (
-                <div className="text-center grid grid-cols-4 border-b py-1">
-                  <div className="col-span-2 w-full">
-                    <div className="flex items-center w-full">
-                      <Image
-                        src={
-                          "https://static.wikia.nocookie.net/leagueoflegends/images/9/97/Bottom_icon.png/revision/latest?cb=20181117143632"
-                        }
-                        alt={`${(<div className="p-2 border rounded-sm" />)}`}
-                        width={30}
-                        height={30}
-                      />
-                      <h2 className="font-semibold text-slate-300 flex w-full justify-center mr-8">
-                        ADC
-                      </h2>
-                    </div>
-                  </div>
-                  <div>
-                    <p>{role.gamesPlayed}</p>
-                  </div>
-                  <div>
-                    <p
-                      className={`${
-                        Math.round((role.wins / role.gamesPlayed) * 100) >= 50
-                          ? "text-emerald-600"
-                          : "text-red-700"
-                      }
-                  ${
-                    Math.round((role.wins / role.gamesPlayed) * 100) === 50 &&
-                    "text-white"
-                  }
-                flex items-center justify-center`}
-                    >
-                      {Math.round((role.wins / role.gamesPlayed) * 100)}
-                      <span className="text-gray-300 text-xs">%</span>
-                    </p>
-                  </div>
-                </div>
-              ) : role.role === "UTILITY" ? (
-                <div className="text-center grid grid-cols-4 border-b py-1">
-                  <div className="col-span-2 w-full">
-                    <div className="flex items-center w-full">
-                      <Image
-                        src={
-                          "https://static.wikia.nocookie.net/leagueoflegends/images/e/e0/Support_icon.png/revision/latest?cb=20181117143601"
-                        }
-                        alt={`${(<div className="p-2 border rounded-sm" />)}`}
-                        width={30}
-                        height={30}
-                      />
-                      <h2 className="font-semibold text-slate-300 flex w-full justify-center mr-8">
-                        SUPPORT
-                      </h2>
-                    </div>
-                  </div>
-                  <div>
-                    <p>{role.gamesPlayed}</p>
-                  </div>
-                  <div>
-                    <p
-                      className={`${
-                        Math.round((role.wins / role.gamesPlayed) * 100) >= 52
-                          ? "text-emerald-600"
-                          : "text-red-700"
-                      }
-                  ${
-                    Math.round((role.wins / role.gamesPlayed) * 100) === 50 &&
-                    "text-white"
-                  }
-                  flex items-center justify-center`}
-                    >
-                      {Math.round((role.wins / role.gamesPlayed) * 100)}
-                      <span className="text-gray-300 text-xs">%</span>
-                    </p>
-                  </div>
-                </div>
-              ) : null}
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>

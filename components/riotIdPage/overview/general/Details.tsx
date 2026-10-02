@@ -314,7 +314,7 @@ const Details = ({
         <div className="w-1/3 p-2 mt-4 border border-gray-700/70 shadow-sm shadow-[#2A2A40] bg-gradient-to-b from-[#1e2238] to-[#2a2f4a] rounded-md flex flex-col items-center">
           <header className="text-sm sm:text-base text-slate-300 font-semibold mb-2 ml-2 text-center items-center flex flex-col sm:flex-row gap-1">
             <Image
-              src={`https://raw.communitydragon.org/latest/game/assets/ux/traiticons/trait_icon_4_duelist.png`}
+              src={`https://wiki.leagueoflegends.com/en-us/images/Duelist_TFT_icon.svg?c69f3`}
               alt={`${(
                 <GiCrossedSwords className="text-center items-center flex flex-col w-[20px] h-[20px]" />
               )}`}

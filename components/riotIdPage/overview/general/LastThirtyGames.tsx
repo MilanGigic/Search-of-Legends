@@ -3,9 +3,21 @@
 import { kda } from "@/lib/riot";
 import Image from "next/image";
 import WinrateGauge from "../../../WinrateGauge";
-import { useEffect, useState } from "react";
 import { getLastThirtyMatches } from "@/actions/getLastThirtyMatches";
 import Last30GamesSkeleton from "../../Last30GamesSkeleton";
+import { useAccountData } from "../../hooks/useAccountData";
+import { winRatePercent } from "@/lib/winrate";
+
+type ChampionTotals = {
+  championId: string;
+  championName: string;
+  championImage: string;
+  gamesPlayed: number;
+  wins: number;
+  kills: number;
+  deaths: number;
+  assists: number;
+};
 
 const LastThirtyGames = ({
   puuid,
@@ -14,79 +26,53 @@ const LastThirtyGames = ({
   puuid: string;
   version: string;
 }) => {
-  const [last30ParticipantRows, setLast30ParticipantRows] = useState<
-    LastThirtyMatches[]
-  >([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setIsLoading(true); // reset on puuid change too, not just mount
-    (async () => {
-      const data = await getLastThirtyMatches(puuid);
-      setLast30ParticipantRows(data);
-      setIsLoading(false);
-    })();
-  }, [puuid]);
-
-  let wins = 0;
-  let losses = 0;
-  for (const row of last30ParticipantRows) {
-    if (row.win === 1) wins++;
-    else losses++;
-  }
-  const winRate = wins + losses > 0 ? (wins / (wins + losses)) * 100 : 0;
-
-  const statsByChampion = new Map<
-    string,
-    {
-      gamesPlayed: number;
-      kills: number;
-      deaths: number;
-      assists: number;
-      cs: number;
-      time: number;
-      wins: number;
-      damage: number;
-      championName: string;
-      championImage: string;
-      championId: string;
-    }
-  >();
-
-  for (const row of last30ParticipantRows) {
-    const champId = row.championId!;
-    const existing = statsByChampion.get(champId) || {
-      gamesPlayed: 0,
-      kills: 0,
-      deaths: 0,
-      assists: 0,
-      cs: 0,
-      time: 0,
-      wins: 0,
-      damage: 0,
-    };
-    statsByChampion.set(champId, {
-      gamesPlayed: existing.gamesPlayed + 1,
-      kills: existing.kills + row.kills!,
-      deaths: existing.deaths + row.deaths!,
-      assists: existing.assists + row.assists!,
-      cs: existing.cs + row.cs!,
-      time: existing.time + row.time!,
-      wins: existing.wins + (row.win ? 1 : 0),
-      damage: existing.damage + row.damage!,
-      championImage: row.championImage,
-      championName: row.championName,
-      championId: champId,
-    });
-  }
-
-  const sorted = Array.from(statsByChampion.entries())
-    .sort((a, b) => b[1].gamesPlayed - a[1].gamesPlayed)
-    .slice(0, 3);
+  const { data, error, isLoading } = useAccountData(
+    puuid,
+    getLastThirtyMatches,
+  );
 
   if (isLoading) {
     return <Last30GamesSkeleton />;
   }
+
+  if (!data) {
+    return (
+      <div className="p-5 py-3 border border-gray-700/70 rounded-md text-sm text-red-400">
+        {error}
+      </div>
+    );
+  }
+
+  const wins = data.filter((row) => row.win === 1).length;
+  const losses = data.length - wins;
+  const winRate = data.length > 0 ? (wins / data.length) * 100 : 0;
+
+  const statsByChampion = new Map<string, ChampionTotals>();
+
+  for (const row of data) {
+    const totals = statsByChampion.get(row.championId) ?? {
+      championId: row.championId,
+      championName: row.championName,
+      championImage: row.championImage,
+      gamesPlayed: 0,
+      wins: 0,
+      kills: 0,
+      deaths: 0,
+      assists: 0,
+    };
+
+    totals.gamesPlayed += 1;
+    totals.wins += row.win === 1 ? 1 : 0;
+    totals.kills += row.kills ?? 0;
+    totals.deaths += row.deaths ?? 0;
+    totals.assists += row.assists ?? 0;
+
+    statsByChampion.set(row.championId, totals);
+  }
+
+  const top3 = Array.from(statsByChampion.values())
+    .sort((a, b) => b.gamesPlayed - a.gamesPlayed)
+    .slice(0, 3);
 
   return (
     <div className="p-5 py-3 border border-gray-700/70 text-slate-300 rounded-md flex flex-col gap-1 bg-gradient-to-b from-[#1B1F35] to-[#121624] shadow-sm shadow-[#2A2A40]">
@@ -100,21 +86,25 @@ const LastThirtyGames = ({
           size={100}
         />
       </div>
-      {sorted.map(([, stats], index) => {
-        const avgKills = stats.kills / stats.time;
-        const avgDeaths = stats.deaths / stats.time;
-        const avgAssists = stats.assists / stats.time;
-        const userKda = kda(avgKills, avgDeaths, avgAssists);
+      {top3.map((stats, index) => {
+        // Per-game averages (the old code divided by time played).
+        const userKda = kda(
+          stats.kills / stats.gamesPlayed,
+          stats.deaths / stats.gamesPlayed,
+          stats.assists / stats.gamesPlayed,
+        );
 
         return (
           <div
-            key={index}
-            className={`flex justify-between ${index < sorted.length - 1 && "border-b"} p-1`}
+            key={stats.championId}
+            className={`flex justify-between p-1 ${
+              index < top3.length - 1 ? "border-b" : ""
+            }`}
           >
             <div className="flex items-center justify-center rounded-full">
               <Image
                 src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${stats.championImage}`}
-                alt={`${stats.championName}`}
+                alt={stats.championName}
                 width={44}
                 height={44}
                 className="rounded-full"
@@ -128,7 +118,7 @@ const LastThirtyGames = ({
                   <p>{stats.gamesPlayed - stats.wins}L</p>
                 </div>
                 <p className="text-gray-400 text-xs">
-                  {((stats.wins / stats.gamesPlayed) * 100).toFixed(0)}%
+                  {winRatePercent(stats.wins, stats.gamesPlayed)}%
                 </p>
               </div>
             </div>

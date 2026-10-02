@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
         hostname: "static.wikia.nocookie.net",
         protocol: "https",
       },
+      {
+        hostname: "wiki.leagueoflegends.com",
+        protocol: "https",
+      },
     ],
   },
 };
