@@ -32,9 +32,6 @@ const UserCard = ({
   region: string;
   riotId: string;
 }) => {
-  const [tierImage, setTierImage] = useState<StaticImageData | undefined>(
-    undefined,
-  );
   const [isPending, startTransition] = useTransition();
   const [updateError, setUpdateError] = useState<string | null>(null);
 
@@ -45,44 +42,21 @@ const UserCard = ({
   const rank = accountData.rank;
   const tier = accountData.tier;
 
-  useEffect(() => {
-    if (tier) {
-      switch (tier) {
-        case "IRON":
-          setTierImage(Iron);
-          break;
-        case "BRONZE":
-          setTierImage(Bronze);
-          break;
-        case "SILVER":
-          setTierImage(Silver);
-          break;
-        case "GOLD":
-          setTierImage(Gold);
-          break;
-        case "PLATINUM":
-          setTierImage(Platinum);
-          break;
-        case "EMERALD":
-          setTierImage(Emerald);
-          break;
-        case "DIAMOND":
-          setTierImage(Diamond);
-          break;
-        case "MASTER":
-          setTierImage(Master);
-          break;
-        case "GRANDMASTER":
-          setTierImage(Grandmaster);
-          break;
-        case "CHALLENGER":
-          setTierImage(Challenger);
-          break;
-        default:
-          setTierImage(undefined);
-      }
-    }
-  }, [tier]);
+  const TIER_IMAGES: Record<string, StaticImageData> = {
+    IRON: Iron,
+    BRONZE: Bronze,
+    SILVER: Silver,
+    GOLD: Gold,
+    PLATINUM: Platinum,
+    EMERALD: Emerald,
+    DIAMOND: Diamond,
+    MASTER: Master,
+    GRANDMASTER: Grandmaster,
+    CHALLENGER: Challenger,
+  };
+
+  // inside the component
+  const tierImage = tier ? TIER_IMAGES[tier] : undefined;
 
   const handleUpdate = () => {
     setUpdateError(null);
@@ -97,15 +71,18 @@ const UserCard = ({
   };
 
   const pathname = usePathname();
-  const activeTab: PageContent = pathname.includes("/champions")
+  const activeTab: PageContent = pathname.endsWith("/champions")
     ? "champions"
-    : pathname.includes("/live")
+    : pathname.endsWith("/live")
       ? "live"
       : "overview";
-
   if (!accountData) {
     return null;
   }
+
+  const games = (accountData.wins ?? 0) + (accountData.losses ?? 0);
+  const winRate =
+    games > 0 ? Math.round(((accountData.wins ?? 0) / games) * 100) : 0;
 
   return (
     <div className="container max-w-6xl mx-auto bg-gradient-to-b text-slate-300 from-[#121624] to-[#1B1F35] border-b border-slate-400 shadow-[#2A2A40] px-6 sm:px-4 pt-4">
@@ -160,11 +137,7 @@ const UserCard = ({
                   {rank && (
                     <p className="text-sm text-gray-300">
                       {accountData.wins}W-{accountData.losses}L (
-                      {Math.round(
-                        (accountData.wins! /
-                          (accountData.wins! + accountData.losses!)) *
-                          100,
-                      )}
+                      {Math.round(winRate)}
                       %)
                     </p>
                   )}

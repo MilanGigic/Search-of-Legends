@@ -1,1 +1,5 @@
->> Make the page mobile friendly
+Fetching new accounts doesn't work.
+Rank and division doesn't get updated.
+Last 30 games, champion stats, role stats don't get updated immediately but need a refresh to update.
+Images on role stats don't show.
+Image on Laning phase (at 15) doesn't show.
