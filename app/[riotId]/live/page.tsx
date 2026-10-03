@@ -63,6 +63,8 @@ const LivePage = async ({ params }: AccountPageProps) => {
         championsByKey={championsByKey}
         spellsByKey={spellsByKey}
         runeIcons={runeIcons}
+        gameName={gameName}
+        tagLine={tagLine}
       />
     </div>
   );

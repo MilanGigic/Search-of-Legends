@@ -1,10 +1,10 @@
 "use client";
 
 import { AccountWithHistory } from "@/actions/fetchAccountByName";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ParticipantCard } from "./ParticipantCard";
 import { SoloRank } from "@/lib/riot-rank";
+import NotInGame from "./NotInGame";
 
 type ChampionLookup = Record<number, { id: string; name: string }>;
 
@@ -14,16 +14,21 @@ export default function ClientLivePage({
   championsByKey,
   spellsByKey,
   runeIcons,
+  gameName,
+  tagLine,
 }: {
   accountData: AccountWithHistory;
   version: string;
   championsByKey: ChampionLookup;
   spellsByKey: Record<number, string>;
   runeIcons: Record<number, string>;
+  gameName: string;
+  tagLine: string;
 }) {
   const [data, setData] = useState<CurrentGameInfo | null>(null);
 
   const [ranks, setRanks] = useState<Record<string, SoloRank>>({});
+  const [status, setStatus] = useState<Status>("loading");
 
   useEffect(() => {
     if (!data?.participants) return;
@@ -56,18 +61,65 @@ export default function ClientLivePage({
     })();
   }, [accountData.puuid, accountData.region]);
 
+  type Status = "loading" | "live" | "offline" | "error";
+
+  const checkGame = useCallback(async () => {
+    setStatus("loading");
+    try {
+      const res = await fetch(
+        `/api/get-live-match?puuid=${accountData.puuid}&region=${accountData.region}`,
+      );
+
+      if (res.status === 404) {
+        setData(null);
+        setStatus("offline"); // the only status that means "not in a game"
+        return;
+      }
+      if (!res.ok) {
+        setData(null);
+        setStatus("error");
+        return;
+      }
+
+      setData(await res.json());
+      setStatus("live");
+    } catch {
+      setData(null);
+      setStatus("error");
+    }
+  }, [accountData.puuid, accountData.region]);
+
+  useEffect(() => {
+    checkGame();
+  }, [checkGame]);
+
   console.log("Region:", accountData.region);
 
-  if (!data) {
-    return <div>Not in game</div>;
+  if (status === "loading" && !data) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center text-neutral-400">
+        Checking for a live game...
+      </div>
+    );
+  }
+
+  if (status === "offline" || status === "error" || !data) {
+    return (
+      <NotInGame
+        gameName={gameName}
+        tagLine={tagLine}
+        profileHref={`/${encodeURIComponent(gameName)}-${encodeURIComponent(tagLine)}`}
+        checking={status === "loading"}
+        onRetry={checkGame}
+        variant={status === "error" ? "error" : "offline"}
+      />
+    );
   }
 
   const blueTeamParticipants =
     data.participants?.filter((p) => p.teamId === 100) || [];
   const redTeamParticipants =
     data.participants?.filter((p) => p.teamId === 200) || [];
-
-  console.log("Game id:", data.gameQueueConfigId);
 
   const renderTeam = (participants: typeof blueTeamParticipants) => (
     <div className="flex w-full flex-col items-center gap-4 lg:flex-row lg:gap-3">
