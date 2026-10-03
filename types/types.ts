@@ -251,6 +251,36 @@ interface Position {
   y: number;
 }
 
+interface CurrentGameInfo {
+  gameId: number;
+  mapId: number;
+  gameMode: string;
+  gameType: string;
+  gameLength: number;
+  gameQueueConfigId: number;
+  participants: Participant[];
+}
+
+interface Participant {
+  puuid: string;
+  teamId: number;
+  spell1Id: number;
+  spell2Id: number;
+  championId: number;
+  lastSelectedSkinIndex: number;
+  profileIconId: number;
+  riotId: string;
+  bot: boolean;
+  gameCustomizationObjects: unknown[]; // empty array in sample; adjust if structure is known
+  perks: Perks;
+}
+
+interface Perks {
+  perkIds: number[];
+  perkStyle: number;
+  perkSubStyle: number;
+}
+
 interface Entries {
   queueType: string;
   tier: string;

@@ -41,6 +41,7 @@ export default function ParticipantRow({
     const mappedName = championMap[championName] || championName;
     return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${mappedName}.png`;
   };
+
   return (
     <div className="flex items-center gap-1 sm:gap-2 p-1 sm:p-2 border-b border-gray-600 bg-[#2A2A40] rounded-lg mb-2">
       {/* Champion Image */}

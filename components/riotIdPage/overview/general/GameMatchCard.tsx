@@ -48,11 +48,6 @@ const GameMatchCard = ({
   console.log("Region:", region);
   console.log("Game info matchId:", game.info.matchId);
 
-  // FIX: depend on `game.info.matchId` (a stable primitive) instead of the
-  // `game` object itself. `game` is re-created as a new object/array entry
-  // upstream whenever MatchHistorySection's fetch effect re-runs, so using
-  // it as a dependency caused this effect to re-fire and reset state even
-  // when the actual match data hadn't changed.
   useEffect(() => {
     const currentUser = game.participants?.find((p) => p.puuid === puuid);
     setUser(currentUser || null);
