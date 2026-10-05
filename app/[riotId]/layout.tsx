@@ -17,7 +17,7 @@ export default function RiotIdLayout({
     <>
       <Header showSearch={true} />
       <Sidebar />
-      <div className="w-full flex flex-col sticky top-16 z-50">
+      <div className="w-full flex flex-col sticky top-16 z-20">
         <Suspense fallback={<div className="h-24" />}>
           <UserCardSection params={params} />
         </Suspense>

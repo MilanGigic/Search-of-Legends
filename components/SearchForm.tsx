@@ -145,7 +145,7 @@ export default function SearchForm({
       />
 
       {isPanelOpen && (
-        <div className="absolute top-full mt-2 w-[240px] md:w-md bg-gradient-to-b from-[#121624] to-[#1B1F35] rounded-lg shadow-lg border border-slate-400/50 overflow-hidden z-50">
+        <div className="absolute top-full mt-2 w-[240px] md:w-md bg-gradient-to-b from-[#121624] to-[#1B1F35] rounded-lg shadow-lg border border-slate-400/50 overflow-hidden z-100">
           {loading && (
             <div className="flex gap-4 items-center p-4">
               <div className="w-14 h-14 rounded-full skeleton" />
