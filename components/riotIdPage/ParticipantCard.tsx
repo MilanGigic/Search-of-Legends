@@ -22,6 +22,7 @@ type Props = {
   spellsByKey: Record<number, string>;
   runeIcons: Record<number, string>;
   rank: SoloRank | null;
+  puuid: string;
 };
 
 export function ParticipantCard({
@@ -31,6 +32,7 @@ export function ParticipantCard({
   spellsByKey,
   runeIcons,
   rank,
+  puuid,
 }: Props) {
   const spells = [participant.spell1Id, participant.spell2Id]
     .map((id) => spellsByKey[id])
@@ -82,7 +84,7 @@ export function ParticipantCard({
       <div className="absolute inset-0 bg-gradient-to-b from-neutral-900/80 from-5% via-neutral-900/10 via-20% to-transparent" />
 
       {/* 3. Champion name (top) */}
-      <div className="z-10 text-sm font-medium text-gray-400">
+      <div className={`z-10 text-sm font-medium text-gray-400`}>
         {champ?.name ?? participant.championId}
       </div>
 
@@ -127,7 +129,7 @@ export function ParticipantCard({
         {profileHref ? (
           <Link
             href={profileHref}
-            className="my-2 w-full truncate px-2 text-center text-lg font-medium text-white duration-200 hover:opacity-70"
+            className={`my-2 w-full truncate px-2 text-center text-lg font-medium duration-200 hover:opacity-70 ${participant.puuid === puuid ? "text-amber-400" : "text-white"}`}
           >
             {participant.riotId.split("#")[0]}
           </Link>

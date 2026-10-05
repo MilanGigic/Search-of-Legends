@@ -129,6 +129,7 @@ export default function ClientLivePage({
             spellsByKey={spellsByKey}
             runeIcons={runeIcons}
             rank={ranks[participant.puuid] || null}
+            puuid={accountData.puuid}
           />
         </div>
       ))}
