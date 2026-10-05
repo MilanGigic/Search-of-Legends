@@ -1,10 +1,11 @@
 "use client";
 
 import { AccountWithHistory } from "@/actions/fetchAccountByName";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { ParticipantCard } from "./ParticipantCard";
 import { SoloRank } from "@/lib/riot-rank";
 import NotInGame from "./NotInGame";
+import { LiveGameSkeleton } from "./LiveGameSkeleton";
 
 type ChampionLookup = Record<number, { id: string; name: string }>;
 
@@ -96,11 +97,7 @@ export default function ClientLivePage({
   console.log("Region:", accountData.region);
 
   if (status === "loading" && !data) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center text-neutral-400">
-        Checking for a live game...
-      </div>
-    );
+    return <LiveGameSkeleton />;
   }
 
   if (status === "offline" || status === "error" || !data) {

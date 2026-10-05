@@ -1,14 +1,27 @@
 import fetchChampions from "@/actions/champions/fetchChampions";
 import { fetchAccountByName } from "@/actions/fetchAccountByName";
 import ClientLivePage from "@/components/riotIdPage/ClientLivePage";
+import { LiveGameSkeleton } from "@/components/riotIdPage/LiveGameSkeleton";
 import { fetchLatestVersion } from "@/lib/riot-server";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 interface AccountPageProps {
   params: Promise<{ riotId: string }>;
 }
 
-const LivePage = async ({ params }: AccountPageProps) => {
+const LivePage = ({ params }: AccountPageProps) => {
+  return (
+    <div className="text-white">
+      <Suspense fallback={<LiveGameSkeleton />}>
+        <LiveContent params={params} />
+      </Suspense>
+    </div>
+  );
+};
+export default LivePage;
+
+const LiveContent = async ({ params }: AccountPageProps) => {
   const { riotId } = await params;
   const decodedRiotId = decodeURIComponent(riotId);
   const separator = decodedRiotId.lastIndexOf("-");
@@ -69,4 +82,3 @@ const LivePage = async ({ params }: AccountPageProps) => {
     </div>
   );
 };
-export default LivePage;

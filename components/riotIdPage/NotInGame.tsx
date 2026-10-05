@@ -1,6 +1,3 @@
-// components/riotIdPage/NotInGame.tsx
-import Link from "next/link";
-
 type Props = {
   gameName: string;
   tagLine: string;

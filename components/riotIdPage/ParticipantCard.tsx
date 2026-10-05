@@ -82,7 +82,7 @@ export function ParticipantCard({
       <div className="absolute inset-0 bg-gradient-to-b from-neutral-900/80 from-5% via-neutral-900/10 via-20% to-transparent" />
 
       {/* 3. Champion name (top) */}
-      <div className="z-10 text-sm font-medium text-slate-600">
+      <div className="z-10 text-sm font-medium text-gray-400">
         {champ?.name ?? participant.championId}
       </div>
 
@@ -127,7 +127,7 @@ export function ParticipantCard({
         {profileHref ? (
           <Link
             href={profileHref}
-            className="my-2 w-full truncate px-2 text-center text-lg font-medium text-neutral-100 duration-200 hover:opacity-70"
+            className="my-2 w-full truncate px-2 text-center text-lg font-medium text-white duration-200 hover:opacity-70"
           >
             {participant.riotId.split("#")[0]}
           </Link>
@@ -149,7 +149,7 @@ export function ParticipantCard({
                 </p>
                 <div className="flex items-center gap-1 text-xs justify-center text-center">
                   {rank && (
-                    <p className="text-gray-300">
+                    <p className="text-gray-400">
                       (
                       {Math.round(
                         (rank.wins / (rank.wins + rank.losses)) * 100,
