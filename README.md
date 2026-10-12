@@ -33,7 +33,7 @@ This project is for:
 A live demo or screenshots will be added here as the app matures.
 
 <p align="center">
-  <img src="https://via.placeholder.com/1200x700.png?text=BetterSoL+Demo+Preview" alt="BetterSoL demo preview" width="100%" />
+  <img src="../assets/SoL-Demo.mp4" alt="BetterSoL demo preview" width="100%" />
 </p>
 
 > Replace this placeholder with a real screenshot, mock-up, or exported GIF from the application once available.
@@ -43,7 +43,7 @@ A live demo or screenshots will be added here as the app matures.
 | Category            | Stack                                                                     |
 | ------------------- | ------------------------------------------------------------------------- |
 | Frontend            | Next.js                                                                   |
-| Language            | TypeScript / JavaScript                                                   |
+| Language            | TypeScript                                                                |
 | Styling             | CSS Modules, Tailwind-style utility patterns, or custom component styling |
 | Data Source         | Riot Games API                                                            |
 | Backend / API Layer | Next.js server routes or API integration layer                            |
@@ -76,7 +76,7 @@ npm install
 Create a `.env.local` file in the project root and add your Riot API credentials:
 
 ```bash
-NEXT_PUBLIC_RIOT_API_KEY=your_api_key_here
+RIOT_API_KEY=your_api_key_here
 ```
 
 If the app uses a server-side secret pattern, mirror that setup precisely in your project configuration.
