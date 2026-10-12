@@ -34,7 +34,7 @@ A live demo or screenshots will be added here as the app matures.
 
 <p align="center">
   <video width="100%" controls muted playsinline>
-    <source src="assets/SoL-Demo.mp4" type="video/mp4" />
+    <source src="../assets/SoL-Demo.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 </p>
