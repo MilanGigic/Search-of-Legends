@@ -32,12 +32,9 @@ This project is for:
 
 A live demo or screenshots will be added here as the app matures.
 
-<p align="center">
-  <video width="100%" controls muted playsinline>
-    <source src="../assets/SoL-Demo.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
-</p>
+   <p align="center">
+     <img src="assets/SoL-Demo.gif" alt="BetterSoL demo" width="100%" />
+   </p>
 
 > Replace this placeholder with a real screenshot, mock-up, or exported GIF from the application once available.
 
