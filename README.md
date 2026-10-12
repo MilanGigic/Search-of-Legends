@@ -30,13 +30,9 @@ This project is for:
 
 ## 3. Visuals / Demo
 
-A live demo or screenshots will be added here as the app matures.
-
    <p align="center">
      <img src="assets/SoL-Demo.gif" alt="BetterSoL demo" width="100%" />
    </p>
-
-> Replace this placeholder with a real screenshot, mock-up, or exported GIF from the application once available.
 
 ## 4. Tech Stack
 
@@ -112,18 +108,6 @@ const playerStats = {
   roleBreakdown: ["Mid", "Support"],
 };
 ```
-
-### Explore meta insights
-
-```ts
-const patchInsights = {
-  topPickRate: "32.4%",
-  bestWinRate: "53.8%",
-  currentTier: "S+",
-};
-```
-
-These examples reflect the app's intended workflow: search a player, inspect detailed performance, and understand current champion/meta trends.
 
 ## 7. Contributing
 
