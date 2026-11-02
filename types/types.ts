@@ -273,6 +273,7 @@ interface Participant {
   bot: boolean;
   gameCustomizationObjects: unknown[]; // empty array in sample; adjust if structure is known
   perks: Perks;
+  roleBoundItem: number | null;
 }
 
 interface Perks {
@@ -556,6 +557,8 @@ interface ParticipantData {
   item5: number | null;
   item6: number | null;
 
+  roleBoundItem: number | null;
+
   // Position and lane
   individualPosition: string | null;
   teamPosition: string | null;
@@ -653,6 +656,8 @@ interface DbParticipantData {
   item4: number | null;
   item5: number | null;
   item6: number | null;
+
+  roleBoundItem: number | null;
 
   // Position and lane
   individualPosition: string | null;

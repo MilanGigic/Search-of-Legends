@@ -102,7 +102,7 @@
     --sidebar-ring: oklch(0.708 0 0);
 
     /* Custom App Variables */
-    --bg: #17151b;
+    --bg: #21232e;
     --surface: #201d24;
     --surface-raised: #26222e;
     --text-primary: #ede8e2;
@@ -117,6 +117,8 @@
     --font-body: "Public Sans", sans-serif;
     --font-mono: "IBM Plex Mono", monospace;
   }
+
+  /* #17151b */
 
   .dark {
     /* Radix/Shadcn Dark Variables */

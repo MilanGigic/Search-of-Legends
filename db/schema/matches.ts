@@ -112,6 +112,8 @@ export const matchParticipants = pgTable(
     item5: integer("item5"),
     item6: integer("item6"),
 
+    roleBoundItem: integer("role_bound_item"),
+
     // Position and lane
     individualPosition: text("individual_position"),
     teamPosition: text("team_position"),

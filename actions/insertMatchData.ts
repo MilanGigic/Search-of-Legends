@@ -109,6 +109,7 @@ export default async function insertMatchData(
         item4: p.item4,
         item5: p.item5,
         item6: p.item6,
+        roleBoundItem: p.roleBoundItem,
         individualPosition: p.individualPosition,
         teamPosition: p.teamPosition,
         lane: p.lane,

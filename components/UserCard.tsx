@@ -148,11 +148,8 @@ const UserCard = ({
             )}
           </div>
         </div>
-        <div className="flex flex-col justify-center w-[350px] sm:w-3xl gap-1">
-          <VODCarousel />
-        </div>
       </div>
-      <ul className="flex justify-center gap-4 w-full">
+      <ul className="flex gap-4 w-full">
         <Link
           href={`/${riotId}`}
           className={`border-none bg-transparent w-[100px] ${

@@ -21,7 +21,7 @@ export default function ClientPage({
   const puuid = accountData.puuid;
 
   return (
-    <div className="relative z-10 min-h-screen p-4">
+    <div className="relative z-10 min-h-screen container max-w-6xl mx-auto ">
       <main className="relative z-10 w-full flex flex-col items-center justify-center">
         <div className="w-full flex flex-col md:flex-row h-full justify-center items-center md:items-start">
           <UserStats puuid={puuid} riotId={riotId} version={version} />

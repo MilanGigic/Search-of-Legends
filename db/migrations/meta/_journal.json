@@ -162,6 +162,13 @@
       "when": 1783693943109,
       "tag": "0022_shallow_shocker",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1793623873828,
+      "tag": "0023_solid_phantom_reporter",
+      "breakpoints": true
     }
   ]
 }

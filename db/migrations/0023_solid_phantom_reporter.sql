@@ -1,0 +1,1 @@
+ALTER TABLE "match_participants" ADD COLUMN "role_bound_item" integer;

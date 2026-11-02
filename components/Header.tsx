@@ -45,7 +45,7 @@ const Header = ({ showSearch }: { showSearch?: boolean }) => {
       <div className="flex items-center justify-between w-full">
         {!isOpen && (
           <Link href="/">
-            <Button className="flex items-center px-5 py-2  cursor-pointer bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-300 hover:to-blue-200  font-bold text-lg transition-colors duration-200">
+            <Button className="flex items-center px-5 py-2  cursor-pointer bg-gradient-to-r from-[#1E40AF] to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-400 hover:to-cyan-200 font-bold text-lg transition-colors duration-200">
               <span className="absolute top-0 w-[48px] h-16 [@media(pointer:coarse)]:hidden"></span>
               <span>SoL</span>
             </Button>
@@ -85,7 +85,7 @@ const Header = ({ showSearch }: { showSearch?: boolean }) => {
               </div>
               <Link
                 href="/leaderboard"
-                className="bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-300 hover:to-blue-200  font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"
+                className="bg-gradient-to-r from-[#1E40AF] to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-400 hover:to-cyan-200 font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"
               >
                 <span className="absolute top-0 w-[86px] h-16 [@media(pointer:coarse)]:hidden"></span>
                 Leaderboard
@@ -98,7 +98,7 @@ const Header = ({ showSearch }: { showSearch?: boolean }) => {
               </div>
               <Link
                 href="/champions"
-                className="bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-300 hover:to-blue-200  font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"
+                className="bg-gradient-to-r from-[#1E40AF] to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-400 hover:to-cyan-200 font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"
               >
                 <span className="absolute top-0 w-[70px] h-16 [@media(pointer:coarse)]:hidden"></span>
                 Champions
@@ -109,7 +109,7 @@ const Header = ({ showSearch }: { showSearch?: boolean }) => {
               <>
                 <Link
                   href="/leaderboard"
-                  className="bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-300 hover:to-blue-200  font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"
+                  className="bg-gradient-to-r from-[#1E40AF] to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-400 hover:to-cyan-200 font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"
                 >
                   <span className="absolute top-0 w-[86px] h-12 [@media(pointer:coarse)]:hidden"></span>
                   Leaderboard
@@ -117,7 +117,7 @@ const Header = ({ showSearch }: { showSearch?: boolean }) => {
 
                 <Link
                   href="/champions"
-                  className="bg-gradient-to-r from-sky-600 to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-300 hover:to-blue-200  font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"
+                  className="bg-gradient-to-r from-[#1E40AF] to-cyan-400 text-transparent bg-clip-text hover:bg-gradient-to-l hover:bg-clip-text hover:text-transparent hover:from-blue-400 hover:to-cyan-200 font-bold text-sm md:text-base lg:text-lg cursor-pointer transition-colors duration-200"
                 >
                   <span className="absolute top-0 w-[70px] h-12 [@media(pointer:coarse)]:hidden"></span>
                   Champions
