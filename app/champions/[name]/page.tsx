@@ -140,7 +140,7 @@ const ChampionPage = async ({
     <div className="flex flex-col p-8">
       <HeroSection selectedChampion={champ} />
 
-      <div className="flex w-full justify-between px-10 border-b border-[#EDEAE2]/17">
+      <div className="flex w-full justify-between px-10 border-b border-[#EDEAE2]/17 bg-gradient-to-b from-[#121624] to-[#1B1F35] z-10">
         <Suspense fallback={<SectionSkeleton label="Spell order" />}>
           <SpellOrderLoader
             id={champ.championId!}

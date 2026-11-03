@@ -161,7 +161,7 @@ export default function ChampionsTable({ table }: ChampionsTableProps) {
     (tableVirtualItems[tableVirtualItems.length - 1]?.end ?? 0);
 
   return (
-    <div className="w-full text-white">
+    <div className="w-full text-white bg-[#1E1E2F] z-10">
       {/* ---------- Mobile card list, < 768px ---------- */}
       <div
         ref={cardParentRef}
@@ -198,7 +198,7 @@ export default function ChampionsTable({ table }: ChampionsTableProps) {
         className="hidden overflow-x-auto overflow-y-auto md:block md:max-h-[70vh]"
       >
         <table className="w-full lg:table-fixed">
-          <thead className="sticky top-0 bg-[#121624]">
+          <thead className="sticky top-0 bg-[#121624] z-50">
             {headerGroups.map((hg) => (
               <tr key={hg.id} className="border-b border-gray-700/70">
                 {hg.headers.map((header) => {

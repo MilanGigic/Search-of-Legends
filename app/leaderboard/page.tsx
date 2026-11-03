@@ -109,7 +109,7 @@ const LeaderboardPage = () => {
 
   return (
     <div className="text-white max-w-5xl h-full mt-16 flex flex-col z-10 mx-auto items-center justify-center">
-      <div className="w-full flex justify-between p-4">
+      <div className="container max-w-6xl mx-auto bg-gradient-to-b from-[#1B1F35] to-[#121624] border-b border-slate-400 shadow-[#2A2A40] px-6 sm:px-4 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 z-10">
         {REGIONS.map((region, index) => {
           const displayRegion = getFrontendRegion(region);
           return (
@@ -122,9 +122,9 @@ const LeaderboardPage = () => {
               <h1 className="text-center flex-1 h-full flex flex-col justify-center font-semibold tracking-wider  text-white hover:text-white">
                 {displayRegion}
               </h1>
-              <div
-                className={`absolute bottom-0 left-1/2 h-0.5 w-0 bg-gradient-to-r from-white/25 to-white/35 transition-all duration-300 ease-out transform -translate-x-1/2 ${selectedRegion === region ? "w-full" : "group-hover:w-full"}`}
-              ></div>
+              {selectedRegion === region && (
+                <div className="border border-slate-400 rounded-t-md w-full py-0.5 shadow-inner shadow-sky-500" />
+              )}
             </Button>
           );
         })}

@@ -61,7 +61,7 @@ export default function MatchupsPanel({
   );
 
   return (
-    <div className="text-white px-10 py-4 flex flex-col gap-4 border-b border-[#EDEAE2]/17">
+    <div className="text-white px-10 py-4 flex flex-col gap-4 bg-gradient-to-b from-[#121624] to-[#1B1F35] z-10">
       <h1
         style={{
           color: selectedChampion.accentColor ?? "#edeae2",

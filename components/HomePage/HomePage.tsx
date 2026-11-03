@@ -109,7 +109,7 @@ const HomePage = ({ champions, version }: Props) => {
           </motion.div>
         </section>
 
-        <HomePageFooter isMounted={isMounted} />
+        {/* <HomePageFooter isMounted={isMounted} /> */}
       </main>
     </div>
   );

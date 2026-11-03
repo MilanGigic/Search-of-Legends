@@ -65,7 +65,7 @@ export default function HomePageHero() {
           className="w-full"
         >
           <SearchForm
-            placeholder={"Enter Summoner Name (e.g. Faker#KR1)"}
+            placeholder={"Enter Summoner Name (e.g. Extychhh#EUNE)"}
             version={version}
           />
         </motion.div>

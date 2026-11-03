@@ -116,7 +116,7 @@ export default function BuildBanner({
     );
   }
   return (
-    <div className="text-white px-10 py-4 flex justify-between border-b border-[#EDEAE2]/17">
+    <div className="text-white px-10 py-4 flex justify-between bg-gradient-to-b from-[#1B1F35] to-[#121624] z-10 border-b border-[#EDEAE2]/17">
       {/* RUNES */}
       <div className="flex flex-col gap-4">
         <h1

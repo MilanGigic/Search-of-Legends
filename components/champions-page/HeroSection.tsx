@@ -50,10 +50,10 @@ export default function HeroSection({
       style={{
         color: selectedChampion.accentColor ?? "#edeae2",
       }}
-      className="border-b border-[#EDEAE2]/17"
+      className="border-b border-[#EDEAE2]/17 bg-gradient-to-b from-[#1B1F35] to-[#121624] z-10"
     >
-      <div className="flex gap-[60px] items-center px-10 max-w-[1140px] m-auto">
-        <div>
+      <div className="flex gap-[60px] items-center max-w-[1140px] m-auto">
+        <div className="pl-8">
           <p className="font-mono uppercase tracking-[0.16rem]">
             {selectedChampion.lane} -{" "}
             <span>

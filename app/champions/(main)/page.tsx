@@ -46,7 +46,7 @@ export default function ChampionsPage() {
 
   return (
     <div className="w-full px-4 sm:px-0 sm:w-[600px] md:w-2xl lg:w-4xl xl:w-5xl mx-auto flex flex-col gap-4">
-      <header className="flex items-center justify-center flex-col p-4 bg-gradient-to-b from-[#1B1F35] to-[#121624] border-b border-slate-400 z-50">
+      <header className="flex items-center justify-center flex-col p-4 bg-gradient-to-b from-[#1B1F35] to-[#121624] border-b border-slate-400 z-10">
         <div className="flex flex-col items-center text-center">
           <h1 className="text-white font-semibold text-xl sm:text-2xl">
             Tierlist & Builds Master+
